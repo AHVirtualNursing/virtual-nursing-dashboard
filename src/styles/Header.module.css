@@ -1,0 +1,13 @@
+.header {
+    background-color: lightblue;
+    height: 80px;
+    display: flex;
+    align-items: center;
+}
+  
+.imageContainer {
+    position: relative;
+    width: 120px;
+    height: 68px;
+    margin-left: 10px;
+}

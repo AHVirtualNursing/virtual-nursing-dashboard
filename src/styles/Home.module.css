@@ -1,0 +1,10 @@
+.main {
+  text-align: center;
+}
+
+.imageContainer {
+  position: relative;
+  margin: 0 auto;
+  width: 500px;
+  height: 285px;
+}
