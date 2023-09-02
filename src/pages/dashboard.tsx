@@ -26,7 +26,7 @@ export default function Dashboard() {
         <Header />
         <div>
           <h1>Dashboard Page</h1>
-
+          <p>Test commit</p>
           <div>
             <Button variant="contained" onClick={handleBackButton}>
               Back
