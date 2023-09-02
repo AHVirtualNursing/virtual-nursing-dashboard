@@ -4,8 +4,23 @@ import styles from "@/styles/Dashboard.module.css";
 import { Button } from "@mui/material";
 import { useRouter } from "next/router";
 import Header from "@/components/Header";
+import { useState } from "react";
+import BedIcon from '@mui/icons-material/Bed';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import DashboardSideBar from "@/components/DashboardSideBar";
+import {
+  Box,
+  Typography,
+} from "@mui/material";
 
 const inter = Inter({ subsets: ["latin"] });
+
+export interface ISideBarTab {
+  text: string;
+  key: string;
+  icon: JSX.Element;
+}
 
 export default function Dashboard() {
   const router = useRouter();
@@ -14,6 +29,35 @@ export default function Dashboard() {
     router.back();
   };
 
+  const [currentPage, setCurrentPage] = useState("patients");
+
+  const handleSideBarTabClick = (key: string) => {
+    setCurrentPage(key);
+  };
+
+  const patientsTab: ISideBarTab = {
+    text: "Patients Visualisation",
+    key: "patients",
+    icon: <ApartmentIcon />,
+  };
+
+  const wardsTab: ISideBarTab = {
+    text: "Wards",
+    key: "wards",
+    icon: <BedIcon />,
+  };
+
+  const alertsTab: ISideBarTab = {
+    text: "Alerts",
+    key: "alerts",
+    icon: <NotificationsIcon />,
+  };
+
+  const drawerTabs: ISideBarTab[] = [
+    patientsTab,
+    wardsTab,
+    alertsTab,
+  ];
   return (
     <>
       <Head>
@@ -24,15 +68,44 @@ export default function Dashboard() {
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
         <Header />
-        <div>
-          <h1>Dashboard Page</h1>
-          <p>Test commit</p>
-          <div>
-            <Button variant="contained" onClick={handleBackButton}>
-              Back
-            </Button>
-          </div>
-        </div>
+        <Box sx={{ display: "flex" }}>
+        <DashboardSideBar
+          drawerTabs={drawerTabs}
+          handleSideBarTabClick={handleSideBarTabClick}
+        />
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            bgcolor: "background.default",
+            p: 3,
+            marginTop: "80px",
+          }}
+        >
+          <Box>
+            {currentPage === patientsTab.key && (
+              <>
+                <Typography variant="h3">Patient Visualisation</Typography>
+                <div>
+                  <Button variant="contained" onClick={handleBackButton}>
+                    Back
+                  </Button>
+                </div>
+              </>
+            )}
+            {currentPage === wardsTab.key && (
+              <>
+                <Typography variant="h3">Wards Page</Typography>
+              </>
+            )}
+            {currentPage === alertsTab.key && (
+              <>
+                <Typography variant="h3">Alerts Page</Typography>
+              </>
+            )}
+          </Box>
+        </Box>
+      </Box>
       </main>
     </>
   );
