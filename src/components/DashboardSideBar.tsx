@@ -1,15 +1,41 @@
-import { ISideBarTab } from "@/pages/dashboard";
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import BedIcon from '@mui/icons-material/Bed';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 
-export default function DashboardSideBar({
-  drawerTabs,
-  handleSideBarTabClick,
-}: {
-  drawerTabs: ISideBarTab[];
-  handleSideBarTabClick: (key: string) => void
-}) {
+export interface ISideBarTab {
+  text: string;
+  key: string;
+  icon: JSX.Element;
+}
+
+export default function DashboardSideBar({handleSideBarTabClick} : {handleSideBarTabClick: (key:string) => void}) {
+
   const drawerWidth = 240;
+  const patientsTab: ISideBarTab = {
+    text: "General Patients Visualisation",
+    key: "patients",
+    icon: <ApartmentIcon />,
+  };
 
+  const wardsTab: ISideBarTab = {
+    text: "Wards",
+    key: "wards",
+    icon: <BedIcon />,
+  };
+
+  const alertsTab: ISideBarTab = {
+    text: "Alerts",
+    key: "alerts",
+    icon: <NotificationsIcon />,
+  };
+
+  const drawerTabs: ISideBarTab[] = [
+    patientsTab,
+    wardsTab,
+    alertsTab,
+  ];
+  
   return (
     <Drawer
       sx={{

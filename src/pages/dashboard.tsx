@@ -5,39 +5,35 @@ import { Button, Grid } from "@mui/material";
 import { useRouter } from "next/router";
 import Header from "@/components/Header";
 import { useState } from "react";
-import BedIcon from '@mui/icons-material/Bed';
-import ApartmentIcon from '@mui/icons-material/Apartment';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import DashboardSideBar from "@/components/DashboardSideBar";
-import {
-  Paper,
-  Box,
-  Typography,
-} from "@mui/material";
+import { Paper, Box, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridRowModel} from "@mui/x-data-grid";
 import { styled } from '@mui/material/styles';
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 
 const inter = Inter({ subsets: ["latin"] });
-
-export interface ISideBarTab {
-  text: string;
-  key: string;
-  icon: JSX.Element;
-}
 
 export default function Dashboard() {
   const router = useRouter();
 
-  const handleBackButton = () => {
-    router.back();
+  const handleLogoutButton = () => {
+    router.push('/');
   };
 
-  const [currentPage, setCurrentPage] = useState("patients");
+  console.log(router.query)
+  console.log(router.query['state'])
+  const [currentPage, setCurrentPage] = router.query['state'] === undefined ? useState("patients") : useState(router.query['state']);
 
   const handleSideBarTabClick = (key: string) => {
     setCurrentPage(key);
   };
+
+  const viewPatientVisualisation = (ward: number, room: number, bed: number) => {
+    router.push(`/patientVisualisation?ward=${ward}&room=${room}&bed=${bed}`);
+  }
+
+  const viewWardVisualisation = (ward: number) => {
+    router.push(`/wardVisualisation?ward=${ward}`);
+  }
 
   const beds = [
     { Ward: 1, Room: 1, Bed: 1 },
@@ -79,8 +75,6 @@ export default function Dashboard() {
     }
     return wardsHashMap;
   }
-
-  const wards = groupBedsIntoWards(beds);
 
   const rows: GridRowModel[] = [
     {id: 1, Ward: 1, Room: 1, Bed: 1, Status: "HANDLING"},
@@ -126,38 +120,26 @@ export default function Dashboard() {
   const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     '& .alert-OPEN': {
       backgroundColor: '#FF5151',
+      '&:hover': {
+        cursor: 'pointer',
+        backgroundColor: '#FF5151',
+      }
     },
     '& .alert-HANDLING': {
-      backgroundColor: '#FFA829'
+      backgroundColor: '#FFA829',
+      '&:hover': {
+        cursor: 'pointer',
+        backgroundColor: '#FFA829',
+      }
     },
     '& .alert-COMPLETED': {
-      backgroundColor: '#52F374'
+      backgroundColor: '#52F374',
+      '&:hover': {
+        cursor: 'pointer',
+        backgroundColor: '#52F374',
+      }
     }
   }));
-
-  const patientsTab: ISideBarTab = {
-    text: "Patients Visualisation",
-    key: "patients",
-    icon: <ApartmentIcon />,
-  };
-
-  const wardsTab: ISideBarTab = {
-    text: "Wards",
-    key: "wards",
-    icon: <BedIcon />,
-  };
-
-  const alertsTab: ISideBarTab = {
-    text: "Alerts",
-    key: "alerts",
-    icon: <NotificationsIcon />,
-  };
-
-  const drawerTabs: ISideBarTab[] = [
-    patientsTab,
-    wardsTab,
-    alertsTab,
-  ];
   
   return (
     <>
@@ -170,10 +152,7 @@ export default function Dashboard() {
       <main className={`${styles.main} ${inter.className}`}>
         <Header />
         <Box sx={{ display: "flex" }}>
-        <DashboardSideBar
-          drawerTabs={drawerTabs}
-          handleSideBarTabClick={handleSideBarTabClick}
-        />
+        <DashboardSideBar handleSideBarTabClick={handleSideBarTabClick}/>
         <Box
           component="main"
           sx={{
@@ -183,13 +162,13 @@ export default function Dashboard() {
           }}
         >
           <Box>
-            {currentPage === patientsTab.key && (
+            {currentPage === "patients" && (
               <>
-                <Typography sx = {{marginBottom: '20px'}} variant="h3">Patient Visualisation</Typography>
+                <Typography sx = {{marginBottom: '20px'}} variant="h6">General Patients Visualisation</Typography>
                   <Grid container spacing={3}>
                     {beds.map((bed, index) =>(
                       <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                        <Paper elevation={3} style={{ padding: '16px', backgroundColor: bed.Bed == 1? "#FFA829" : (bed.Bed == 8 ? "#FF5151" : '#52F374') }}>
+                        <Paper sx={{':hover': {cursor: 'pointer'}}} onClick={() => viewPatientVisualisation(bed.Ward, bed.Room, bed.Bed)} elevation={3} style={{ padding: '16px', backgroundColor: bed.Bed == 1? "#FFA829" : (bed.Bed == 8 ? "#FF5151" : '#52F374') }}>
                           <Typography variant="h6">
                              Ward: {bed.Ward}, Room: {bed.Room}, Bed: {bed.Bed}
                           </Typography>
@@ -197,18 +176,18 @@ export default function Dashboard() {
                       </Grid>
                     ))}
                   </Grid>
-                  <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleBackButton}>
+                  <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleLogoutButton}>
                     Temporary Logout
                   </Button>
               </>
             )}
-            {currentPage === wardsTab.key && (
+            {currentPage === "wards" && (
               <>
-                <Typography sx = {{marginBottom: '20px'}} variant="h3">Wards Page</Typography>
+                <Typography sx = {{marginBottom: '20px'}} variant="h6">Wards Page</Typography>
                 <Grid container spacing={3}>
                     {Array.from(groupBedsIntoWards(beds).keys()).map((ward, index) => (
                       <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                        <Paper elevation={3} style={{ padding: '16px' }}>
+                        <Paper sx={{':hover': {cursor: 'pointer'}}} onClick={() => viewWardVisualisation(ward)}elevation={3} style={{ padding: '16px' }}>
                           <Typography variant="h6">
                              Ward: {ward}, Count: {groupBedsIntoWards(beds).get(ward).length} 
                           </Typography>
@@ -216,14 +195,14 @@ export default function Dashboard() {
                       </Grid>
                     ))}
                   </Grid>
-                  <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleBackButton}>
+                  <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleLogoutButton}>
                     Temporary Logout
                   </Button>
               </>
             )}
-            {currentPage === alertsTab.key && (
+            {currentPage === "alerts" && (
               <>
-                <Typography variant="h3">View List of Alerts</Typography>
+                <Typography sx = {{marginBottom: '20px'}} variant="h6">View List of Alerts</Typography>
                 <Box
                   sx={{
                     height: "70%",
@@ -242,15 +221,10 @@ export default function Dashboard() {
                     }}
                     pageSizeOptions={[10]}
                     onRowDoubleClick={() => alert("You clicked me")}
-                    getRowClassName={(params) => 'alert-' + params.row.Status}
-                    sx={{
-                      '& .MuiDataGrid-row:hover': {
-                        cursor: 'pointer'
-                      }
-                    }}
+                    getRowClassName={(params) => `alert-${params.row.Status}`}
                   />
                 </Box>
-                <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleBackButton}>
+                <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleLogoutButton}>
                   Temporary Logout
                 </Button>
               </>
