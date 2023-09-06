@@ -23,7 +23,7 @@ export default function Home() {
             <Image src={"/VND_Logo_JPG.jpg"} alt="Logo" fill priority />
           </div>
           <div>
-          <Button variant="contained">LOGIN</Button>
+            <Button variant="contained">LOGIN</Button>
             <Button variant="contained" href="/dashboard">View Dashboard</Button>
           </div>
         </div>

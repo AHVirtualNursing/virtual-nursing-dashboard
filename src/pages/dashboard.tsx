@@ -14,6 +14,9 @@ import {
   Box,
   Typography,
 } from "@mui/material";
+import { DataGrid, GridColDef, GridRowModel} from "@mui/x-data-grid";
+import { styled } from '@mui/material/styles';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -63,7 +66,7 @@ export default function Dashboard() {
     { Ward: 2, Room: 2, Bed: 8 }
   ];
 
-  function groupBedsIntoWards(beds) {
+  function groupBedsIntoWards(beds: string | any[]) {
     const wardsHashMap = new Map()
     for (let i=0; i<beds.length; i++) {
       const bed = beds[i]
@@ -78,6 +81,59 @@ export default function Dashboard() {
   }
 
   const wards = groupBedsIntoWards(beds);
+
+  const rows: GridRowModel[] = [
+    {id: 1, Ward: 1, Room: 1, Bed: 1, Status: "HANDLING"},
+    {id: 2, Ward: 2, Room: 1, Bed: 1, Status: "HANDLING"},
+    {id: 3, Ward: 1, Room: 1, Bed: 1, Status: "COMPLETED"},
+    {id: 4, Ward: 1, Room: 8, Bed: 8, Status: "OPEN"},
+    {id: 5, Ward: 2, Room: 1, Bed: 8, Status: "OPEN"},
+    {id: 6, Ward: 2, Room: 2, Bed: 1, Status: "HANDLING"},
+    {id: 7, Ward: 2, Room: 2, Bed: 8, Status: "OPEN"}
+  ];
+
+  const columns: GridColDef[] = [
+    { field: "id",
+      headerName: "ID",
+      width: 90
+    },
+    {
+      field: "Ward",
+      headerName: "Ward",
+      width: 90,
+      editable: false
+    },
+    {
+      field: "Room",
+      headerName: "Room",
+      width: 90,
+      editable: false
+    },
+    {
+      field: "Bed",
+      headerName: "Bed",
+      width: 90,
+      editable: false
+    },
+    {
+      field: "Status",
+      headerName: "Status",
+      width: 150,
+      editable: false
+    }
+  ];
+
+  const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+    '& .alert-OPEN': {
+      backgroundColor: '#FF5151',
+    },
+    '& .alert-HANDLING': {
+      backgroundColor: '#FFA829'
+    },
+    '& .alert-COMPLETED': {
+      backgroundColor: '#52F374'
+    }
+  }));
 
   const patientsTab: ISideBarTab = {
     text: "Patients Visualisation",
@@ -130,11 +186,10 @@ export default function Dashboard() {
             {currentPage === patientsTab.key && (
               <>
                 <Typography sx = {{marginBottom: '20px'}} variant="h3">Patient Visualisation</Typography>
-                
                   <Grid container spacing={3}>
                     {beds.map((bed, index) =>(
                       <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                        <Paper elevation={3} style={{ padding: '16px', backgroundColor: bed.Bed == 8 ? "red" : 'lightGreen' }}>
+                        <Paper elevation={3} style={{ padding: '16px', backgroundColor: bed.Bed == 1? "#FFA829" : (bed.Bed == 8 ? "#FF5151" : '#52F374') }}>
                           <Typography variant="h6">
                              Ward: {bed.Ward}, Room: {bed.Room}, Bed: {bed.Bed}
                           </Typography>
@@ -143,9 +198,8 @@ export default function Dashboard() {
                     ))}
                   </Grid>
                   <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleBackButton}>
-                    Back
+                    Temporary Logout
                   </Button>
-                
               </>
             )}
             {currentPage === wardsTab.key && (
@@ -154,7 +208,7 @@ export default function Dashboard() {
                 <Grid container spacing={3}>
                     {Array.from(groupBedsIntoWards(beds).keys()).map((ward, index) => (
                       <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                        <Paper elevation={3} style={{ padding: '16px', backgroundColor: 'lightGreen' }}>
+                        <Paper elevation={3} style={{ padding: '16px' }}>
                           <Typography variant="h6">
                              Ward: {ward}, Count: {groupBedsIntoWards(beds).get(ward).length} 
                           </Typography>
@@ -163,13 +217,42 @@ export default function Dashboard() {
                     ))}
                   </Grid>
                   <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleBackButton}>
-                    Back
+                    Temporary Logout
                   </Button>
               </>
             )}
             {currentPage === alertsTab.key && (
               <>
-                <Typography variant="h3">Alerts Page</Typography>
+                <Typography variant="h3">View List of Alerts</Typography>
+                <Box
+                  sx={{
+                    height: "70%",
+                    width: "100%",
+                  }}
+                >
+                  <StyledDataGrid
+                    rows={rows}
+                    columns={columns}
+                    initialState={{
+                      pagination: {
+                        paginationModel: {
+                          pageSize: 10,
+                        },
+                      },
+                    }}
+                    pageSizeOptions={[10]}
+                    onRowDoubleClick={() => alert("You clicked me")}
+                    getRowClassName={(params) => 'alert-' + params.row.Status}
+                    sx={{
+                      '& .MuiDataGrid-row:hover': {
+                        cursor: 'pointer'
+                      }
+                    }}
+                  />
+                </Box>
+                <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleBackButton}>
+                  Temporary Logout
+                </Button>
               </>
             )}
           </Box>
