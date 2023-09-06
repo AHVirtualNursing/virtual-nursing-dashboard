@@ -39,7 +39,7 @@ const patientVisualisationPage = () => {
               <p>Heart Rate: {vitals.temperature}&#176;C</p>
               <p>Heart Rate: {vitals.spo2}%</p>
             </Box>
-            <Button sx = {{marginTop: '20px'}}variant="contained" onClick={() => router.back}>
+            <Button sx = {{marginTop: '20px'}}variant="contained" onClick={() => router.back()}>
               BACK
             </Button>
           </Box>

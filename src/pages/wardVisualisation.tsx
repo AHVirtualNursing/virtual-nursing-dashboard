@@ -144,7 +144,7 @@ const wardVisualisationPage = () => {
                 }}
             />
             </Box>
-            <Button sx = {{marginTop: '20px'}}variant="contained" onClick={() => router.back}>
+            <Button sx = {{marginTop: '20px'}}variant="contained" onClick={() => router.back()}>
               BACK
             </Button>
           </Box>
