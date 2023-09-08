@@ -14,6 +14,7 @@ import {
   Box,
   Typography,
 } from "@mui/material";
+import { signOut } from 'next-auth/react';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -63,7 +64,7 @@ export default function Dashboard() {
     { Ward: 2, Room: 2, Bed: 8 }
   ];
 
-  function groupBedsIntoWards(beds) {
+  function groupBedsIntoWards(beds: any) {
     const wardsHashMap = new Map()
     for (let i=0; i<beds.length; i++) {
       const bed = beds[i]
@@ -76,8 +77,6 @@ export default function Dashboard() {
     }
     return wardsHashMap;
   }
-
-  const wards = groupBedsIntoWards(beds);
 
   const patientsTab: ISideBarTab = {
     text: "Patients Visualisation",
@@ -113,68 +112,68 @@ export default function Dashboard() {
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
         <Header />
-        <Box sx={{ display: "flex" }}>
-        <DashboardSideBar
-          drawerTabs={drawerTabs}
-          handleSideBarTabClick={handleSideBarTabClick}
-        />
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            bgcolor: "background.default",
-            p: 3,
-          }}
-        >
-          <Box>
-            {currentPage === patientsTab.key && (
-              <>
-                <Typography sx = {{marginBottom: '20px'}} variant="h3">Patient Visualisation</Typography>
-                
+          <Box sx={{ display: "flex" }}>
+          <DashboardSideBar
+            drawerTabs={drawerTabs}
+            handleSideBarTabClick={handleSideBarTabClick}
+          />
+          <Box
+            component="main"
+            sx={{
+              flexGrow: 1,
+              bgcolor: "background.default",
+              p: 3,
+            }}
+          >
+            <Box>
+              {currentPage === patientsTab.key && (
+                <>
+                  <Typography sx = {{marginBottom: '20px'}} variant="h3">Patient Visualisation</Typography>
+                  
+                    <Grid container spacing={3}>
+                      {beds.map((bed, index) =>(
+                        <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                          <Paper elevation={3} style={{ padding: '16px', backgroundColor: bed.Bed == 8 ? "red" : 'lightGreen' }}>
+                            <Typography variant="h6">
+                              Ward: {bed.Ward}, Room: {bed.Room}, Bed: {bed.Bed}
+                            </Typography>
+                          </Paper>
+                        </Grid>
+                      ))}
+                    </Grid>
+                    <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleBackButton}>
+                      Back
+                    </Button>
+                  
+                </>
+              )}
+              {currentPage === wardsTab.key && (
+                <>
+                  <Typography sx = {{marginBottom: '20px'}} variant="h3">Wards Page</Typography>
                   <Grid container spacing={3}>
-                    {beds.map((bed, index) =>(
-                      <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                        <Paper elevation={3} style={{ padding: '16px', backgroundColor: bed.Bed == 8 ? "red" : 'lightGreen' }}>
-                          <Typography variant="h6">
-                             Ward: {bed.Ward}, Room: {bed.Room}, Bed: {bed.Bed}
-                          </Typography>
-                        </Paper>
-                      </Grid>
-                    ))}
-                  </Grid>
-                  <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleBackButton}>
-                    Back
-                  </Button>
-                
-              </>
-            )}
-            {currentPage === wardsTab.key && (
-              <>
-                <Typography sx = {{marginBottom: '20px'}} variant="h3">Wards Page</Typography>
-                <Grid container spacing={3}>
-                    {Array.from(groupBedsIntoWards(beds).keys()).map((ward, index) => (
-                      <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                        <Paper elevation={3} style={{ padding: '16px', backgroundColor: 'lightGreen' }}>
-                          <Typography variant="h6">
-                             Ward: {ward}, Count: {groupBedsIntoWards(beds).get(ward).length} 
-                          </Typography>
-                        </Paper>
-                      </Grid>
-                    ))}
-                  </Grid>
-                  <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleBackButton}>
-                    Back
-                  </Button>
-              </>
-            )}
-            {currentPage === alertsTab.key && (
-              <>
-                <Typography variant="h3">Alerts Page</Typography>
-              </>
-            )}
+                      {Array.from(groupBedsIntoWards(beds).keys()).map((ward, index) => (
+                        <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                          <Paper elevation={3} style={{ padding: '16px', backgroundColor: 'lightGreen' }}>
+                            <Typography variant="h6">
+                              Ward: {ward}, Count: {groupBedsIntoWards(beds).get(ward).length} 
+                            </Typography>
+                          </Paper>
+                        </Grid>
+                      ))}
+                    </Grid>
+                    <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleBackButton}>
+                      Back
+                    </Button>
+                </>
+              )}
+              {currentPage === alertsTab.key && (
+                <>
+                  <Typography variant="h3">Alerts Page</Typography>
+                </>
+              )}
+            </Box>
           </Box>
         </Box>
-      </Box>
       </main>
     </>
   );

@@ -1,7 +1,6 @@
 import React from 'react';
 import styles from '@/styles/Home.module.css';
 import Image from 'next/image';
-import axios from 'axios';
 import {
   Container,
   Typography,
@@ -14,20 +13,21 @@ import {
   Avatar,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { signIn } from 'next-auth/react';
 
 export default function LoginPage() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const identifier = data.get('identifier') as string;
+    const password = data.get('password') as string;
 
-    try {
-      await axios.post(`http://localhost:3001/auth/login`, {
-        identifier: data.get('identifier'),
-        password: data.get('password'),
-      });
-    } catch (error) {
-      console.error('Error:', error);
-    }
+    await signIn('credentials', {
+      identifier: identifier,
+      password: password,
+      redirect: true,
+      callbackUrl: '/dashboard',
+    });
   };
 
   return (
