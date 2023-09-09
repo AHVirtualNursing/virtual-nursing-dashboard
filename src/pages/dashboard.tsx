@@ -14,7 +14,6 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import { signOut } from 'next-auth/react';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -129,7 +128,6 @@ export default function Dashboard() {
               {currentPage === patientsTab.key && (
                 <>
                   <Typography sx = {{marginBottom: '20px'}} variant="h3">Patient Visualisation</Typography>
-                  
                     <Grid container spacing={3}>
                       {beds.map((bed, index) =>(
                         <Grid item xs={12} sm={6} md={4} lg={3} key={index}>

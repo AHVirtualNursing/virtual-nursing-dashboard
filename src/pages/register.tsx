@@ -1,33 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from '@/styles/Home.module.css';
+import { useRouter } from 'next/router';
 import Image from 'next/image';
 import {
   Container,
   Typography,
   Box,
-  Grid,
-  Link,
   TextField,
   Button,
   CssBaseline,
   Avatar,
+  Grid,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { signIn } from 'next-auth/react';
+import axios from 'axios';
 
 export default function LoginPage() {
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const router = useRouter();
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const identifier = data.get('identifier') as string;
+    const username = data.get('username') as string;
+    const email = data.get('email') as string;
     const password = data.get('password') as string;
 
-    await signIn('credentials', {
-      identifier: identifier,
-      password: password,
-      redirect: true,
-      callbackUrl: '/dashboard',
-    });
+    try {
+      const res = await axios.post('http://localhost:3001/auth/register', {
+        username: username,
+        email: email,
+        password: password,
+      });
+
+      if (res.status === 201) {
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          router.push('/login');
+        }, 1500);
+      }
+
+
+    } catch (err) {
+      setShowErrorMessage(true);
+      console.log(err);
+    }
   };
 
   return (
@@ -48,7 +66,7 @@ export default function LoginPage() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component='h1' variant='h5'>
-            Sign in
+            Register New Nurse
           </Typography>
           <Box
             component='form'
@@ -59,10 +77,21 @@ export default function LoginPage() {
               margin='normal'
               required
               fullWidth
-              id='identifier'
-              label='Email Address or Username'
-              name='identifier'
+              id='username'
+              label='Username'
+              name='username'
+              autoComplete='username'
+              autoFocus
+            />
+            <TextField
+              margin='normal'
+              required
+              fullWidth
+              id='email'
+              label='Email Address'
+              name='email'
               autoComplete='email'
+              error={showErrorMessage}
               autoFocus
             />
             <TextField
@@ -80,15 +109,13 @@ export default function LoginPage() {
               fullWidth
               variant='contained'
               sx={{ mt: 3, mb: 2 }}>
-              Sign In
+              Register
             </Button>
-            <Grid container>
-              <Grid item>
-                <Link href='/register' variant='body2'>
-                  {"Register New Nurse"}
-                </Link>
+            {showSuccessMessage ? (
+              <Grid>
+                <p className='text-green-600'>New nurse created. Redirecting to login..</p>
               </Grid>
-            </Grid>
+            ) : null}
           </Box>
         </Box>
       </Container>

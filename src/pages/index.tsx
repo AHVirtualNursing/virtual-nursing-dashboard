@@ -20,6 +20,9 @@ export default function Home() {
             <Link href='/login'>
               <Button variant='contained'>LOGIN</Button>
             </Link>
+            <Link href='/register'>
+              <Button variant='contained'>REGISTER</Button>
+            </Link>
             <Button variant="contained" href="/dashboard">
               View Dashboard
             </Button>
