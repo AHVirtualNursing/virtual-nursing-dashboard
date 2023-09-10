@@ -205,9 +205,11 @@ export default function Dashboard() {
             <Box>
               {currentPage === "patients" && (
                 <>
-                  <Typography sx={{ marginBottom: "20px" }} variant="h6">
-                    General Patients Visualisation
-                  </Typography>
+                  <Box sx={{ display:"flex"}}>
+                    <Typography sx={{ marginBottom: "20px", flex: "1" }} variant="h6">
+                      General Patients Visualisation
+                    </Typography>
+                  </Box>
                   <Grid container spacing={3}>
                     {allBeds.map((bed, index) => (
                       <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
@@ -239,13 +241,12 @@ export default function Dashboard() {
                       </Grid>
                     ))}
                   </Grid>
-                  <Button
-                    sx={{ marginTop: "20px" }}
-                    variant="contained"
-                    onClick={handleLogoutButton}
-                  >
-                    Temporary Logout
-                  </Button>
+                  <Button 
+                    variant="contained" 
+                    sx={{marginTop: "20px"}} 
+                    href="/createPatient">
+                      Assign New Patient
+                    </Button>
                 </>
               )}
               {currentPage === "wards" && (

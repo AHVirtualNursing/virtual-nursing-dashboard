@@ -6,6 +6,11 @@ import { useRouter } from 'next/router';
 import styles from "@/styles/Dashboard.module.css";
 import Image from 'next/image';
 import profilePic from '../../public/doctor.png'
+import MonitorHeartIcon from '@mui/icons-material/MonitorHeart';
+import ThermostatIcon from '@mui/icons-material/Thermostat';
+import BloodtypeIcon from '@mui/icons-material/Bloodtype';
+import AirIcon from '@mui/icons-material/Air';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,7 +30,6 @@ const patientVisualisationPage = () => {
     spo2: 80
   }
 
-  // You can now use the ward, room, and bed values to render your page content
   return (
     <main className={`${styles.main} ${inter.className}`}>
       <Header />
@@ -52,6 +56,7 @@ const patientVisualisationPage = () => {
                     <Grid item>
                       <Box className={styles.vitalBox}>
                         <p>Respiratory Rate: </p>
+                        <AirIcon/>
                         <Typography variant="h6" fontWeight='bold'>
                           {vitals.respiratoryRate} breaths/min
                         </Typography>
@@ -60,6 +65,7 @@ const patientVisualisationPage = () => {
                     <Grid item>
                       <Box className={styles.vitalBox} >
                         <p>Heart Rate: </p>
+                        <MonitorHeartIcon/>
                         <Typography variant="h6" fontWeight='bold'>
                           {vitals.heartRate} beats/min
                         </Typography>
@@ -68,6 +74,7 @@ const patientVisualisationPage = () => {
                     <Grid item>
                       <Box className={styles.vitalBox}>
                         <p>Blood Pressure: </p>
+                        <BloodtypeIcon/>
                         <Typography variant="h6" fontWeight='bold'>
                           {vitals.bloodPressure} mm/HG
                         </Typography>
@@ -76,6 +83,7 @@ const patientVisualisationPage = () => {
                     <Grid item>
                       <Box className={styles.vitalBox}>
                         <p>Temperature: </p>
+                        <ThermostatIcon/>
                         <Typography variant="h6" fontWeight='bold'>
                           {vitals.temperature}&#176;C
                         </Typography>
@@ -84,6 +92,7 @@ const patientVisualisationPage = () => {
                     <Grid item>
                       <Box className={styles.vitalBox}>
                         <p>SPo2: </p>
+                        <FavoriteIcon/>
                         <Typography variant="h6" fontWeight='bold'>
                           {vitals.spo2}%
                         </Typography>
@@ -97,7 +106,6 @@ const patientVisualisationPage = () => {
               BACK
             </Button>
           </Box>
-        {/* Add your visualization components here */}
       </Box>
     </main>
   );

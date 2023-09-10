@@ -116,7 +116,6 @@ const wardVisualisationPage = () => {
   }
 
 
-  // You can now use the ward, room, and bed values to render your page content
   return (
     <main className={`${styles.main} ${inter.className}`}>
       <Header />
@@ -148,7 +147,6 @@ const wardVisualisationPage = () => {
               BACK
             </Button>
           </Box>
-        {/* Add your visualization components here */}
       </Box>
     </main>
   );
