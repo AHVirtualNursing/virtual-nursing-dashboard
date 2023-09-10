@@ -5,36 +5,35 @@ import { Button, Grid } from "@mui/material";
 import { useRouter } from "next/router";
 import Header from "@/components/Header";
 import { useState } from "react";
-import BedIcon from '@mui/icons-material/Bed';
-import ApartmentIcon from '@mui/icons-material/Apartment';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import DashboardSideBar from "@/components/DashboardSideBar";
-import {
-  Paper,
-  Box,
-  Typography,
-} from "@mui/material";
+import { Paper, Box, Typography } from "@mui/material";
+import { DataGrid, GridColDef, GridRowModel} from "@mui/x-data-grid";
+import { styled } from '@mui/material/styles';
 
 const inter = Inter({ subsets: ["latin"] });
-
-export interface ISideBarTab {
-  text: string;
-  key: string;
-  icon: JSX.Element;
-}
 
 export default function Dashboard() {
   const router = useRouter();
 
-  const handleBackButton = () => {
-    router.back();
+  const handleLogoutButton = () => {
+    router.push('/');
   };
 
-  const [currentPage, setCurrentPage] = useState("patients");
+  console.log(router.query)
+  console.log(router.query['state'])
+  const [currentPage, setCurrentPage] = router.query['state'] === undefined ? useState("patients") : useState(router.query['state']);
 
   const handleSideBarTabClick = (key: string) => {
     setCurrentPage(key);
   };
+
+  const viewPatientVisualisation = (ward: number, room: number, bed: number) => {
+    router.push(`/patientVisualisation?ward=${ward}&room=${room}&bed=${bed}`);
+  }
+
+  const viewWardVisualisation = (ward: number) => {
+    router.push(`/wardVisualisation?ward=${ward}`);
+  }
 
   const beds = [
     { Ward: 1, Room: 1, Bed: 1 },
@@ -63,7 +62,7 @@ export default function Dashboard() {
     { Ward: 2, Room: 2, Bed: 8 }
   ];
 
-  function groupBedsIntoWards(beds: any) {
+  function groupBedsIntoWards(beds: string | any[]) {
     const wardsHashMap = new Map()
     for (let i=0; i<beds.length; i++) {
       const bed = beds[i]
@@ -77,29 +76,70 @@ export default function Dashboard() {
     return wardsHashMap;
   }
 
-  const patientsTab: ISideBarTab = {
-    text: "Patients Visualisation",
-    key: "patients",
-    icon: <ApartmentIcon />,
-  };
-
-  const wardsTab: ISideBarTab = {
-    text: "Wards",
-    key: "wards",
-    icon: <BedIcon />,
-  };
-
-  const alertsTab: ISideBarTab = {
-    text: "Alerts",
-    key: "alerts",
-    icon: <NotificationsIcon />,
-  };
-
-  const drawerTabs: ISideBarTab[] = [
-    patientsTab,
-    wardsTab,
-    alertsTab,
+  const rows: GridRowModel[] = [
+    {id: 1, Ward: 1, Room: 1, Bed: 1, Status: "HANDLING"},
+    {id: 2, Ward: 2, Room: 1, Bed: 1, Status: "HANDLING"},
+    {id: 3, Ward: 1, Room: 1, Bed: 1, Status: "COMPLETED"},
+    {id: 4, Ward: 1, Room: 8, Bed: 8, Status: "OPEN"},
+    {id: 5, Ward: 2, Room: 1, Bed: 8, Status: "OPEN"},
+    {id: 6, Ward: 2, Room: 2, Bed: 1, Status: "HANDLING"},
+    {id: 7, Ward: 2, Room: 2, Bed: 8, Status: "OPEN"}
   ];
+
+  const columns: GridColDef[] = [
+    { field: "id",
+      headerName: "ID",
+      width: 90
+    },
+    {
+      field: "Ward",
+      headerName: "Ward",
+      width: 90,
+      editable: false
+    },
+    {
+      field: "Room",
+      headerName: "Room",
+      width: 90,
+      editable: false
+    },
+    {
+      field: "Bed",
+      headerName: "Bed",
+      width: 90,
+      editable: false
+    },
+    {
+      field: "Status",
+      headerName: "Status",
+      width: 150,
+      editable: false
+    }
+  ];
+
+  const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+    '& .alert-OPEN': {
+      backgroundColor: '#FF5151',
+      '&:hover': {
+        cursor: 'pointer',
+        backgroundColor: '#FF5151',
+      }
+    },
+    '& .alert-HANDLING': {
+      backgroundColor: '#FFA829',
+      '&:hover': {
+        cursor: 'pointer',
+        backgroundColor: '#FFA829',
+      }
+    },
+    '& .alert-COMPLETED': {
+      backgroundColor: '#52F374',
+      '&:hover': {
+        cursor: 'pointer',
+        backgroundColor: '#52F374',
+      }
+    }
+  }));
   
   return (
     <>
@@ -111,67 +151,87 @@ export default function Dashboard() {
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
         <Header />
-          <Box sx={{ display: "flex" }}>
-          <DashboardSideBar
-            drawerTabs={drawerTabs}
-            handleSideBarTabClick={handleSideBarTabClick}
-          />
-          <Box
-            component="main"
-            sx={{
-              flexGrow: 1,
-              bgcolor: "background.default",
-              p: 3,
-            }}
-          >
-            <Box>
-              {currentPage === patientsTab.key && (
-                <>
-                  <Typography sx = {{marginBottom: '20px'}} variant="h3">Patient Visualisation</Typography>
-                    <Grid container spacing={3}>
-                      {beds.map((bed, index) =>(
-                        <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                          <Paper elevation={3} style={{ padding: '16px', backgroundColor: bed.Bed == 8 ? "red" : 'lightGreen' }}>
-                            <Typography variant="h6">
-                              Ward: {bed.Ward}, Room: {bed.Room}, Bed: {bed.Bed}
-                            </Typography>
-                          </Paper>
-                        </Grid>
-                      ))}
-                    </Grid>
-                    <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleBackButton}>
-                      Back
-                    </Button>
-                  
-                </>
-              )}
-              {currentPage === wardsTab.key && (
-                <>
-                  <Typography sx = {{marginBottom: '20px'}} variant="h3">Wards Page</Typography>
+        <Box sx={{ display: "flex" }}>
+        <DashboardSideBar handleSideBarTabClick={handleSideBarTabClick}/>
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            bgcolor: "background.default",
+            p: 3,
+          }}
+        >
+          <Box>
+            {currentPage === "patients" && (
+              <>
+                <Typography sx = {{marginBottom: '20px'}} variant="h6">General Patients Visualisation</Typography>
                   <Grid container spacing={3}>
-                      {Array.from(groupBedsIntoWards(beds).keys()).map((ward, index) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                          <Paper elevation={3} style={{ padding: '16px', backgroundColor: 'lightGreen' }}>
-                            <Typography variant="h6">
-                              Ward: {ward}, Count: {groupBedsIntoWards(beds).get(ward).length} 
-                            </Typography>
-                          </Paper>
-                        </Grid>
-                      ))}
-                    </Grid>
-                    <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleBackButton}>
-                      Back
-                    </Button>
-                </>
-              )}
-              {currentPage === alertsTab.key && (
-                <>
-                  <Typography variant="h3">Alerts Page</Typography>
-                </>
-              )}
-            </Box>
+                    {beds.map((bed, index) =>(
+                      <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                        <Paper sx={{':hover': {cursor: 'pointer'}}} onClick={() => viewPatientVisualisation(bed.Ward, bed.Room, bed.Bed)} elevation={3} style={{ padding: '16px', backgroundColor: bed.Bed == 1? "#FFA829" : (bed.Bed == 8 ? "#FF5151" : '#52F374') }}>
+                          <Typography variant="h6">
+                             Ward: {bed.Ward}, Room: {bed.Room}, Bed: {bed.Bed}
+                          </Typography>
+                        </Paper>
+                      </Grid>
+                    ))}
+                  </Grid>
+                  <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleLogoutButton}>
+                    Temporary Logout
+                  </Button>
+              </>
+            )}
+            {currentPage === "wards" && (
+              <>
+                <Typography sx = {{marginBottom: '20px'}} variant="h6">Wards Page</Typography>
+                <Grid container spacing={3}>
+                    {Array.from(groupBedsIntoWards(beds).keys()).map((ward, index) => (
+                      <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                        <Paper sx={{':hover': {cursor: 'pointer'}}} onClick={() => viewWardVisualisation(ward)}elevation={3} style={{ padding: '16px' }}>
+                          <Typography variant="h6">
+                             Ward: {ward}, Count: {groupBedsIntoWards(beds).get(ward).length} 
+                          </Typography>
+                        </Paper>
+                      </Grid>
+                    ))}
+                  </Grid>
+                  <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleLogoutButton}>
+                    Temporary Logout
+                  </Button>
+              </>
+            )}
+            {currentPage === "alerts" && (
+              <>
+                <Typography sx = {{marginBottom: '20px'}} variant="h6">View List of Alerts</Typography>
+                <Box
+                  sx={{
+                    height: "70%",
+                    width: "100%",
+                  }}
+                >
+                  <StyledDataGrid
+                    rows={rows}
+                    columns={columns}
+                    initialState={{
+                      pagination: {
+                        paginationModel: {
+                          pageSize: 10,
+                        },
+                      },
+                    }}
+                    pageSizeOptions={[10]}
+                    onRowDoubleClick={() => alert("You clicked me")}
+                    getRowClassName={(params) => `alert-${params.row.Status}`}
+                  />
+                </Box>
+                <Button sx = {{marginTop: '20px'}}variant="contained" onClick={handleLogoutButton}>
+                  Temporary Logout
+                </Button>
+              </>
+            )}
           </Box>
         </Box>
+      </Box>
       </main>
     </>
   );
