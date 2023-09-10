@@ -22,7 +22,7 @@ export default function DashboardSideBar({
 }: {
   handleSideBarTabClick: (key: string) => void;
 }) {
-  const [activeTab, setActiveTab] = useState("");
+  const [activeTab, setActiveTab] = useState("patients");
 
   const drawerWidth = 240;
   const patientsTab: ISideBarTab = {

@@ -1,9 +1,11 @@
 import DashboardSideBar from '@/components/DashboardSideBar';
 import Header from '@/components/Header';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Grid, Paper, Typography } from '@mui/material';
 import { Inter } from 'next/font/google';
 import { useRouter } from 'next/router';
 import styles from "@/styles/Dashboard.module.css";
+import Image from 'next/image';
+import profilePic from '../../public/doctor.png'
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,12 +34,64 @@ const patientVisualisationPage = () => {
           <Box component="main" sx={{flexGrow: 1, bgcolor: "background.default", p:3}}>
             <Box>
               <Typography sx= {{marginBottom: '20px'}} variant="h6">Patient Visualisation</Typography>
-              <p>Ward: {ward}, Room: {room}, Bed: {bed} </p>
-              <p>Heart Rate: {vitals.heartRate} beats/min</p>
-              <p>Respiratory Rate: {vitals.respiratoryRate} breaths/min</p>
-              <p>Blood Pressure: {vitals.bloodPressure} mm/Hg</p>
-              <p>Heart Rate: {vitals.temperature}&#176;C</p>
-              <p>Heart Rate: {vitals.spo2}%</p>
+              <Box sx={{display: "flex", justifyContent: "space-evenly"}}>
+                <Box>
+                  <Box>
+                    <Image src={profilePic} alt="Picture of Patient" />
+                  </Box>
+                  <Box sx={{paddingTop: '20px', textAlign: 'left'}}>
+                    <h3>Lee Wei Guang</h3>
+                    <p>Ward: {ward}</p>
+                    <p>Room: {room}</p>
+                    <p>Bed: {bed} </p>
+                    <p>Nurse in charge: Carol</p>
+                  </Box>
+                </Box>
+                <Box>
+                  <Grid container spacing={2} justifyContent="space-evenly">
+                    <Grid item>
+                      <Box className={styles.vitalBox}>
+                        <p>Respiratory Rate: </p>
+                        <Typography variant="h6" fontWeight='bold'>
+                          {vitals.respiratoryRate} breaths/min
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item>
+                      <Box className={styles.vitalBox} >
+                        <p>Heart Rate: </p>
+                        <Typography variant="h6" fontWeight='bold'>
+                          {vitals.heartRate} beats/min
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item>
+                      <Box className={styles.vitalBox}>
+                        <p>Blood Pressure: </p>
+                        <Typography variant="h6" fontWeight='bold'>
+                          {vitals.bloodPressure} mm/HG
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item>
+                      <Box className={styles.vitalBox}>
+                        <p>Temperature: </p>
+                        <Typography variant="h6" fontWeight='bold'>
+                          {vitals.temperature}&#176;C
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item>
+                      <Box className={styles.vitalBox}>
+                        <p>SPo2: </p>
+                        <Typography variant="h6" fontWeight='bold'>
+                          {vitals.spo2}%
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Box>
             </Box>
             <Button sx = {{marginTop: '20px'}}variant="contained" onClick={() => router.back()}>
               BACK
