@@ -1,7 +1,15 @@
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
-import BedIcon from '@mui/icons-material/Bed';
-import ApartmentIcon from '@mui/icons-material/Apartment';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+import BedIcon from "@mui/icons-material/Bed";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import { useState } from "react";
 
 export interface ISideBarTab {
   text: string;
@@ -9,7 +17,12 @@ export interface ISideBarTab {
   icon: JSX.Element;
 }
 
-export default function DashboardSideBar({handleSideBarTabClick} : {handleSideBarTabClick: (key:string) => void}) {
+export default function DashboardSideBar({
+  handleSideBarTabClick,
+}: {
+  handleSideBarTabClick: (key: string) => void;
+}) {
+  const [activeTab, setActiveTab] = useState("");
 
   const drawerWidth = 240;
   const patientsTab: ISideBarTab = {
@@ -30,12 +43,8 @@ export default function DashboardSideBar({handleSideBarTabClick} : {handleSideBa
     icon: <NotificationsIcon />,
   };
 
-  const drawerTabs: ISideBarTab[] = [
-    patientsTab,
-    wardsTab,
-    alertsTab,
-  ];
-  
+  const drawerTabs: ISideBarTab[] = [patientsTab, wardsTab, alertsTab];
+
   return (
     <Drawer
       sx={{
@@ -55,9 +64,14 @@ export default function DashboardSideBar({handleSideBarTabClick} : {handleSideBa
           <ListItem
             key={tab.text}
             disablePadding
-            onClick={() => handleSideBarTabClick(tab.key)}
+            onClick={() => {
+              handleSideBarTabClick(tab.key);
+              setActiveTab(tab.key);
+            }}
           >
-            <ListItemButton>
+            <ListItemButton
+              className={activeTab === tab.key ? "bg-blue-200" : ""}
+            >
               <ListItemIcon>{tab.icon}</ListItemIcon>
               <ListItemText primary={tab.text} />
             </ListItemButton>
