@@ -11,16 +11,34 @@ import ThermostatIcon from '@mui/icons-material/Thermostat';
 import BloodtypeIcon from '@mui/icons-material/Bloodtype';
 import AirIcon from '@mui/icons-material/Air';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { useEffect, useState } from 'react';
+import { Patient } from '@/models/patient';
+import axios from 'axios';
 
 const inter = Inter({ subsets: ["latin"] });
 
 const patientVisualisationPage = () => {
   const router = useRouter();
-  const { ward, room, bed } = router.query;
+  const { patientId, wardNum, roomNum, bedNum } = router.query;
   
   const handleSideBarTabClick = (key: string) => {
     router.push({pathname: "/dashboard", query: {state : key}}, '/dashboard' );
   };
+
+  const [selectedPatient, setSelectedPatient] = useState<Patient>();
+
+  useEffect(() => {
+    const selectPatientById = async () => {
+      try {
+        await axios.get('http://localhost:3001/patient/' + patientId).then((res) => {
+          setSelectedPatient(res.data);
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    selectPatientById();
+  }, []);
 
   const vitals = {
     heartRate: 60,
@@ -44,11 +62,11 @@ const patientVisualisationPage = () => {
                     <Image src={profilePic} alt="Picture of Patient" />
                   </Box>
                   <Box sx={{paddingTop: '20px', textAlign: 'left'}}>
-                    <h3>Lee Wei Guang</h3>
-                    <p>Ward: {ward}</p>
-                    <p>Room: {room}</p>
-                    <p>Bed: {bed} </p>
-                    <p>Nurse in charge: Carol</p>
+                    <h3>{selectedPatient?.name}</h3>
+                    <p>Ward: {wardNum}</p>
+                    <p>Room: {roomNum}</p>
+                    <p>Bed: {bedNum} </p>
+                    <p>Nurse in charge: HARDCODED</p>
                   </Box>
                 </Box>
                 <Box>

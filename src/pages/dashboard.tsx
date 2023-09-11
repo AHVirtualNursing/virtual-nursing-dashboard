@@ -30,7 +30,6 @@ export default function Dashboard() {
 
   const [allBeds, setAllBeds] = useState<SmartBed[]>([]);
 
-  // fetch smartbed data from mongo here
   useEffect(() => {
     const fetchAllBeds = async () => {
       try {
@@ -49,11 +48,12 @@ export default function Dashboard() {
   };
 
   const viewPatientVisualisation = (
-    ward: number,
-    room: number,
-    bed: number
+    patientId: string | undefined,
+    wardNum: number,
+    roomNum: number,
+    bedNum: number
   ) => {
-    router.push(`/patientVisualisation?ward=${ward}&room=${room}&bed=${bed}`);
+    router.push(`/patientVisualisation?patientId=${patientId}&wardNum=${wardNum}&roomNum=${roomNum}&bedNum=${bedNum}`);
   };
 
   const viewWardVisualisation = (ward: number | undefined) => {
@@ -192,16 +192,12 @@ export default function Dashboard() {
                     </Typography>
                   </Box>
                   <Grid container spacing={3}>
-                    {allBeds.map((bed, index) => (
-                      <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                    {allBeds.map((bed) => (
+                      <Grid item xs={12} sm={6} md={4} lg={3} key={bed._id}>
                         <Paper
                           sx={{ ":hover": { cursor: "pointer" } }}
                           onClick={() =>
-                            viewPatientVisualisation(
-                              bed.ward.num,
-                              bed.roomNum,
-                              bed.bedNum
-                            )
+                            viewPatientVisualisation(bed.patient?._id, bed.ward.num, bed.roomNum, bed.bedNum)
                           }
                           elevation={3}
                           style={{

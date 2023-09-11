@@ -1,6 +1,7 @@
 import { Patient } from "./patient";
 
 export class Reminder {
+    _id: string;
     content: string;
     isComplete: boolean;
     createdBy: string;
@@ -8,12 +9,14 @@ export class Reminder {
     picture?: string;
 
     constructor(
+        _id: string,
         content: string,
         isComplete: boolean,
         createdBy: string,
         patient: Patient,
         picture?: string
     ) {
+        this._id = _id;
         this.content = content;
         this.isComplete = isComplete;
         this.createdBy = createdBy;

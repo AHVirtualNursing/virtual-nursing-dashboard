@@ -3,6 +3,7 @@ import { Reminder } from "./reminder";
 import { Vital } from "./vital";
 
 export class Patient {
+    _id: string;
     name: string;
     nric: string;
     condition: string;
@@ -19,6 +20,7 @@ export class Patient {
     vital?: Vital;
 
     constructor(
+        _id: string,
         name: string,
         nric: string,
         condition: string,
@@ -34,6 +36,7 @@ export class Patient {
         isDischarged?: boolean,
         vital?: Vital,
         ) {
+        this._id = _id;
         this.name = name;
         this.nric = nric;
         this.picture = picture;
