@@ -16,9 +16,10 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import axios from "axios";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
-  const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -28,11 +29,19 @@ export default function LoginPage() {
     const password = data.get("password") as string;
 
     try {
-      const res = await axios.post("http://localhost:3001/auth/register", {
-        username: username,
-        email: email,
-        password: password,
-      });
+      const res = await axios.post(
+        "http://localhost:3001/auth/register",
+        {
+          username: username,
+          email: email,
+          password: password,
+        },
+        {
+          headers: {
+            "X-UserType": "mobile",
+          },
+        }
+      );
 
       if (res.status === 201) {
         setShowSuccessMessage(true);
@@ -64,7 +73,7 @@ export default function LoginPage() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Register New Nurse
+            Register New Mobile Nurse
           </Typography>
           <Box
             component="form"
@@ -115,7 +124,7 @@ export default function LoginPage() {
             {showSuccessMessage ? (
               <Grid>
                 <p className="text-green-600">
-                  New nurse created. Redirecting to login..
+                  New mobile nurse created. Redirecting to home page..
                 </p>
               </Grid>
             ) : null}

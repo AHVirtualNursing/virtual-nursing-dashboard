@@ -1,21 +1,29 @@
-import NextAuth from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import axios from 'axios';
+import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import axios from "axios";
 
 export default NextAuth({
   providers: [
     CredentialsProvider({
-      name: 'Credentials',
+      name: "Credentials",
 
       credentials: {
-        identifier: { label: 'Identifier', type: 'text' },
-        password: { label: 'Password', type: 'password' },
+        identifier: { label: "Identifier", type: "text" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const res = await axios.post(`http://localhost:3001/auth/login`, {
-          identifier: credentials?.identifier,
-          password: credentials?.password,
-        });
+        const res = await axios.post(
+          `http://localhost:3001/auth/login`,
+          {
+            identifier: credentials?.identifier,
+            password: credentials?.password,
+          },
+          {
+            headers: {
+              "X-UserType": "virtual-nurse",
+            },
+          }
+        );
 
         if (res.status === 200) {
           return { id: res.data.user._id };
@@ -27,7 +35,7 @@ export default NextAuth({
   ],
 
   pages: {
-    signIn: '/login',
+    signIn: "/login",
   },
 
   secret: process.env.NEXTAUTH_SECRET,
