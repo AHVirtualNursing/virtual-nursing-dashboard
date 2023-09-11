@@ -14,18 +14,19 @@ const handleSideBarTabClick = (key: string) => {
 
 
 function createPatient() {
-    const [bedAssigned, setAssignedBed] = React.useState("");
+  const [bedAssigned, setAssignedBed] = React.useState("");
 
-    const handleChange = (event: SelectChangeEvent) => {
-        setAssignedBed(event.target.value);
-    }
+  const handleChange = (event: SelectChangeEvent) => {
+      setAssignedBed(event.target.value);
+  }
+
   return (
     <main className={`${styles.main} ${inter.className}`}>
       <Header />
       <Box sx={{ display: "flex" }}>
         <DashboardSideBar handleSideBarTabClick={handleSideBarTabClick}/>
           <Box component="main" sx={{flexGrow: 1, bgcolor: "background.default", p:3}}>
-            <Typography sx= {{marginBottom: '20px'}} variant="h6">Create New Patient/Assign To Bed</Typography>
+            <Typography sx= {{marginBottom: '20px', textAlign: "left"}} variant="h6">Create New Patient/Assign To Bed</Typography>
             <TextField
                 margin='normal'
                 required

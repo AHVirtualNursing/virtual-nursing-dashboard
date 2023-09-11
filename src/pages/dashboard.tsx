@@ -10,6 +10,7 @@ import { Paper, Box, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridRowModel } from "@mui/x-data-grid";
 import { styled } from "@mui/material/styles";
 import axios from "axios";
+import { SmartBed } from "@/models/smartBed";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,33 +28,13 @@ export default function Dashboard() {
       ? useState("patients")
       : useState(router.query["state"]);
 
-  // define typing for smartbed object
-  type Smartbed = {
-    bedNum: number;
-    roomNum: number;
-    wardNum: number;
-    patientName: string;
-    occupied: boolean;
-    heartRate: Object[];
-    respiratoryRate: Object[];
-    bloodPressure: Object[];
-    spo2: Object[];
-    temperature: Object[];
-    railsStatus: boolean;
-    note: string;
-    alerts: Object[];
-    alertConfig: undefined;
-    reminders: Object[];
-    reports: Object[];
-  };
-
-  const [allBeds, setAllBeds] = useState<Smartbed[]>([]);
+  const [allBeds, setAllBeds] = useState<SmartBed[]>([]);
 
   // fetch smartbed data from mongo here
   useEffect(() => {
     const fetchAllBeds = async () => {
       try {
-        await axios.get("http://localhost:3001/smartbeds").then((res) => {
+        await axios.get("http://localhost:3001/smartbed").then((res) => {
           setAllBeds(res.data.data);
         });
       } catch (e) {
@@ -75,7 +56,7 @@ export default function Dashboard() {
     router.push(`/patientVisualisation?ward=${ward}&room=${room}&bed=${bed}`);
   };
 
-  const viewWardVisualisation = (ward: number) => {
+  const viewWardVisualisation = (ward: number | undefined) => {
     router.push(`/wardVisualisation?ward=${ward}`);
   };
 
@@ -174,10 +155,10 @@ export default function Dashboard() {
       },
     },
     "& .alert-COMPLETED": {
-      backgroundColor: "#52F374",
+      backgroundColor: "lightgreen",
       "&:hover": {
         cursor: "pointer",
-        backgroundColor: "#52F374",
+        backgroundColor: "lightgreen",
       },
     },
   }));
@@ -206,7 +187,7 @@ export default function Dashboard() {
               {currentPage === "patients" && (
                 <>
                   <Box sx={{ display:"flex"}}>
-                    <Typography sx={{ marginBottom: "20px", flex: "1" }} variant="h6">
+                    <Typography textAlign="left" sx={{ marginBottom: "20px", flex: "1"}} variant="h6">
                       General Patients Visualisation
                     </Typography>
                   </Box>
@@ -217,7 +198,7 @@ export default function Dashboard() {
                           sx={{ ":hover": { cursor: "pointer" } }}
                           onClick={() =>
                             viewPatientVisualisation(
-                              bed.wardNum,
+                              bed.ward.num,
                               bed.roomNum,
                               bed.bedNum
                             )
@@ -230,12 +211,12 @@ export default function Dashboard() {
                                 ? "#FFA829"
                                 : bed.bedNum == 8
                                 ? "#FF5151"
-                                : "#52F374",
+                                : "lightgreen",
                           }}
                         >
+                          <p>{bed.patient ? bed.patient.name : "Vacant Bed"}</p>
                           <Typography variant="h6">
-                            Ward: {bed.wardNum}, Room: {bed.roomNum}, Bed:{""}
-                            {bed.bedNum}
+                            Ward: {bed.ward.num}, Room: {bed.roomNum}, Bed: {bed.bedNum}
                           </Typography>
                         </Paper>
                       </Grid>
@@ -243,15 +224,21 @@ export default function Dashboard() {
                   </Grid>
                   <Button 
                     variant="contained" 
-                    sx={{marginTop: "20px"}} 
+                    sx={{margin: "10px", marginTop: "20px"}} 
                     href="/createPatient">
                       Assign New Patient
-                    </Button>
+                  </Button>
+                  <Button 
+                    variant="contained" 
+                    sx={{margin: "10px", marginTop: "20px"}} 
+                    href="/createPatient">
+                      Discharge Patient
+                  </Button>
                 </>
               )}
               {currentPage === "wards" && (
                 <>
-                  <Typography sx={{ marginBottom: "20px" }} variant="h6">
+                  <Typography textAlign="left"  sx={{ marginBottom: "20px" }} variant="h6">
                     Wards Page
                   </Typography>
                   <Grid container spacing={3}>
@@ -284,7 +271,7 @@ export default function Dashboard() {
               )}
               {currentPage === "alerts" && (
                 <>
-                  <Typography sx={{ marginBottom: "20px" }} variant="h6">
+                  <Typography textAlign="left"  sx={{ marginBottom: "20px" }} variant="h6">
                     View List of Alerts
                   </Typography>
                   <Box
