@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import styles from '@/styles/Home.module.css';
-import { useRouter } from 'next/router';
-import Image from 'next/image';
+import React, { useState } from "react";
+import styles from "@/styles/Home.module.css";
+import { useRouter } from "next/router";
+import Image from "next/image";
 import {
   Container,
   Typography,
@@ -11,9 +11,9 @@ import {
   CssBaseline,
   Avatar,
   Grid,
-} from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import axios from 'axios';
+} from "@mui/material";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import axios from "axios";
 
 export default function LoginPage() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -23,12 +23,12 @@ export default function LoginPage() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const username = data.get('username') as string;
-    const email = data.get('email') as string;
-    const password = data.get('password') as string;
+    const username = data.get("username") as string;
+    const email = data.get("email") as string;
+    const password = data.get("password") as string;
 
     try {
-      const res = await axios.post('http://localhost:3001/auth/register', {
+      const res = await axios.post("http://localhost:3001/auth/register", {
         username: username,
         email: email,
         password: password,
@@ -37,11 +37,9 @@ export default function LoginPage() {
       if (res.status === 201) {
         setShowSuccessMessage(true);
         setTimeout(() => {
-          router.push('/login');
+          router.push("/login");
         }, 1500);
       }
-
-
     } catch (err) {
       setShowErrorMessage(true);
       console.log(err);
@@ -51,69 +49,74 @@ export default function LoginPage() {
   return (
     <div>
       <div className={styles.imageContainer}>
-        <Image src={'/VND_Logo_JPG.jpg'} alt='Logo' fill priority />
+        <Image src={"/VND_Logo_JPG.jpg"} alt="Logo" fill priority />
       </div>
-      <Container component='main' maxWidth='xs'>
+      <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
           sx={{
             marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}>
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
             <LockOutlinedIcon />
           </Avatar>
-          <Typography component='h1' variant='h5'>
+          <Typography component="h1" variant="h5">
             Register New Nurse
           </Typography>
           <Box
-            component='form'
+            component="form"
             onSubmit={handleSubmit}
             noValidate
-            sx={{ mt: 1 }}>
+            sx={{ mt: 1 }}
+          >
             <TextField
-              margin='normal'
+              margin="normal"
               required
               fullWidth
-              id='username'
-              label='Username'
-              name='username'
-              autoComplete='username'
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
               autoFocus
             />
             <TextField
-              margin='normal'
+              margin="normal"
               required
               fullWidth
-              id='email'
-              label='Email Address'
-              name='email'
-              autoComplete='email'
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
               error={showErrorMessage}
               autoFocus
             />
             <TextField
-              margin='normal'
+              margin="normal"
               required
               fullWidth
-              name='password'
-              label='Password'
-              type='password'
-              id='password'
-              autoComplete='current-password'
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
             />
             <Button
-              type='submit'
+              type="submit"
               fullWidth
-              variant='contained'
-              sx={{ mt: 3, mb: 2 }}>
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
               Register
             </Button>
             {showSuccessMessage ? (
               <Grid>
-                <p className='text-green-600'>New nurse created. Redirecting to login..</p>
+                <p className="text-green-600">
+                  New nurse created. Redirecting to login..
+                </p>
               </Grid>
             ) : null}
           </Box>

@@ -1,7 +1,7 @@
-import '@/styles/globals.css';
-import type { AppProps } from 'next/app';
-import { SessionProvider } from 'next-auth/react';
-import { ProtectedLayout } from '@/components/layouts/protectedLayout';
+import "@/styles/globals.css";
+import type { AppProps } from "next/app";
+import { SessionProvider } from "next-auth/react";
+import { ProtectedLayout } from "@/components/layouts/protectedLayout";
 
 type AppPropsWithAuth = AppProps & {
   Component: {
@@ -9,15 +9,16 @@ type AppPropsWithAuth = AppProps & {
   };
 };
 
-
 export default function App({ Component, pageProps }: AppPropsWithAuth) {
-  return <SessionProvider session={pageProps.session}>
-    {Component.requireAuth ? (
-      <ProtectedLayout>
+  return (
+    <SessionProvider session={pageProps.session}>
+      {Component.requireAuth ? (
+        <ProtectedLayout>
+          <Component {...pageProps} />
+        </ProtectedLayout>
+      ) : (
         <Component {...pageProps} />
-      </ProtectedLayout>
-    ) : (
-      <Component {...pageProps} />
-    )}
-  </SessionProvider>;
+      )}
+    </SessionProvider>
+  );
 }

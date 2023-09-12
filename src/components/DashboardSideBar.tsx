@@ -69,7 +69,8 @@ export default function DashboardSideBar({
               setActiveTab(tab.key);
             }}
           >
-            <ListItemButton sx={{backgroundColor: activeTab === tab.key? "lightblue" : ""}}
+            <ListItemButton
+              sx={{ backgroundColor: activeTab === tab.key ? "lightblue" : "" }}
             >
               <ListItemIcon>{tab.icon}</ListItemIcon>
               <ListItemText primary={tab.text} />

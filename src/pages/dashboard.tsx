@@ -11,6 +11,7 @@ import { DataGrid, GridColDef, GridRowModel } from "@mui/x-data-grid";
 import { styled } from "@mui/material/styles";
 import axios from "axios";
 import { SmartBed } from "@/models/smartBed";
+import { Ward } from "@/models/ward";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,18 +30,40 @@ export default function Dashboard() {
       : useState(router.query["state"]);
 
   const [allBeds, setAllBeds] = useState<SmartBed[]>([]);
+  const [allWards, setAllWards] = useState<Ward[]>([]);
+  const [occupiedBeds, setOccupiedBeds] = useState<SmartBed[]>([]);
 
+  // fetch all beds and store occupied beds for display
   useEffect(() => {
     const fetchAllBeds = async () => {
       try {
         await axios.get("http://localhost:3001/smartbed").then((res) => {
-          setAllBeds(res.data.data);
+          const bedData = res.data.data;
+          setAllBeds(bedData);
+          const occupied = bedData.filter(
+            (bed: { bedStatus: string }) => bed.bedStatus === "occupied"
+          );
+          setOccupiedBeds(occupied);
         });
       } catch (e) {
         console.error(e);
       }
     };
     fetchAllBeds();
+  }, []);
+
+  // fetch all wards
+  useEffect(() => {
+    const fetchAllWards = async () => {
+      try {
+        await axios.get("http://localhost:3001/ward").then((res) => {
+          setAllWards(res.data.data);
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchAllWards();
   }, []);
 
   const handleSideBarTabClick = (key: string) => {
@@ -53,53 +76,14 @@ export default function Dashboard() {
     roomNum: number,
     bedNum: number
   ) => {
-    router.push(`/patientVisualisation?patientId=${patientId}&wardNum=${wardNum}&roomNum=${roomNum}&bedNum=${bedNum}`);
+    router.push(
+      `/patientVisualisation?patientId=${patientId}&wardNum=${wardNum}&roomNum=${roomNum}&bedNum=${bedNum}`
+    );
   };
 
-  const viewWardVisualisation = (ward: number | undefined) => {
+  const viewWardVisualisation = (ward: string | undefined) => {
     router.push(`/wardVisualisation?ward=${ward}`);
   };
-
-  const beds = [
-    { Ward: 1, Room: 1, Bed: 1 },
-    { Ward: 1, Room: 2, Bed: 2 },
-    { Ward: 1, Room: 3, Bed: 3 },
-    { Ward: 1, Room: 4, Bed: 4 },
-    { Ward: 1, Room: 5, Bed: 5 },
-    { Ward: 1, Room: 6, Bed: 6 },
-    { Ward: 1, Room: 7, Bed: 7 },
-    { Ward: 1, Room: 8, Bed: 8 },
-    { Ward: 2, Room: 1, Bed: 1 },
-    { Ward: 2, Room: 1, Bed: 2 },
-    { Ward: 2, Room: 1, Bed: 3 },
-    { Ward: 2, Room: 1, Bed: 4 },
-    { Ward: 2, Room: 1, Bed: 5 },
-    { Ward: 2, Room: 1, Bed: 6 },
-    { Ward: 2, Room: 1, Bed: 7 },
-    { Ward: 2, Room: 1, Bed: 8 },
-    { Ward: 2, Room: 2, Bed: 1 },
-    { Ward: 2, Room: 2, Bed: 2 },
-    { Ward: 2, Room: 2, Bed: 3 },
-    { Ward: 2, Room: 2, Bed: 4 },
-    { Ward: 2, Room: 2, Bed: 5 },
-    { Ward: 2, Room: 2, Bed: 6 },
-    { Ward: 2, Room: 2, Bed: 7 },
-    { Ward: 2, Room: 2, Bed: 8 },
-  ];
-
-  function groupBedsIntoWards(beds: string | any[]) {
-    const wardsHashMap = new Map();
-    for (let i = 0; i < beds.length; i++) {
-      const bed = beds[i];
-      const ward = bed["Ward"];
-      if (wardsHashMap.has(ward)) {
-        wardsHashMap.get(ward).push(bed);
-      } else {
-        wardsHashMap.set(ward, [bed]);
-      }
-    }
-    return wardsHashMap;
-  }
 
   const rows: GridRowModel[] = [
     { id: 1, Ward: 1, Room: 1, Bed: 1, Status: "HANDLING" },
@@ -186,18 +170,27 @@ export default function Dashboard() {
             <Box>
               {currentPage === "patients" && (
                 <>
-                  <Box sx={{ display:"flex"}}>
-                    <Typography textAlign="left" sx={{ marginBottom: "20px", flex: "1"}} variant="h6">
+                  <Box sx={{ display: "flex" }}>
+                    <Typography
+                      textAlign="left"
+                      sx={{ marginBottom: "20px", flex: "1" }}
+                      variant="h6"
+                    >
                       General Patients Visualisation
                     </Typography>
                   </Box>
                   <Grid container spacing={3}>
-                    {allBeds.map((bed) => (
+                    {occupiedBeds.map((bed) => (
                       <Grid item xs={12} sm={6} md={4} lg={3} key={bed._id}>
                         <Paper
                           sx={{ ":hover": { cursor: "pointer" } }}
                           onClick={() =>
-                            viewPatientVisualisation(bed.patient?._id, bed.ward.num, bed.roomNum, bed.bedNum)
+                            viewPatientVisualisation(
+                              bed.patient?._id,
+                              bed.ward.num,
+                              bed.roomNum,
+                              bed.bedNum
+                            )
                           }
                           elevation={3}
                           style={{
@@ -212,49 +205,56 @@ export default function Dashboard() {
                         >
                           <p>{bed.patient ? bed.patient.name : "Vacant Bed"}</p>
                           <Typography variant="h6">
-                            Ward: {bed.ward.num}, Room: {bed.roomNum}, Bed: {bed.bedNum}
+                            Ward: {bed.ward.num}, Room: {bed.roomNum}, Bed:{" "}
+                            {bed.bedNum}
                           </Typography>
                         </Paper>
                       </Grid>
                     ))}
                   </Grid>
-                  <Button 
-                    variant="contained" 
-                    sx={{margin: "10px", marginTop: "20px"}} 
-                    href="/createPatient">
-                      Assign New Patient
+                  <Button
+                    variant="contained"
+                    sx={{ margin: "10px", marginTop: "20px" }}
+                    href="/createPatient"
+                  >
+                    Assign New Patient
                   </Button>
-                  <Button 
-                    variant="contained" 
-                    sx={{margin: "10px", marginTop: "20px"}} 
-                    href="/createPatient">
-                      Discharge Patient
+                  <Button
+                    variant="contained"
+                    sx={{ margin: "10px", marginTop: "20px" }}
+                    href="/createPatient"
+                  >
+                    Discharge Patient
                   </Button>
                 </>
               )}
               {currentPage === "wards" && (
                 <>
-                  <Typography textAlign="left"  sx={{ marginBottom: "20px" }} variant="h6">
+                  <Typography
+                    textAlign="left"
+                    sx={{ marginBottom: "20px" }}
+                    variant="h6"
+                  >
                     Wards Page
                   </Typography>
                   <Grid container spacing={3}>
-                    {Array.from(groupBedsIntoWards(beds).keys()).map(
-                      (ward, index) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                          <Paper
-                            sx={{ ":hover": { cursor: "pointer" } }}
-                            onClick={() => viewWardVisualisation(ward)}
-                            elevation={3}
-                            style={{ padding: "16px" }}
-                          >
-                            <Typography variant="h6">
-                              Ward: {ward}, Count:{" "}
-                              {groupBedsIntoWards(beds).get(ward).length}
-                            </Typography>
-                          </Paper>
-                        </Grid>
-                      )
-                    )}
+                    {allWards.map((ward) => (
+                      <Grid item xs={12} sm={6} md={4} lg={3} key={ward._id}>
+                        <Paper
+                          sx={{ ":hover": { cursor: "pointer" } }}
+                          onClick={() => viewWardVisualisation(ward._id)}
+                          elevation={3}
+                          style={{
+                            padding: "16px",
+                          }}
+                        >
+                          <Typography variant="h6">
+                            Ward: {ward.num}, Bed Count :{" "}
+                            {ward.smartBeds?.length}
+                          </Typography>
+                        </Paper>
+                      </Grid>
+                    ))}
                   </Grid>
                   <Button
                     sx={{ marginTop: "20px" }}
@@ -267,7 +267,11 @@ export default function Dashboard() {
               )}
               {currentPage === "alerts" && (
                 <>
-                  <Typography textAlign="left"  sx={{ marginBottom: "20px" }} variant="h6">
+                  <Typography
+                    textAlign="left"
+                    sx={{ marginBottom: "20px" }}
+                    variant="h6"
+                  >
                     View List of Alerts
                   </Typography>
                   <Box

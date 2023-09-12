@@ -8,7 +8,7 @@ export class SmartBed {
     ward: Ward;
     bedStatus: string;
     railStatus: boolean;
-    patient?: Patient
+    patient?: Patient;
 
     constructor(
         _id: string,

@@ -1,11 +1,11 @@
-import Head from 'next/head';
-import Image from 'next/image';
-import { Inter } from 'next/font/google';
-import styles from '@/styles/Home.module.css';
-import Button from '@mui/material/Button';
-import Link from 'next/link';
+import Head from "next/head";
+import Image from "next/image";
+import { Inter } from "next/font/google";
+import styles from "@/styles/Home.module.css";
+import Button from "@mui/material/Button";
+import Link from "next/link";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   return (
@@ -17,11 +17,11 @@ export default function Home() {
             <Image src={"/VND_Logo_JPG.jpg"} alt="Logo" fill priority />
           </div>
           <div>
-            <Link href='/login'>
-              <Button variant='contained'>LOGIN</Button>
+            <Link href="/login">
+              <Button variant="contained">LOGIN</Button>
             </Link>
-            <Link href='/register'>
-              <Button variant='contained'>REGISTER</Button>
+            <Link href="/register">
+              <Button variant="contained">REGISTER</Button>
             </Link>
             <Button variant="contained" href="/dashboard">
               View Dashboard
