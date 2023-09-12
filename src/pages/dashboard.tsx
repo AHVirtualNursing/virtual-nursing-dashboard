@@ -72,7 +72,7 @@ export default function Dashboard() {
 
   const viewPatientVisualisation = (
     patientId: string | undefined,
-    wardNum: number,
+    wardNum: string,
     roomNum: number,
     bedNum: number
   ) => {
@@ -81,8 +81,11 @@ export default function Dashboard() {
     );
   };
 
-  const viewWardVisualisation = (ward: string | undefined) => {
-    router.push(`/wardVisualisation?ward=${ward}`);
+  const viewWardVisualisation = (wardId: string, wardNum: string) => {
+    router.push({
+      pathname: "/wardVisualisation",
+      query: { wardId: wardId, wardNum: wardNum },
+    });
   };
 
   const rows: GridRowModel[] = [
@@ -242,7 +245,9 @@ export default function Dashboard() {
                       <Grid item xs={12} sm={6} md={4} lg={3} key={ward._id}>
                         <Paper
                           sx={{ ":hover": { cursor: "pointer" } }}
-                          onClick={() => viewWardVisualisation(ward._id)}
+                          onClick={() =>
+                            viewWardVisualisation(ward._id, ward.num)
+                          }
                           elevation={3}
                           style={{
                             padding: "16px",

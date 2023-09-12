@@ -43,7 +43,7 @@ const patientVisualisationPage = () => {
       }
     };
     selectPatientById();
-  }, []);
+  }, [patientId]);
 
   const vitals = {
     heartRate: 60,

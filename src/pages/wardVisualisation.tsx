@@ -5,12 +5,31 @@ import { Inter } from "next/font/google";
 import { useRouter } from "next/router";
 import styles from "@/styles/Dashboard.module.css";
 import { DataGrid, GridColDef, GridRowModel } from "@mui/x-data-grid";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Ward } from "@/models/ward";
+import { SmartBed } from "@/models/smartBed";
 
 const inter = Inter({ subsets: ["latin"] });
 
 const wardVisualisationPage = () => {
   const router = useRouter();
-  const { ward } = router.query;
+  const { wardId, wardNum } = router.query;
+  const [activeWard, setWard] = useState<Ward>();
+
+  // fetch ward given Id
+  useEffect(() => {
+    const fetchBedsInWard = async () => {
+      try {
+        await axios.get("http://localhost:3001/ward/" + wardId).then((res) => {
+          setWard(res.data);
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchBedsInWard();
+  }, [wardId]);
 
   const handleSideBarTabClick = (key: string) => {
     router.push(
@@ -49,12 +68,6 @@ const wardVisualisationPage = () => {
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 90 },
     {
-      field: "Ward",
-      headerName: "Ward",
-      width: 90,
-      editable: false,
-    },
-    {
       field: "Room",
       headerName: "Room",
       width: 90,
@@ -67,33 +80,39 @@ const wardVisualisationPage = () => {
       editable: false,
     },
     {
+      field: "Patient",
+      headerName: "Patient",
+      width: 300,
+      editable: false,
+    },
+    {
       field: "heartRate",
       headerName: "Heart Rate",
-      width: 150,
+      width: 300,
       editable: false,
     },
     {
       field: "respiratoryRate",
       headerName: "Respiratory Rate",
-      width: 150,
+      width: 300,
       editable: false,
     },
     {
       field: "bloodPressure",
       headerName: "Blood Pressure",
-      width: 150,
+      width: 300,
       editable: false,
     },
     {
       field: "temperature",
       headerName: "Temperature",
-      width: 150,
+      width: 300,
       editable: false,
     },
     {
       field: "spo2",
       headerName: "SPo2",
-      width: 150,
+      width: 200,
       editable: false,
     },
   ];
@@ -107,9 +126,13 @@ const wardVisualisationPage = () => {
       spo2: 80,
     };
     const listOfBeds: GridRowModel[] = [];
-    for (let i = 0; i < beds.length; i++) {
-      if (beds[i]["Ward"] == ward) {
-        listOfBeds.push(beds[i]);
+    if (activeWard?.smartBeds?.length !== undefined) {
+      for (let i = 0; i < activeWard!.smartBeds!.length; i++) {
+        listOfBeds.push({
+          Room: activeWard!.smartBeds![i].roomNum,
+          Bed: activeWard!.smartBeds![i].bedNum,
+          Patient: activeWard!.smartBeds![i].patient?.name,
+        });
       }
     }
     return listOfBeds.map((bed, index) => ({
@@ -130,10 +153,10 @@ const wardVisualisationPage = () => {
         >
           <Box>
             <Typography sx={{ marginBottom: "20px" }} variant="h6">
-              Ward {ward} Visualisation
+              Ward {wardNum} Visualisation
             </Typography>
             <DataGrid
-              rows={getBedsInWard(ward)}
+              rows={getBedsInWard(wardId)}
               columns={columns}
               initialState={{
                 pagination: {
