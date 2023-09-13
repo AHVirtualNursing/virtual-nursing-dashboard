@@ -66,54 +66,54 @@ const wardVisualisationPage = () => {
   ];
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 90 },
+    { field: "id", headerName: "ID", flex: 1 },
     {
       field: "Room",
       headerName: "Room",
-      width: 90,
       editable: false,
+      flex: 1,
     },
     {
       field: "Bed",
       headerName: "Bed",
-      width: 90,
       editable: false,
+      flex: 1,
     },
     {
       field: "Patient",
       headerName: "Patient",
-      width: 300,
       editable: false,
+      flex: 1,
     },
     {
       field: "heartRate",
       headerName: "Heart Rate",
-      width: 300,
       editable: false,
+      flex: 1,
     },
     {
       field: "respiratoryRate",
       headerName: "Respiratory Rate",
-      width: 300,
       editable: false,
+      flex: 1,
     },
     {
       field: "bloodPressure",
       headerName: "Blood Pressure",
-      width: 300,
       editable: false,
+      flex: 1,
     },
     {
       field: "temperature",
       headerName: "Temperature",
-      width: 300,
       editable: false,
+      flex: 1,
     },
     {
       field: "spo2",
       headerName: "SPo2",
-      width: 200,
       editable: false,
+      flex: 1,
     },
   ];
 
