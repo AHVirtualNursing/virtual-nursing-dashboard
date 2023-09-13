@@ -24,22 +24,18 @@ export default function LoginPage() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const username = data.get("username") as string;
+    const name = data.get("name") as string;
     const email = data.get("email") as string;
     const password = data.get("password") as string;
 
     try {
       const res = await axios.post(
-        "http://localhost:3001/auth/register",
+        "http://localhost:3001/nurse",
         {
-          username: username,
+          name: name,
+          username: name,
           email: email,
           password: password,
-        },
-        {
-          headers: {
-            "X-UserType": "mobile",
-          },
         }
       );
 
@@ -84,10 +80,9 @@ export default function LoginPage() {
               margin="normal"
               required
               fullWidth
-              id="username"
-              label="Username"
-              name="username"
-              autoComplete="username"
+              id="name"
+              label="Name"
+              name="name"
               autoFocus
             />
             <TextField
