@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import {
   Box,
   Button,
+  Grid,
   InputLabel,
   MenuItem,
   Select,
@@ -25,28 +26,49 @@ const handleSideBarTabClick = (key: string) => {
 
 function createPatient() {
   const [bedAssigned, setAssignedBed] = React.useState("");
+
   const handleChange = (event: SelectChangeEvent) => {
     setAssignedBed(event.target.value);
   };
+
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const patientName = data.get("patientName") as string;
     const condition = data.get("condition") as string;
-    const bedId = bedAssigned;
-    console.log(patientName);
-    console.log(condition);
-    console.log(bedAssigned);
+    const patientNric = data.get("patientNric") as string;
     // update smart bed status to occupied, require ObjectId of newly created patient
+
+    try {
+      const res = await axios.post("http://localhost:3001/patient", {
+        name: patientName,
+        nric: patientNric,
+        condition: condition,
+      });
+      console.log(res);
+      if (res.status === 200) {
+        const updateBedRes = await axios.put(
+          "http://localhost:3001/smartbed/" + bedAssigned,
+          {
+            patient: res.data.data._id,
+          }
+        );
+        console.log(updateBedRes);
+        if (updateBedRes.status == 200) {
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            router.push("/dashboard");
+          }, 1500);
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const [allBeds, setAllBeds] = useState<SmartBed[]>([]);
   const [vacantBeds, setVacantBeds] = useState<SmartBed[]>([]);
-  const [newPatient, setNewPatient] = useState<Patient>();
-
-  // create new patient here
-  useEffect(() => {});
 
   // fetch all beds and store vacant beds for selection
   useEffect(() => {
@@ -54,7 +76,6 @@ function createPatient() {
       try {
         await axios.get("http://localhost:3001/smartbed").then((res) => {
           const bedData = res.data.data;
-          setAllBeds(bedData);
           const vacant = bedData.filter(
             (bed: { bedStatus: string }) => bed.bedStatus === "vacant"
           );
@@ -101,6 +122,15 @@ function createPatient() {
               margin="normal"
               required
               fullWidth
+              id="patientNric"
+              label="NRIC of Patient"
+              name="patientNric"
+              autoFocus
+            ></TextField>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
               id="condition"
               label="Any conditions to take note of"
               name="condition"
@@ -125,6 +155,11 @@ function createPatient() {
             <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
               Assign Patient
             </Button>
+            {showSuccessMessage ? (
+              <Grid>
+                <p className="text-green-600">New patient created.</p>
+              </Grid>
+            ) : null}
           </Box>
         </Box>
       </Box>
