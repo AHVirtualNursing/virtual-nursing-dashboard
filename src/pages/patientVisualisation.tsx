@@ -92,31 +92,6 @@ const patientVisualisationPage = () => {
     }));
   }
 
-  const reminderColumns = [
-    { field: "id", headerName: "ID", flex: 1 },
-    { field: "content", headerName: "Content", flex: 1 },
-    { field: "isComplete", headerName: "Completed", flex: 1 },
-    { field: "createdBy", headerName: "Created By", flex: 1 },
-  ];
-
-  function getReminders() {
-    const listOfReminders: GridRowModel[] = [];
-    if (selectedPatient?.reminders !== undefined) {
-      for (let i = 0; i < selectedPatient.reminders.length; i++) {
-        listOfReminders.push({
-          content: selectedPatient.reminders[i].content,
-          isComplete: selectedPatient.reminders[i].isComplete,
-          createdBy: selectedPatient.reminders[i].createdBy,
-        });
-      }
-    }
-    console.log();
-    return listOfReminders.map((reminder, index) => ({
-      id: index + 1,
-      ...reminder,
-    }));
-  }
-
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -217,20 +192,6 @@ const patientVisualisationPage = () => {
         backgroundColor: "lightgreen",
       },
     },
-    "& .reminder-true": {
-      backgroundColor: "lightgreen",
-      "&:hover": {
-        cursor: "pointer",
-        backgroundColor: "lightgreen",
-      },
-    },
-    "& .reminder-false": {
-      backgroundColor: "pink",
-      "&:hover": {
-        cursor: "pointer",
-        backgroundColor: "pink",
-      },
-    },
   }));
 
   return (
@@ -243,149 +204,131 @@ const patientVisualisationPage = () => {
           sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
         >
           <Box>
-            <Box sx={{ display: "flex", justifyContent: "space-evenly" }}>
+            <Box
+              sx={{
+                backgroundColor: "lightblue",
+                display: "flex",
+                border: 1,
+                borderRadius: 3,
+              }}
+            >
               <Box>
-                <Box>
-                  <Image src={profilePic} alt="Picture of Patient" />
-                </Box>
-                <Box sx={{ paddingTop: "20px", textAlign: "left" }}>
-                  <h3>{selectedPatient?.name}</h3>
-                  <p>Ward: {wardNum}</p>
-                  <p>Room: {roomNum}</p>
-                  <p>Bed: {bedNum} </p>
-                  <p>Masked NRIC: {selectedPatient?.nric} </p>
-                  {/* <p>Condition: {selectedPatient?.condition} </p>
-                  <p>Additional Info: {selectedPatient?.addInfo} </p> */}
-                </Box>
+                <Image
+                  style={{
+                    width: "50%",
+                    height: "auto",
+                    borderRadius: "50%",
+                  }}
+                  src={profilePic}
+                  alt="Picture of Patient"
+                />
+                <h3>
+                  {selectedPatient?.name} ({selectedPatient?.nric})
+                </h3>
               </Box>
               <Box>
-                <Box>
-                  <Grid container spacing={2} justifyContent="space-evenly">
-                    <Grid item>
-                      <Box className={styles.vitalBox}>
-                        <p>Respiratory Rate: </p>
-                        <AirIcon />
-                        <Typography variant="h6" fontWeight="bold">
-                          {vitals.respiratoryRate} breaths/min
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item>
-                      <Box className={styles.vitalBox}>
-                        <p>Heart Rate: </p>
-                        <MonitorHeartIcon />
-                        <Typography variant="h6" fontWeight="bold">
-                          {vitals.heartRate} beats/min
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item>
-                      <Box className={styles.vitalBox}>
-                        <p>Blood Pressure: </p>
-                        <BloodtypeIcon />
-                        <Typography variant="h6" fontWeight="bold">
-                          {vitals.bloodPressure} mm/HG
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item>
-                      <Box className={styles.vitalBox}>
-                        <p>Temperature: </p>
-                        <ThermostatIcon />
-                        <Typography variant="h6" fontWeight="bold">
-                          {vitals.temperature}&#176;C
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item>
-                      <Box className={styles.vitalBox}>
-                        <p>SPo2: </p>
-                        <FavoriteIcon />
-                        <Typography variant="h6" fontWeight="bold">
-                          {vitals.spo2}%
-                        </Typography>
-                      </Box>
-                    </Grid>
+                <Box display={"flex"} sx={{ paddingTop: "20px" }}>
+                  <p>
+                    Ward: {wardNum}, Room: {roomNum}, Bed: {bedNum}
+                  </p>
+                </Box>
+                <Box textAlign={"left"}>
+                  <p>Condition: {selectedPatient?.condition} </p>
+                  <p>Additional Info: {selectedPatient?.addInfo} </p>
+                </Box>
+              </Box>
+            </Box>
+            <Box>
+              {/* <Box>
+                <Grid container spacing={2} justifyContent="space-evenly">
+                  <Grid item>
+                    <Box className={styles.vitalBox}>
+                      <p>Respiratory Rate: </p>
+                      <AirIcon />
+                      <Typography variant="h6" fontWeight="bold">
+                        {vitals.respiratoryRate} breaths/min
+                      </Typography>
+                    </Box>
                   </Grid>
-                </Box>
-                <Box display={"flex"} justifyContent="space-evenly">
-                  <Box width={232}>
-                    <Line data={respData} />
-                  </Box>
-                  <Box width={232}>
-                    <Line data={heartData} />
-                  </Box>
-                  <Box width={232}>
-                    <Line data={bpData} />
-                  </Box>
-                  <Box width={232}>
-                    <Line data={tempData} />
-                  </Box>
-                  <Box width={232}>
-                    <Line data={spo2Data} />
-                  </Box>
-                </Box>
-                <Box display={"flex"} sx={{ marginTop: "20px" }}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                      {selectedPatient?.alerts?.length != undefined &&
-                      selectedPatient.alerts.length > 0 ? (
-                        <Box>
-                          <h3>Alerts</h3>
-                          <StyledDataGrid
-                            aria-label="Alerts"
-                            columns={alertColumns}
-                            rows={getAlerts()}
-                            autoHeight
-                            rowHeight={100}
-                            getRowClassName={(params) =>
-                              `alert-${params.row.status}`
-                            }
-                            sx={{
-                              "& .MuiDataGrid-cellContent": {
-                                whiteSpace: "normal !important",
-                                wordWrap: "break-word !important",
-                              },
-                            }}
-                          />
-                        </Box>
-                      ) : (
-                        <div>
-                          <h3>Alerts</h3>
-                          <p>No alerts have been set</p>
-                        </div>
-                      )}
-                    </Grid>
-                    <Grid item xs={6}>
-                      {selectedPatient?.reminders?.length != undefined &&
-                      selectedPatient.reminders.length > 0 ? (
-                        <Box>
-                          <h3>Reminders</h3>
-                          <StyledDataGrid
-                            columns={reminderColumns}
-                            rows={getReminders()}
-                            autoHeight
-                            rowHeight={100}
-                            getRowClassName={(params) =>
-                              `reminder-${params.row.isComplete}`
-                            }
-                            sx={{
-                              "& .MuiDataGrid-cellContent": {
-                                whiteSpace: "normal !important",
-                                wordWrap: "break-word !important",
-                              },
-                            }}
-                          />
-                        </Box>
-                      ) : (
-                        <div>
-                          <h3>Reminders</h3>
-                          <p>No reminders have been set</p>
-                        </div>
-                      )}
-                    </Grid>
+                  <Grid item>
+                    <Box className={styles.vitalBox}>
+                      <p>Heart Rate: </p>
+                      <MonitorHeartIcon />
+                      <Typography variant="h6" fontWeight="bold">
+                        {vitals.heartRate} beats/min
+                      </Typography>
+                    </Box>
                   </Grid>
+                  <Grid item>
+                    <Box className={styles.vitalBox}>
+                      <p>Blood Pressure: </p>
+                      <BloodtypeIcon />
+                      <Typography variant="h6" fontWeight="bold">
+                        {vitals.bloodPressure} mm/HG
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item>
+                    <Box className={styles.vitalBox}>
+                      <p>Temperature: </p>
+                      <ThermostatIcon />
+                      <Typography variant="h6" fontWeight="bold">
+                        {vitals.temperature}&#176;C
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item>
+                    <Box className={styles.vitalBox}>
+                      <p>SPo2: </p>
+                      <FavoriteIcon />
+                      <Typography variant="h6" fontWeight="bold">
+                        {vitals.spo2}%
+                      </Typography>
+                    </Box>
+                  </Grid>
+                </Grid>
+              </Box> */}
+              <Box display={"flex"} style={{ width: "33%" }}>
+                <Line data={respData} />
+                <Line data={heartData} />
+                <Line data={spo2Data} />
+              </Box>
+              <Box display={"flex"}>
+                <Box style={{ width: "33%" }}>
+                  <Line data={bpData} />
                 </Box>
+                <Box style={{ width: "33%" }}>
+                  <Line data={tempData} />
+                </Box>
+                <Grid item xs={6} style={{ flex: 1 }}>
+                  {selectedPatient?.alerts?.length != undefined &&
+                  selectedPatient.alerts.length > 0 ? (
+                    <Box>
+                      <h3>Alerts</h3>
+                      <StyledDataGrid
+                        aria-label="Alerts"
+                        columns={alertColumns}
+                        rows={getAlerts()}
+                        autoHeight
+                        rowHeight={100}
+                        getRowClassName={(params) =>
+                          `alert-${params.row.status}`
+                        }
+                        sx={{
+                          "& .MuiDataGrid-cellContent": {
+                            whiteSpace: "normal !important",
+                            wordWrap: "break-word !important",
+                          },
+                        }}
+                      />
+                    </Box>
+                  ) : (
+                    <div>
+                      <h3>Alerts</h3>
+                      <p>No alerts have been set</p>
+                    </div>
+                  )}
+                </Grid>
               </Box>
             </Box>
           </Box>
