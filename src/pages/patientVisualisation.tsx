@@ -214,33 +214,35 @@ const patientVisualisationPage = () => {
     return (
       <Box>
         {value === index && (
-          <Grid item xs={6} style={{ flex: 1 }}>
-            {selectedPatient?.alerts?.length != undefined &&
-            getAlerts(status).length > 0 ? (
-              <Box>
-                <h3>Alerts</h3>
-                <StyledDataGrid
-                  aria-label="Alerts"
-                  columns={alertColumns}
-                  rows={getAlerts(status)}
-                  autoHeight
-                  rowHeight={100}
-                  getRowClassName={(params) => `alert-${params.row.status}`}
-                  sx={{
-                    "& .MuiDataGrid-cellContent": {
-                      whiteSpace: "normal !important",
-                      wordWrap: "break-word !important",
-                    },
-                  }}
-                />
-              </Box>
-            ) : (
-              <div>
-                <h3>Alerts</h3>
-                <p>No {status} alerts</p>
-              </div>
-            )}
-          </Grid>
+          <Box>
+            <Grid item xs={6} style={{ flex: 1 }}>
+              {selectedPatient?.alerts?.length != undefined &&
+              getAlerts(status).length > 0 ? (
+                <Box>
+                  <StyledDataGrid
+                    aria-label="Alerts"
+                    columns={alertColumns}
+                    rows={getAlerts(status)}
+                    autoHeight
+                    rowHeight={100}
+                    getRowClassName={(params) => `alert-${params.row.status}`}
+                    sx={{
+                      "& .MuiDataGrid-cellContent": {
+                        whiteSpace: "normal !important",
+                        wordWrap: "break-word !important",
+                      },
+                    }}
+                  />
+                </Box>
+              ) : (
+                <div>
+                  <Typography marginTop={2} variant="body1">
+                    No {status} alerts
+                  </Typography>
+                </div>
+              )}
+            </Grid>
+          </Box>
         )}
       </Box>
     );
@@ -387,6 +389,7 @@ const patientVisualisationPage = () => {
                   </Box>
                   <Box sx={{ width: "33%" }}>
                     <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                      <h3>Alerts</h3>
                       <Tabs
                         value={value}
                         onChange={handleChange}
