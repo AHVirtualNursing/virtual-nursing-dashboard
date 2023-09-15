@@ -13,24 +13,43 @@ import {
 } from "@mui/material";
 import styles from "@/styles/Dashboard.module.css";
 import { Inter } from "next/font/google";
-import router from "next/router";
+import router, { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { SmartBed } from "@/models/smartBed";
 import axios from "axios";
+import { Patient } from "@/models/patient";
 
 const inter = Inter({ subsets: ["latin"] });
 const handleSideBarTabClick = (key: string) => {
   router.push({ pathname: "/dashboard", query: { state: key } }, "/dashboard");
 };
 
-function createPatient() {
-  const [bedAssigned, setAssignedBed] = React.useState("");
-
-  const handleChange = (event: SelectChangeEvent) => {
-    setAssignedBed(event.target.value);
-  };
-
+function updatePatient() {
+  const router = useRouter();
+  const patientId = router.query["patientId"];
+  const [patientSelected, setSelectedPatient] = useState<Patient>();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  useEffect(() => {
+    const selectPatientById = async () => {
+      try {
+        await axios
+          .get("http://localhost:3001/patient/" + patientId)
+          .then((res) => {
+            console.log(res.data);
+            setSelectedPatient(res.data);
+            console.log(patientSelected);
+          });
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    selectPatientById();
+  }, [patientId]);
+
+  if (patientSelected === undefined) {
+    return <p>Loading</p>;
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -38,54 +57,27 @@ function createPatient() {
     const patientName = data.get("patientName") as string;
     const condition = data.get("condition") as string;
     const patientNric = data.get("patientNric") as string;
-    // update smart bed status to occupied, require ObjectId of newly created patient
 
     try {
-      const res = await axios.post("http://localhost:3001/patient", {
-        name: patientName,
-        nric: patientNric,
-        condition: condition,
-      });
+      const res = await axios.put(
+        "http://localhost:3001/patient/" + patientId,
+        {
+          name: patientName,
+          nric: patientNric,
+          condition: condition,
+        }
+      );
       console.log(res);
       if (res.status === 200) {
-        const updateBedRes = await axios.put(
-          "http://localhost:3001/smartbed/" + bedAssigned,
-          {
-            patient: res.data.data._id,
-          }
-        );
-        console.log(updateBedRes);
-        if (updateBedRes.status == 200) {
-          setShowSuccessMessage(true);
-          setTimeout(() => {
-            router.push("/dashboard");
-          }, 1500);
-        }
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
       }
     } catch (err) {
       console.log(err);
     }
   };
-
-  const [vacantBeds, setVacantBeds] = useState<SmartBed[]>([]);
-
-  // fetch all beds and store vacant beds for selection
-  useEffect(() => {
-    const fetchAllBeds = async () => {
-      try {
-        await axios.get("http://localhost:3001/smartbed").then((res) => {
-          const bedData = res.data.data;
-          const vacant = bedData.filter(
-            (bed: { bedStatus: string }) => bed.bedStatus === "vacant"
-          );
-          setVacantBeds(vacant);
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    fetchAllBeds();
-  }, []);
 
   return (
     <main className={`${styles.main} ${inter.className}`}>
@@ -100,7 +92,7 @@ function createPatient() {
             sx={{ marginBottom: "20px", textAlign: "left" }}
             variant="h6"
           >
-            Create New Patient/Assign To Bed
+            Update Patient Details
           </Typography>
           <Box
             component="form"
@@ -114,6 +106,7 @@ function createPatient() {
               fullWidth
               id="patientName"
               label="Name of Patient"
+              defaultValue={patientSelected?.name}
               name="patientName"
               autoFocus
             ></TextField>
@@ -123,6 +116,7 @@ function createPatient() {
               fullWidth
               id="patientNric"
               label="NRIC of Patient"
+              defaultValue={patientSelected?.nric}
               name="patientNric"
               autoFocus
             ></TextField>
@@ -132,31 +126,17 @@ function createPatient() {
               fullWidth
               id="condition"
               label="Any conditions to take note of"
+              defaultValue={patientSelected?.condition}
               name="condition"
               autoFocus
               sx={{ paddingBottom: "10px" }}
             ></TextField>
-            <InputLabel sx={{ textAlign: "left" }} id="wardRoomBedLabel">
-              Selected Bed
-            </InputLabel>
-            <Select
-              fullWidth
-              value={bedAssigned}
-              label="Available Beds"
-              onChange={handleChange}
-            >
-              {vacantBeds.map((bed) => (
-                <MenuItem key={bed._id} value={bed._id}>
-                  Ward: {bed.ward.num}, Room: {bed.roomNum}, Bed: {bed.bedNum}
-                </MenuItem>
-              ))}
-            </Select>
             <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
-              Assign Patient
+              Update Patient
             </Button>
             {showSuccessMessage ? (
               <Grid>
-                <p className="text-green-600">New patient created.</p>
+                <p className="text-green-600">Patient Updated.</p>
               </Grid>
             ) : null}
           </Box>
@@ -165,5 +145,4 @@ function createPatient() {
     </main>
   );
 }
-
-export default createPatient;
+export default updatePatient;

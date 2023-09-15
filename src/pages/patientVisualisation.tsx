@@ -194,6 +194,10 @@ const patientVisualisationPage = () => {
     },
   }));
 
+  function updateSelectedPatient() {
+    router.push("/updatePatient?patientId=" + selectedPatient?._id);
+  }
+
   return (
     <main className={`${styles.main} ${inter.className}`}>
       <Header />
@@ -235,6 +239,15 @@ const patientVisualisationPage = () => {
                 <Box textAlign={"left"}>
                   <p>Condition: {selectedPatient?.condition} </p>
                   <p>Additional Info: {selectedPatient?.addInfo} </p>
+                </Box>
+                <Box textAlign={"right"} marginRight={2}>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    onClick={updateSelectedPatient}
+                  >
+                    Update Details
+                  </Button>
                 </Box>
               </Box>
             </Box>
@@ -288,47 +301,55 @@ const patientVisualisationPage = () => {
                   </Grid>
                 </Grid>
               </Box> */}
-              <Box display={"flex"} style={{ width: "33%" }}>
-                <Line data={respData} />
-                <Line data={heartData} />
-                <Line data={spo2Data} />
-              </Box>
-              <Box display={"flex"}>
-                <Box style={{ width: "33%" }}>
-                  <Line data={bpData} />
+              <Box
+                sx={{
+                  marginTop: 2,
+                  border: 1,
+                  borderRadius: 3,
+                }}
+              >
+                <Box display={"flex"} style={{ width: "33%" }}>
+                  <Line data={respData} />
+                  <Line data={heartData} />
+                  <Line data={spo2Data} />
                 </Box>
-                <Box style={{ width: "33%" }}>
-                  <Line data={tempData} />
+                <Box display={"flex"}>
+                  <Box style={{ width: "33%" }}>
+                    <Line data={bpData} />
+                  </Box>
+                  <Box style={{ width: "33%" }}>
+                    <Line data={tempData} />
+                  </Box>
+                  <Grid item xs={6} style={{ flex: 1 }}>
+                    {selectedPatient?.alerts?.length != undefined &&
+                    selectedPatient.alerts.length > 0 ? (
+                      <Box>
+                        <h3>Alerts</h3>
+                        <StyledDataGrid
+                          aria-label="Alerts"
+                          columns={alertColumns}
+                          rows={getAlerts()}
+                          autoHeight
+                          rowHeight={100}
+                          getRowClassName={(params) =>
+                            `alert-${params.row.status}`
+                          }
+                          sx={{
+                            "& .MuiDataGrid-cellContent": {
+                              whiteSpace: "normal !important",
+                              wordWrap: "break-word !important",
+                            },
+                          }}
+                        />
+                      </Box>
+                    ) : (
+                      <div>
+                        <h3>Alerts</h3>
+                        <p>No alerts have been set</p>
+                      </div>
+                    )}
+                  </Grid>
                 </Box>
-                <Grid item xs={6} style={{ flex: 1 }}>
-                  {selectedPatient?.alerts?.length != undefined &&
-                  selectedPatient.alerts.length > 0 ? (
-                    <Box>
-                      <h3>Alerts</h3>
-                      <StyledDataGrid
-                        aria-label="Alerts"
-                        columns={alertColumns}
-                        rows={getAlerts()}
-                        autoHeight
-                        rowHeight={100}
-                        getRowClassName={(params) =>
-                          `alert-${params.row.status}`
-                        }
-                        sx={{
-                          "& .MuiDataGrid-cellContent": {
-                            whiteSpace: "normal !important",
-                            wordWrap: "break-word !important",
-                          },
-                        }}
-                      />
-                    </Box>
-                  ) : (
-                    <div>
-                      <h3>Alerts</h3>
-                      <p>No alerts have been set</p>
-                    </div>
-                  )}
-                </Grid>
               </Box>
             </Box>
           </Box>
