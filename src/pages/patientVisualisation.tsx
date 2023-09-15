@@ -1,6 +1,15 @@
 import DashboardSideBar from "@/components/DashboardSideBar";
 import Header from "@/components/Header";
-import { Box, Button, Grid, Paper, Typography, styled } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Paper,
+  Tab,
+  Tabs,
+  Typography,
+  styled,
+} from "@mui/material";
 import { Inter } from "next/font/google";
 import { useRouter } from "next/router";
 import styles from "@/styles/Dashboard.module.css";
@@ -72,18 +81,17 @@ const patientVisualisationPage = () => {
     { field: "notes", headerName: "Notes" },
   ];
 
-  function getAlerts() {
+  function getAlerts(status: string) {
     const listOfAlerts: GridRowModel[] = [];
     if (selectedPatient?.alerts !== undefined) {
       for (let i = 0; i < selectedPatient.alerts.length; i++) {
-        console.log(selectedPatient.alerts[i].status);
-        console.log(selectedPatient.alerts[i].description);
-        console.log(selectedPatient.alerts[i].notes);
-        listOfAlerts.push({
-          status: selectedPatient.alerts[i].status,
-          description: selectedPatient.alerts[i].description,
-          notes: selectedPatient.alerts[i].notes,
-        });
+        if (selectedPatient.alerts[i].status == status) {
+          listOfAlerts.push({
+            status: selectedPatient.alerts[i].status,
+            description: selectedPatient.alerts[i].description,
+            notes: selectedPatient.alerts[i].notes,
+          });
+        }
       }
     }
     return listOfAlerts.map((alert, index) => ({
@@ -193,6 +201,63 @@ const patientVisualisationPage = () => {
       },
     },
   }));
+
+  interface TabPanelProps {
+    status: string;
+    index: number;
+    value: number;
+  }
+
+  function CustomTabPanel(props: TabPanelProps) {
+    const { status, value, index, ...other } = props;
+
+    return (
+      <Box>
+        {value === index && (
+          <Grid item xs={6} style={{ flex: 1 }}>
+            {selectedPatient?.alerts?.length != undefined &&
+            getAlerts(status).length > 0 ? (
+              <Box>
+                <h3>Alerts</h3>
+                <StyledDataGrid
+                  aria-label="Alerts"
+                  columns={alertColumns}
+                  rows={getAlerts(status)}
+                  autoHeight
+                  rowHeight={100}
+                  getRowClassName={(params) => `alert-${params.row.status}`}
+                  sx={{
+                    "& .MuiDataGrid-cellContent": {
+                      whiteSpace: "normal !important",
+                      wordWrap: "break-word !important",
+                    },
+                  }}
+                />
+              </Box>
+            ) : (
+              <div>
+                <h3>Alerts</h3>
+                <p>No {status} alerts</p>
+              </div>
+            )}
+          </Grid>
+        )}
+      </Box>
+    );
+  }
+
+  function a11yProps(index: number) {
+    return {
+      id: `simple-tab-${index}`,
+      "aria-controls": `simple-tabpanel-${index}`,
+    };
+  }
+
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
 
   function updateSelectedPatient() {
     router.push("/updatePatient?patientId=" + selectedPatient?._id);
@@ -320,39 +385,66 @@ const patientVisualisationPage = () => {
                   <Box style={{ width: "33%" }}>
                     <Line data={tempData} />
                   </Box>
-                  <Grid item xs={6} style={{ flex: 1 }}>
-                    {selectedPatient?.alerts?.length != undefined &&
-                    selectedPatient.alerts.length > 0 ? (
-                      <Box>
-                        <h3>Alerts</h3>
-                        <StyledDataGrid
-                          aria-label="Alerts"
-                          columns={alertColumns}
-                          rows={getAlerts()}
-                          autoHeight
-                          rowHeight={100}
-                          getRowClassName={(params) =>
-                            `alert-${params.row.status}`
-                          }
-                          sx={{
-                            "& .MuiDataGrid-cellContent": {
-                              whiteSpace: "normal !important",
-                              wordWrap: "break-word !important",
-                            },
-                          }}
-                        />
-                      </Box>
-                    ) : (
-                      <div>
-                        <h3>Alerts</h3>
-                        <p>No alerts have been set</p>
-                      </div>
-                    )}
-                  </Grid>
+                  <Box sx={{ width: "33%" }}>
+                    <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                      <Tabs
+                        value={value}
+                        onChange={handleChange}
+                        aria-label="basic tabs example"
+                      >
+                        <Tab label="Open" {...a11yProps(0)} />
+                        <Tab label="Handling" {...a11yProps(1)} />
+                        <Tab label="Completed" {...a11yProps(2)} />
+                      </Tabs>
+                    </Box>
+                    <CustomTabPanel
+                      value={value}
+                      index={0}
+                      status="open"
+                    ></CustomTabPanel>
+                    <CustomTabPanel
+                      value={value}
+                      index={1}
+                      status="handling"
+                    ></CustomTabPanel>
+                    <CustomTabPanel
+                      value={value}
+                      index={2}
+                      status="complete"
+                    ></CustomTabPanel>
+                  </Box>
                 </Box>
               </Box>
             </Box>
           </Box>
+
+          {/* <Grid item xs={6} style={{ flex: 1 }}>
+            {selectedPatient?.alerts?.length != undefined &&
+            selectedPatient.alerts.length > 0 ? (
+              <Box>
+                <h3>Alerts</h3>
+                <StyledDataGrid
+                  aria-label="Alerts"
+                  columns={alertColumns}
+                  rows={getAlerts()}
+                  autoHeight
+                  rowHeight={100}
+                  getRowClassName={(params) => `alert-${params.row.status}`}
+                  sx={{
+                    "& .MuiDataGrid-cellContent": {
+                      whiteSpace: "normal !important",
+                      wordWrap: "break-word !important",
+                    },
+                  }}
+                />
+              </Box>
+            ) : (
+              <div>
+                <h3>Alerts</h3>
+                <p>No alerts have been set</p>
+              </div>
+            )}
+          </Grid> */}
           <Button
             sx={{ marginTop: "20px" }}
             variant="contained"
