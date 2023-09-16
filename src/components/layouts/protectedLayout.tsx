@@ -1,33 +1,24 @@
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 type Props = {
   children: React.ReactElement;
 };
 
-/*
-  add the requireAuth property to the page component
-  to protect the page from unauthenticated users
-  e.g.:
-  Dashboard.requireAuth = true;
-  export default Dashboard;
- */
-
 export const ProtectedLayout = ({ children }: Props): JSX.Element => {
   const router = useRouter();
   const { status: sessionStatus } = useSession();
-  const authorized = sessionStatus === 'authenticated';
-  const unAuthorized = sessionStatus === 'unauthenticated';
-  const loading = sessionStatus === 'loading';
+  const authorized = sessionStatus === "authenticated";
+  const unAuthorized = sessionStatus === "unauthenticated";
+  const loading = sessionStatus === "loading";
 
   useEffect(() => {
     if (loading || !router.isReady) return;
 
     if (unAuthorized) {
-      console.log('not authorized');
       router.push({
-        pathname: '/login',
+        pathname: "/",
         query: { returnUrl: router.asPath },
       });
     }

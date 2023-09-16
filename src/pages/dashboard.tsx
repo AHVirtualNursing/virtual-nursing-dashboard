@@ -17,6 +17,8 @@ export default function Dashboard() {
   const router = useRouter();
 
   const handleLogoutButton = () => {
+    router.push("/");
+
     signOut();
   };
 
@@ -279,4 +281,3 @@ export default function Dashboard() {
     </>
   );
 }
-Dashboard.requireAuth = true;
