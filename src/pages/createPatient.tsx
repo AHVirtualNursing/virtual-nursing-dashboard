@@ -17,6 +17,7 @@ import router from "next/router";
 import React, { useEffect, useState } from "react";
 import { SmartBed } from "@/models/smartBed";
 import axios from "axios";
+import { Patient } from "@/models/patient";
 
 const inter = Inter({ subsets: ["latin"] });
 const handleSideBarTabClick = (key: string) => {
@@ -75,9 +76,11 @@ function createPatient() {
       try {
         await axios.get("http://localhost:3001/smartbed").then((res) => {
           const bedData = res.data.data;
-          const vacant = bedData.filter(
-            (bed: { bedStatus: string }) => bed.bedStatus === "vacant"
+          let vacant = bedData.filter(
+            (bed: { bedStatus: string; patient: Patient }) =>
+              bed.bedStatus === "vacant" && bed.patient === undefined
           );
+          console.log(vacant);
           setVacantBeds(vacant);
         });
       } catch (e) {

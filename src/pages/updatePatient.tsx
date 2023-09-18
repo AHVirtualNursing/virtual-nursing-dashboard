@@ -109,6 +109,7 @@ function updatePatient() {
               defaultValue={patientSelected?.name}
               name="patientName"
               autoFocus
+              disabled
             ></TextField>
             <TextField
               margin="normal"
@@ -119,6 +120,7 @@ function updatePatient() {
               defaultValue={patientSelected?.nric}
               name="patientNric"
               autoFocus
+              disabled
             ></TextField>
             <TextField
               margin="normal"

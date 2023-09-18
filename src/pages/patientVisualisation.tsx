@@ -52,10 +52,11 @@ const patientVisualisationPage = () => {
   const [selectedPatient, setSelectedPatient] = useState<Patient>();
 
   useEffect(() => {
+    console.log(patientId);
     const selectPatientById = async () => {
       try {
         await axios
-          .get("http://localhost:3001/patient/" + patientId)
+          .get(`http://localhost:3001/patient/${patientId}`)
           .then((res) => {
             setSelectedPatient(res.data);
           });
@@ -297,7 +298,7 @@ const patientVisualisationPage = () => {
                   {selectedPatient?.name} ({selectedPatient?.nric})
                 </h3>
               </Box>
-              <Box>
+              <Box style={{ width: "100%" }}>
                 <Box display={"flex"} sx={{ paddingTop: "20px" }}>
                   <p>
                     Ward: {wardNum}, Room: {roomNum}, Bed: {bedNum}

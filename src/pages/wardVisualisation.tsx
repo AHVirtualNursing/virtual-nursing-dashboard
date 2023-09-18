@@ -19,9 +19,10 @@ const wardVisualisationPage = () => {
 
   // fetch ward given Id
   useEffect(() => {
+    console.log(wardId);
     const fetchBedsInWard = async () => {
       try {
-        await axios.get("http://localhost:3001/ward/" + wardId).then((res) => {
+        await axios.get(`http://localhost:3001/ward/${wardId}`).then((res) => {
           setWard(res.data);
         });
       } catch (e) {

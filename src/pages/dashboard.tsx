@@ -31,7 +31,6 @@ export default function Dashboard() {
 
   const [allBeds, setAllBeds] = useState<SmartBed[]>([]);
   const [allWards, setAllWards] = useState<Ward[]>([]);
-  const [occupiedBeds, setOccupiedBeds] = useState<SmartBed[]>([]);
 
   // fetch all beds and store occupied beds for display
   useEffect(() => {
@@ -39,11 +38,32 @@ export default function Dashboard() {
       try {
         await axios.get("http://localhost:3001/smartbed").then((res) => {
           const bedData = res.data.data;
+          bedData.sort((bedA: SmartBed, bedB: SmartBed) => {
+            if (bedA.bedStatus === "occupied" && bedB.bedStatus === "vacant") {
+              return -1;
+            }
+            if (bedA.bedStatus === "vacant" && bedB.bedStatus === "occupied") {
+              return 1;
+            }
+            if (
+              bedA.bedStatus === "vacant" &&
+              bedA.patient === undefined &&
+              bedB.bedStatus === "vacant" &&
+              bedB.patient
+            ) {
+              return 1;
+            }
+            if (
+              bedA.bedStatus === "vacant" &&
+              bedA.patient &&
+              bedB.bedStatus === "vacant" &&
+              bedB.patient === undefined
+            ) {
+              return -1;
+            }
+            return 0;
+          });
           setAllBeds(bedData);
-          const occupied = bedData.filter(
-            (bed: { bedStatus: string }) => bed.bedStatus === "occupied"
-          );
-          setOccupiedBeds(occupied);
         });
       } catch (e) {
         console.error(e);
@@ -181,9 +201,16 @@ export default function Dashboard() {
                     >
                       General Patients Visualisation
                     </Typography>
+                    <Button
+                      variant="contained"
+                      sx={{ margin: "10px" }}
+                      href="/createPatient"
+                    >
+                      Assign New Patient
+                    </Button>
                   </Box>
                   <Grid container spacing={3}>
-                    {occupiedBeds.map((bed) => (
+                    {allBeds.map((bed) => (
                       <Grid item xs={12} sm={6} md={4} lg={3} key={bed._id}>
                         <Paper
                           sx={{ ":hover": { cursor: "pointer" } }}
@@ -199,11 +226,11 @@ export default function Dashboard() {
                           style={{
                             padding: "16px",
                             backgroundColor:
-                              bed.bedNum == 1
-                                ? "#FFA829"
-                                : bed.bedNum == 8
-                                ? "#FF5151"
-                                : "lightgreen",
+                              bed.bedStatus == "occupied"
+                                ? "lightgreen"
+                                : bed.patient
+                                ? "orange"
+                                : "pink",
                           }}
                         >
                           <p>{bed.patient ? bed.patient.name : "Vacant Bed"}</p>
@@ -215,20 +242,6 @@ export default function Dashboard() {
                       </Grid>
                     ))}
                   </Grid>
-                  <Button
-                    variant="contained"
-                    sx={{ margin: "10px", marginTop: "20px" }}
-                    href="/createPatient"
-                  >
-                    Assign New Patient
-                  </Button>
-                  <Button
-                    variant="contained"
-                    sx={{ margin: "10px", marginTop: "20px" }}
-                    href="/createPatient"
-                  >
-                    Discharge Patient
-                  </Button>
                 </>
               )}
               {currentPage === "wards" && (
