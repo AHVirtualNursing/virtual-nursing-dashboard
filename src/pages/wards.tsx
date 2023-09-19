@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Typography, Grid, Paper, Button } from "@mui/material";
 import { Ward } from "@/models/ward";
-import axios from "axios";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/router";
+import { fetchAllWards } from "./api/wards_api";
 
 export default function Wards() {
   const router = useRouter();
@@ -11,17 +11,7 @@ export default function Wards() {
   const [wardsList, setWardsList] = useState<Ward[]>([]);
 
   useEffect(() => {
-    const fetchAllWards = async () => {
-      try {
-        await axios.get("http://localhost:3001/ward").then((res) => {
-          const wards = res.data.data;
-          setWardsList(wards);
-        });
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchAllWards();
+    fetchAllWards().then((res) => setWardsList(res.data));
   }, [wardsList.length]);
 
   const viewWardVisualisation = (wardId: string, wardNum: string) => {
