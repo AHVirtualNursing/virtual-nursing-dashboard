@@ -3,6 +3,7 @@ import { Box, Typography, Grid, Button, Paper } from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { SmartBed } from "@/models/smartBed";
+import { fetchAllWards, fetchBedsByWardId } from "./api/wards_api";
 
 export default function Patients() {
   type BedWithWardNumObject = {
@@ -14,30 +15,22 @@ export default function Patients() {
   const [allBeds, setAllBeds] = useState<BedWithWardNumObject[]>([]);
 
   useEffect(() => {
-    const fetchAllWardsAndBeds = async () => {
-      try {
-        await axios.get("http://localhost:3001/ward").then((res) => {
-          const wards = res.data.data;
-          let promises = [];
-          for (var ward of wards) {
-            promises.push(axios.get(`http://localhost:3001/ward/${ward._id}`));
-          }
-          let beds: BedWithWardNumObject[] = [];
-          Promise.all(promises).then((res) => {
-            res.map((w) => {
-              console.log(w);
-              var obj = { wardNum: w.data.num, smartbeds: w.data.smartBeds };
-              beds.push(obj);
-            });
-            setAllBeds(beds);
-          });
-        });
-      } catch (e) {
-        console.error(e);
+    fetchAllWards().then((res) => {
+      const wards = res.data;
+      let promises = [];
+      for (var ward of wards) {
+        promises.push(fetchBedsByWardId(ward._id));
       }
-    };
-    fetchAllWardsAndBeds();
-    console.log(allBeds);
+      let beds: BedWithWardNumObject[] = [];
+      Promise.all(promises).then((res) => {
+        res.forEach((w, index) => {
+          const wardNum = wards[index].num;
+          const obj = { wardNum, smartbeds: w };
+          beds.push(obj);
+        });
+        setAllBeds(beds);
+      });
+    });
   }, [allBeds.length]);
 
   const viewPatientVisualisation = (

@@ -8,3 +8,12 @@ export const fetchAllWards = async () => {
     console.error(error);
   }
 };
+
+export const fetchBedsByWardId = async (wardId : string | string[] | undefined) => {
+  try {
+    const res = await axios.get(`http://localhost:3001/ward/${wardId}/smartbeds`);
+    return res.data;
+  } catch (error) {
+    console.error(error);
+  }
+}

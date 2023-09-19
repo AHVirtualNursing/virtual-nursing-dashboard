@@ -35,6 +35,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { fetchPatientByPatientId } from "./api/patients_api";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -52,19 +53,7 @@ const patientVisualisationPage = () => {
   const [selectedPatient, setSelectedPatient] = useState<Patient>();
 
   useEffect(() => {
-    console.log(patientId);
-    const selectPatientById = async () => {
-      try {
-        await axios
-          .get(`http://localhost:3001/patient/${patientId}`)
-          .then((res) => {
-            setSelectedPatient(res.data);
-          });
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    selectPatientById();
+    fetchPatientByPatientId(patientId).then((res) => setSelectedPatient(res));
   }, [patientId]);
 
   const vitals = {

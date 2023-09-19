@@ -18,6 +18,7 @@ import React, { useEffect, useState } from "react";
 import { SmartBed } from "@/models/smartBed";
 import axios from "axios";
 import { Patient } from "@/models/patient";
+import { fetchAllWards, fetchBedsByWardId } from "./api/wards_api";
 
 const inter = Inter({ subsets: ["latin"] });
 const handleSideBarTabClick = (key: string) => {
@@ -25,6 +26,11 @@ const handleSideBarTabClick = (key: string) => {
 };
 
 function createPatient() {
+  type BedWithWardNumObject = {
+    wardNum: string;
+    smartbeds: SmartBed[];
+  };
+
   const [bedAssigned, setAssignedBed] = React.useState("");
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -68,27 +74,31 @@ function createPatient() {
     }
   };
 
-  const [vacantBeds, setVacantBeds] = useState<SmartBed[]>([]);
+  const [vacantBeds, setVacantBeds] = useState<BedWithWardNumObject[]>([]);
 
   // fetch all beds and store vacant beds for selection
   useEffect(() => {
-    const fetchAllBeds = async () => {
-      try {
-        await axios.get("http://localhost:3001/smartbed").then((res) => {
-          const bedData = res.data.data;
-          let vacant = bedData.filter(
+    fetchAllWards().then((res) => {
+      const wards = res.data;
+      let promises = [];
+      for (var ward of wards) {
+        promises.push(fetchBedsByWardId(ward._id));
+      }
+      let beds: BedWithWardNumObject[] = [];
+      Promise.all(promises).then((res) => {
+        res.forEach((w, index) => {
+          const wardNum = wards[index].num;
+          const vacantBeds = w.filter(
             (bed: { bedStatus: string; patient: Patient }) =>
               bed.bedStatus === "vacant" && bed.patient === undefined
           );
-          console.log(vacant);
-          setVacantBeds(vacant);
+          const obj = { wardNum, smartbeds: vacantBeds };
+          beds.push(obj);
         });
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    fetchAllBeds();
-  }, []);
+        setVacantBeds(beds);
+      });
+    });
+  }, [vacantBeds.length]);
 
   return (
     <main className={`${styles.main} ${inter.className}`}>
@@ -148,11 +158,13 @@ function createPatient() {
               label="Available Beds"
               onChange={handleChange}
             >
-              {vacantBeds.map((bed) => (
-                <MenuItem key={bed._id} value={bed._id}>
-                  Ward: {bed.ward.num}, Room: {bed.roomNum}, Bed: {bed.bedNum}
-                </MenuItem>
-              ))}
+              {vacantBeds.map(({ wardNum, smartbeds }) =>
+                smartbeds.map((bed) => (
+                  <MenuItem key={bed._id} value={bed._id}>
+                    Ward: {wardNum}, Room: {bed.roomNum}, Bed: {bed.bedNum}
+                  </MenuItem>
+                ))
+              )}
             </Select>
             <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
               Assign Patient
