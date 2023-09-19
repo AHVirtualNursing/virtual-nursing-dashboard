@@ -33,52 +33,14 @@ export default function Dashboard() {
   const [allBeds, setAllBeds] = useState<SmartBed[]>([]);
   const [allWards, setAllWards] = useState<Ward[]>([]);
 
-  // fetch all beds and store occupied beds for display
-  useEffect(() => {
-    const fetchAllBeds = async () => {
-      try {
-        await axios.get("http://localhost:3001/smartbed").then((res) => {
-          const bedData = res.data.data;
-          bedData.sort((bedA: SmartBed, bedB: SmartBed) => {
-            if (bedA.bedStatus === "occupied" && bedB.bedStatus === "vacant") {
-              return -1;
-            }
-            if (bedA.bedStatus === "vacant" && bedB.bedStatus === "occupied") {
-              return 1;
-            }
-            if (
-              bedA.bedStatus === "vacant" &&
-              bedA.patient === undefined &&
-              bedB.bedStatus === "vacant" &&
-              bedB.patient
-            ) {
-              return 1;
-            }
-            if (
-              bedA.bedStatus === "vacant" &&
-              bedA.patient &&
-              bedB.bedStatus === "vacant" &&
-              bedB.patient === undefined
-            ) {
-              return -1;
-            }
-            return 0;
-          });
-          setAllBeds(bedData);
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    fetchAllBeds();
-  }, []);
-
   // fetch all wards
   useEffect(() => {
     const fetchAllWards = async () => {
       try {
         await axios.get("http://localhost:3001/ward").then((res) => {
+          console.log(res);
           setAllWards(res.data.data);
+          setAllBeds([]);
         });
       } catch (e) {
         console.error(e);
@@ -86,6 +48,22 @@ export default function Dashboard() {
     };
     fetchAllWards();
   }, []);
+
+  useEffect(() => {
+    const retrieveBedsByWardId = async (wardId: string) => {
+      try {
+        await axios.get(`http://localhost:3001/ward/${wardId}`).then((res) => {
+          setAllBeds((prevBeds) => [...prevBeds, ...res.data.smartBeds]);
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    setAllBeds([]);
+    for (const w of allWards) {
+      retrieveBedsByWardId(w._id);
+    }
+  }, [allWards]);
 
   const handleSideBarTabClick = (key: string) => {
     setCurrentPage(key);
