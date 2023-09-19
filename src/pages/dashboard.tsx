@@ -1,27 +1,19 @@
 import Head from "next/head";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Dashboard.module.css";
-import { Button, Grid } from "@mui/material";
+import { Box } from "@mui/material";
 import { useRouter } from "next/router";
 import Header from "@/components/Header";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import DashboardSideBar from "@/components/DashboardSideBar";
-import { Paper, Box, Typography } from "@mui/material";
-import { DataGrid, GridColDef, GridRowModel } from "@mui/x-data-grid";
-import { signOut } from "next-auth/react";
-import { styled } from "@mui/material/styles";
-import axios from "axios";
-import { SmartBed } from "@/models/smartBed";
-import { Ward } from "@/models/ward";
+import Wards from "./wards";
+import Patients from "./patients";
+import Alerts from "./alerts";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Dashboard() {
   const router = useRouter();
-
-  const handleLogoutButton = () => {
-    signOut();
-  };
 
   console.log(router.query);
   console.log(router.query["state"]);
@@ -30,129 +22,9 @@ export default function Dashboard() {
       ? useState("patients")
       : useState(router.query["state"]);
 
-  const [allBeds, setAllBeds] = useState<BedWithWardNumObject[]>([]);
-  const [allWards, setAllWards] = useState<Ward[]>([]);
-
-  type BedWithWardNumObject = {
-    wardNum: string;
-    smartbeds: SmartBed[];
-  };
-
-  // fetch all wards
-  useEffect(() => {
-    const fetchAllWardsAndBeds = async () => {
-      try {
-        await axios.get("http://localhost:3001/ward").then((res) => {
-          // console.log(res.data.data);
-          const wards = res.data.data;
-          setAllWards(wards);
-
-          let promises = [];
-          for (var ward of wards) {
-            promises.push(axios.get(`http://localhost:3001/ward/${ward._id}`));
-          }
-          let beds: BedWithWardNumObject[] = [];
-          Promise.all(promises).then((res) => {
-            // console.log(res); //ward object
-            res.map((w) => {
-              console.log(w);
-              var obj = { wardNum: w.data.num, smartbeds: w.data.smartBeds };
-              beds.push(obj);
-            });
-            setAllBeds(beds);
-          });
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    fetchAllWardsAndBeds();
-    console.log(allBeds);
-  }, [allBeds.length, allWards.length]);
-
   const handleSideBarTabClick = (key: string) => {
     setCurrentPage(key);
   };
-
-  const viewPatientVisualisation = (
-    patientId: string | undefined,
-    wardNum: string,
-    roomNum: number,
-    bedNum: number
-  ) => {
-    router.push(
-      `/patientVisualisation?patientId=${patientId}&wardNum=${wardNum}&roomNum=${roomNum}&bedNum=${bedNum}`
-    );
-  };
-
-  const viewWardVisualisation = (wardId: string, wardNum: string) => {
-    router.push({
-      pathname: "/wardVisualisation",
-      query: { wardId: wardId, wardNum: wardNum },
-    });
-  };
-
-  const rows: GridRowModel[] = [
-    { id: 1, Ward: 1, Room: 1, Bed: 1, Status: "HANDLING" },
-    { id: 2, Ward: 2, Room: 1, Bed: 1, Status: "HANDLING" },
-    { id: 3, Ward: 1, Room: 1, Bed: 1, Status: "COMPLETED" },
-    { id: 4, Ward: 1, Room: 8, Bed: 8, Status: "OPEN" },
-    { id: 5, Ward: 2, Room: 1, Bed: 8, Status: "OPEN" },
-    { id: 6, Ward: 2, Room: 2, Bed: 1, Status: "HANDLING" },
-    { id: 7, Ward: 2, Room: 2, Bed: 8, Status: "OPEN" },
-  ];
-
-  const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 90 },
-    {
-      field: "Ward",
-      headerName: "Ward",
-      width: 90,
-      editable: false,
-    },
-    {
-      field: "Room",
-      headerName: "Room",
-      width: 90,
-      editable: false,
-    },
-    {
-      field: "Bed",
-      headerName: "Bed",
-      width: 90,
-      editable: false,
-    },
-    {
-      field: "Status",
-      headerName: "Status",
-      width: 150,
-      editable: false,
-    },
-  ];
-
-  const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
-    "& .alert-OPEN": {
-      backgroundColor: "#FF5151",
-      "&:hover": {
-        cursor: "pointer",
-        backgroundColor: "#FF5151",
-      },
-    },
-    "& .alert-HANDLING": {
-      backgroundColor: "#FFA829",
-      "&:hover": {
-        cursor: "pointer",
-        backgroundColor: "#FFA829",
-      },
-    },
-    "& .alert-COMPLETED": {
-      backgroundColor: "lightgreen",
-      "&:hover": {
-        cursor: "pointer",
-        backgroundColor: "lightgreen",
-      },
-    },
-  }));
 
   return (
     <>
@@ -175,141 +47,9 @@ export default function Dashboard() {
             }}
           >
             <Box>
-              {currentPage === "patients" && (
-                <>
-                  <Box sx={{ display: "flex" }}>
-                    <Typography
-                      textAlign="left"
-                      sx={{ marginBottom: "20px", flex: "1" }}
-                      variant="h6"
-                    >
-                      General Patients Visualisation
-                    </Typography>
-                    <Button
-                      variant="contained"
-                      sx={{ margin: "10px" }}
-                      href="/createPatient"
-                    >
-                      Assign New Patient
-                    </Button>
-                  </Box>
-                  <Grid container spacing={3}>
-                    {allBeds.map(({ wardNum, smartbeds }) =>
-                      smartbeds.map((bed) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} key={bed._id}>
-                          <Paper
-                            sx={{ ":hover": { cursor: "pointer" } }}
-                            onClick={() =>
-                              viewPatientVisualisation(
-                                bed.patient?._id,
-                                wardNum,
-                                bed.roomNum,
-                                bed.bedNum
-                              )
-                            }
-                            elevation={3}
-                            style={{
-                              padding: "16px",
-                              backgroundColor:
-                                bed.bedStatus == "occupied"
-                                  ? "lightgreen"
-                                  : bed.patient
-                                  ? "orange"
-                                  : "pink",
-                            }}
-                          >
-                            <p>
-                              {bed.patient ? bed.patient.name : "Vacant Bed"}
-                            </p>
-                            <Typography variant="h6">
-                              Ward: {wardNum}, Room: {bed.roomNum}, Bed:{" "}
-                              {bed.bedNum}
-                            </Typography>
-                          </Paper>
-                        </Grid>
-                      ))
-                    )}
-                  </Grid>
-                </>
-              )}
-              {currentPage === "wards" && (
-                <>
-                  <Typography
-                    textAlign="left"
-                    sx={{ marginBottom: "20px" }}
-                    variant="h6"
-                  >
-                    Wards Page
-                  </Typography>
-                  <Grid container spacing={3}>
-                    {allWards.map((ward) => (
-                      <Grid item xs={12} sm={6} md={4} lg={3} key={ward._id}>
-                        <Paper
-                          sx={{ ":hover": { cursor: "pointer" } }}
-                          onClick={() =>
-                            viewWardVisualisation(ward._id, ward.wardNum)
-                          }
-                          elevation={3}
-                          style={{
-                            padding: "16px",
-                          }}
-                        >
-                          <Typography variant="h6">
-                            Ward: {ward.wardNum}, Bed Count :{" "}
-                            {ward.smartBeds?.length}
-                          </Typography>
-                        </Paper>
-                      </Grid>
-                    ))}
-                  </Grid>
-                  <Button
-                    sx={{ marginTop: "20px" }}
-                    variant="contained"
-                    onClick={handleLogoutButton}
-                  >
-                    Temporary Logout
-                  </Button>
-                </>
-              )}
-              {currentPage === "alerts" && (
-                <>
-                  <Typography
-                    textAlign="left"
-                    sx={{ marginBottom: "20px" }}
-                    variant="h6"
-                  >
-                    View List of Alerts
-                  </Typography>
-                  <Box
-                    sx={{
-                      height: "70%",
-                      width: "100%",
-                    }}
-                  >
-                    <StyledDataGrid
-                      rows={rows}
-                      columns={columns}
-                      initialState={{
-                        pagination: {
-                          paginationModel: {
-                            pageSize: 10,
-                          },
-                        },
-                      }}
-                      pageSizeOptions={[10]}
-                      onRowDoubleClick={() => alert("You clicked me")}
-                      getRowClassName={(params) => `alert-${params.row.Status}`}
-                    />
-                  </Box>
-                  <Button
-                    sx={{ marginTop: "20px" }}
-                    variant="contained"
-                    onClick={handleLogoutButton}
-                  >
-                    Temporary Logout
-                  </Button>
-                </>
-              )}
+              {currentPage === "patients" && <Patients />}
+              {currentPage === "wards" && <Wards />}
+              {currentPage === "alerts" && <Alerts />}
             </Box>
           </Box>
         </Box>
