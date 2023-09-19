@@ -117,13 +117,6 @@ export default function Dashboard() {
     { id: 5, Ward: 2, Room: 1, Bed: 8, Status: "OPEN" },
     { id: 6, Ward: 2, Room: 2, Bed: 1, Status: "HANDLING" },
     { id: 7, Ward: 2, Room: 2, Bed: 8, Status: "OPEN" },
-    { id: 1, Ward: 1, Room: 1, Bed: 1, Status: "HANDLING" },
-    { id: 2, Ward: 2, Room: 1, Bed: 1, Status: "HANDLING" },
-    { id: 3, Ward: 1, Room: 1, Bed: 1, Status: "COMPLETED" },
-    { id: 4, Ward: 1, Room: 8, Bed: 8, Status: "OPEN" },
-    { id: 5, Ward: 2, Room: 1, Bed: 8, Status: "OPEN" },
-    { id: 6, Ward: 2, Room: 2, Bed: 1, Status: "HANDLING" },
-    { id: 7, Ward: 2, Room: 2, Bed: 8, Status: "OPEN" },
   ];
 
   const columns: GridColDef[] = [
