@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import DashboardSideBar from "@/components/DashboardSideBar";
 import { Paper, Box, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridRowModel } from "@mui/x-data-grid";
+import { signOut } from "next-auth/react";
 import { styled } from "@mui/material/styles";
 import axios from "axios";
 import { SmartBed } from "@/models/smartBed";
@@ -19,7 +20,7 @@ export default function Dashboard() {
   const router = useRouter();
 
   const handleLogoutButton = () => {
-    router.push("/");
+    signOut();
   };
 
   console.log(router.query);
@@ -109,6 +110,13 @@ export default function Dashboard() {
   };
 
   const rows: GridRowModel[] = [
+    { id: 1, Ward: 1, Room: 1, Bed: 1, Status: "HANDLING" },
+    { id: 2, Ward: 2, Room: 1, Bed: 1, Status: "HANDLING" },
+    { id: 3, Ward: 1, Room: 1, Bed: 1, Status: "COMPLETED" },
+    { id: 4, Ward: 1, Room: 8, Bed: 8, Status: "OPEN" },
+    { id: 5, Ward: 2, Room: 1, Bed: 8, Status: "OPEN" },
+    { id: 6, Ward: 2, Room: 2, Bed: 1, Status: "HANDLING" },
+    { id: 7, Ward: 2, Room: 2, Bed: 8, Status: "OPEN" },
     { id: 1, Ward: 1, Room: 1, Bed: 1, Status: "HANDLING" },
     { id: 2, Ward: 2, Room: 1, Bed: 1, Status: "HANDLING" },
     { id: 3, Ward: 1, Room: 1, Bed: 1, Status: "COMPLETED" },
@@ -329,3 +337,4 @@ export default function Dashboard() {
     </>
   );
 }
+Dashboard.requireAuth = true;

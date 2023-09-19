@@ -8,3 +8,10 @@
   width: 500px;
   height: 285px;
 }
+
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}

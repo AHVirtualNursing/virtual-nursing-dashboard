@@ -16,23 +16,28 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import axios from "axios";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
-  const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const username = data.get("username") as string;
+    const name = data.get("name") as string;
     const email = data.get("email") as string;
     const password = data.get("password") as string;
 
     try {
-      const res = await axios.post("http://localhost:3001/auth/register", {
-        username: username,
-        email: email,
-        password: password,
-      });
+      const res = await axios.post(
+        "http://localhost:3001/nurse",
+        {
+          name: name,
+          username: name,
+          email: email,
+          password: password,
+        }
+      );
 
       if (res.status === 201) {
         setShowSuccessMessage(true);
@@ -59,28 +64,25 @@ export default function LoginPage() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-          }}
-        >
+          }}>
           <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Register New Nurse
+            Register New Mobile Nurse
           </Typography>
           <Box
             component="form"
             onSubmit={handleSubmit}
             noValidate
-            sx={{ mt: 1 }}
-          >
+            sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
               fullWidth
-              id="username"
-              label="Username"
-              name="username"
-              autoComplete="username"
+              id="name"
+              label="Name"
+              name="name"
               autoFocus
             />
             <TextField
@@ -111,14 +113,13 @@ export default function LoginPage() {
               fullWidth
               onClick={() => router.push("/")}
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
+              sx={{ mt: 3, mb: 2 }}>
               Home
             </Button>
             {showSuccessMessage ? (
               <Grid>
                 <p className="text-green-600">
-                  New nurse created. Redirecting to login..
+                  New mobile nurse created. Redirecting to home page..
                 </p>
               </Grid>
             ) : null}

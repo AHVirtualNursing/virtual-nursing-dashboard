@@ -16,12 +16,15 @@ export default function Home() {
           <div className={styles.imageContainer}>
             <Image src={"/VND_Logo_JPG.jpg"} alt="Logo" fill priority />
           </div>
-          <div>
+          <div className={styles.buttonContainer}>
             <Link href="/login">
               <Button variant="contained">LOGIN</Button>
             </Link>
             <Link href="/register">
               <Button variant="contained">REGISTER</Button>
+            </Link>
+            <Link href="/register-mobile">
+              <Button variant="contained">REGISTER MOBILE</Button>
             </Link>
             <Button variant="contained" href="/dashboard">
               View Dashboard
