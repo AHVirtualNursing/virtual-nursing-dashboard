@@ -30,40 +30,62 @@ export default function Dashboard() {
       ? useState("patients")
       : useState(router.query["state"]);
 
-  const [allBeds, setAllBeds] = useState<SmartBed[]>([]);
+  const [allBeds, setAllBeds] = useState<BedWithWardNumObject[]>([]);
   const [allWards, setAllWards] = useState<Ward[]>([]);
+
+  type BedWithWardNumObject = {
+    wardNum: string;
+    smartbeds: SmartBed[];
+  };
 
   // fetch all wards
   useEffect(() => {
-    const fetchAllWards = async () => {
+    const fetchAllWardsAndBeds = async () => {
       try {
         await axios.get("http://localhost:3001/ward").then((res) => {
-          console.log(res);
-          setAllWards(res.data.data);
-          setAllBeds([]);
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    fetchAllWards();
-  }, []);
+          // console.log(res.data.data);
+          const wards = res.data.data;
+          setAllWards(wards);
 
-  useEffect(() => {
-    const retrieveBedsByWardId = async (wardId: string) => {
-      try {
-        await axios.get(`http://localhost:3001/ward/${wardId}`).then((res) => {
-          setAllBeds((prevBeds) => [...prevBeds, ...res.data.smartBeds]);
+          let promises = [];
+          for (var ward of wards) {
+            promises.push(axios.get(`http://localhost:3001/ward/${ward._id}`));
+          }
+          let beds: BedWithWardNumObject[] = [];
+          Promise.all(promises).then((res) => {
+            // console.log(res); //ward object
+            res.map((w) => {
+              console.log(w);
+              var obj = { wardNum: w.data.num, smartbeds: w.data.smartBeds };
+              beds.push(obj);
+            });
+            setAllBeds(beds);
+          });
         });
       } catch (e) {
         console.error(e);
       }
     };
-    setAllBeds([]);
-    for (const w of allWards) {
-      retrieveBedsByWardId(w._id);
-    }
-  }, [allWards]);
+    fetchAllWardsAndBeds();
+    console.log(allBeds);
+  }, [allBeds.length, allWards.length]);
+
+  // useEffect(() => {
+  //   const retrieveBedsByWardId = async (wardId: string) => {
+  //     try {
+  //       await axios.get(`http://localhost:3001/ward/${wardId}`).then((res) => {
+  //         console.log(res.data);
+  //         setAllBeds((prevBeds) => [...prevBeds, ...res.data.smartBeds]);
+  //       });
+  //     } catch (e) {
+  //       console.error(e);
+  //     }
+  //   };
+  //   setAllBeds([]);
+  //   for (const w of allWards) {
+  //     retrieveBedsByWardId(w._id);
+  //   }
+  // }, [allWards]);
 
   const handleSideBarTabClick = (key: string) => {
     setCurrentPage(key);
@@ -189,37 +211,41 @@ export default function Dashboard() {
                     </Button>
                   </Box>
                   <Grid container spacing={3}>
-                    {allBeds.map((bed) => (
-                      <Grid item xs={12} sm={6} md={4} lg={3} key={bed._id}>
-                        <Paper
-                          sx={{ ":hover": { cursor: "pointer" } }}
-                          onClick={() =>
-                            viewPatientVisualisation(
-                              bed.patient?._id,
-                              bed.ward.num,
-                              bed.roomNum,
-                              bed.bedNum
-                            )
-                          }
-                          elevation={3}
-                          style={{
-                            padding: "16px",
-                            backgroundColor:
-                              bed.bedStatus == "occupied"
-                                ? "lightgreen"
-                                : bed.patient
-                                ? "orange"
-                                : "pink",
-                          }}
-                        >
-                          <p>{bed.patient ? bed.patient.name : "Vacant Bed"}</p>
-                          <Typography variant="h6">
-                            Ward: {bed.ward.num}, Room: {bed.roomNum}, Bed:{" "}
-                            {bed.bedNum}
-                          </Typography>
-                        </Paper>
-                      </Grid>
-                    ))}
+                    {allBeds.map(({ wardNum, smartbeds }) =>
+                      smartbeds.map((bed) => (
+                        <Grid item xs={12} sm={6} md={4} lg={3} key={bed._id}>
+                          <Paper
+                            sx={{ ":hover": { cursor: "pointer" } }}
+                            onClick={() =>
+                              viewPatientVisualisation(
+                                bed.patient?._id,
+                                wardNum,
+                                bed.roomNum,
+                                bed.bedNum
+                              )
+                            }
+                            elevation={3}
+                            style={{
+                              padding: "16px",
+                              backgroundColor:
+                                bed.bedStatus == "occupied"
+                                  ? "lightgreen"
+                                  : bed.patient
+                                  ? "orange"
+                                  : "pink",
+                            }}
+                          >
+                            <p>
+                              {bed.patient ? bed.patient.name : "Vacant Bed"}
+                            </p>
+                            <Typography variant="h6">
+                              Ward: {wardNum}, Room: {bed.roomNum}, Bed:{" "}
+                              {bed.bedNum}
+                            </Typography>
+                          </Paper>
+                        </Grid>
+                      ))
+                    )}
                   </Grid>
                 </>
               )}
