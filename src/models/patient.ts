@@ -1,6 +1,8 @@
 import { Alert } from "./alert";
 import { Reminder } from "./reminder";
 import { Vital } from "./vital";
+import { Report } from "./report";
+import { AlertConfig } from "./alertConfig";
 
 export class Patient {
   _id: string;
@@ -15,9 +17,11 @@ export class Patient {
   temperature?: number;
   news2Score?: number;
   alerts?: Alert[];
+  alertConfig?: AlertConfig[];
   reminders?: Reminder[];
   isDischarged?: boolean;
   vital?: Vital;
+  reports?: Report[];
 
   constructor(
     _id: string,
@@ -32,9 +36,11 @@ export class Patient {
     temperature?: number,
     news2Score?: number,
     alerts?: Alert[],
+    alertConfig?: AlertConfig[],
     reminders?: Reminder[],
     isDischarged?: boolean,
-    vital?: Vital
+    vital?: Vital,
+    reports?: Report[],
   ) {
     this._id = _id;
     this.name = name;
@@ -48,8 +54,10 @@ export class Patient {
     this.temperature = temperature;
     this.news2Score = news2Score;
     this.alerts = alerts;
+    this.alertConfig = alertConfig;
     this.reminders = reminders;
     this.isDischarged = isDischarged;
     this.vital = vital;
+    this.reports = reports;
   }
 }

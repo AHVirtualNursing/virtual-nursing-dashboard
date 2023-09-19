@@ -70,23 +70,6 @@ export default function Dashboard() {
     console.log(allBeds);
   }, [allBeds.length, allWards.length]);
 
-  // useEffect(() => {
-  //   const retrieveBedsByWardId = async (wardId: string) => {
-  //     try {
-  //       await axios.get(`http://localhost:3001/ward/${wardId}`).then((res) => {
-  //         console.log(res.data);
-  //         setAllBeds((prevBeds) => [...prevBeds, ...res.data.smartBeds]);
-  //       });
-  //     } catch (e) {
-  //       console.error(e);
-  //     }
-  //   };
-  //   setAllBeds([]);
-  //   for (const w of allWards) {
-  //     retrieveBedsByWardId(w._id);
-  //   }
-  // }, [allWards]);
-
   const handleSideBarTabClick = (key: string) => {
     setCurrentPage(key);
   };
@@ -264,7 +247,7 @@ export default function Dashboard() {
                         <Paper
                           sx={{ ":hover": { cursor: "pointer" } }}
                           onClick={() =>
-                            viewWardVisualisation(ward._id, ward.num)
+                            viewWardVisualisation(ward._id, ward.wardNum)
                           }
                           elevation={3}
                           style={{
@@ -272,7 +255,7 @@ export default function Dashboard() {
                           }}
                         >
                           <Typography variant="h6">
-                            Ward: {ward.num}, Bed Count :{" "}
+                            Ward: {ward.wardNum}, Bed Count :{" "}
                             {ward.smartBeds?.length}
                           </Typography>
                         </Paper>
