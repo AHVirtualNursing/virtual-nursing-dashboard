@@ -82,13 +82,6 @@ export default function LoginPage() {
               sx={{ mt: 3, mb: 2 }}>
               Sign In
             </Button>
-            <Grid container>
-              <Grid item>
-                <Link href='/register' variant='body2'>
-                  {"Register New Nurse"}
-                </Link>
-              </Grid>
-            </Grid>
           </Box>
         </Box>
       </Container>
