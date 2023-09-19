@@ -9,7 +9,7 @@ import DashboardSideBar from "@/components/DashboardSideBar";
 import { Paper, Box, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridRowModel } from "@mui/x-data-grid";
 import { styled } from "@mui/material/styles";
-import { signOut } from "next-auth/react";
+import ChangePasswordPage from "@/components/changePassword";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -250,6 +250,7 @@ export default function Dashboard() {
                   </Box>
                 </>
               )}
+              {currentPage === "changePassword" && <ChangePasswordPage />}
             </Box>
           </Box>
         </Box>

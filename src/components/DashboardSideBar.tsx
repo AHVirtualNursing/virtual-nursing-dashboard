@@ -10,6 +10,7 @@ import BedIcon from "@mui/icons-material/Bed";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import LogoutIcon from "@mui/icons-material/Logout";
+import LockResetIcon from "@mui/icons-material/LockReset";
 import { signOut } from "next-auth/react";
 export interface ISideBarTab {
   text: string;
@@ -41,7 +42,18 @@ export default function DashboardSideBar({
     icon: <NotificationsIcon />,
   };
 
-  const drawerTabs: ISideBarTab[] = [patientsTab, wardsTab, alertsTab];
+  const changePasswordTab: ISideBarTab = {
+    text: "Change Password",
+    key: "changePassword",
+    icon: <LockResetIcon />,
+  };
+
+  const drawerTabs: ISideBarTab[] = [
+    patientsTab,
+    wardsTab,
+    alertsTab,
+    changePasswordTab,
+  ];
 
   return (
     <Drawer
