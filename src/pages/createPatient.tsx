@@ -41,8 +41,16 @@ function createPatient() {
 
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showNricErrorMessage, setShowNricErrorMessage] = useState(false);
+  const nricErrorMessage =
+    "Please ensure that NRIC is filled in and is of the right format.";
   const [showNameErrorMessage, setShowNameErrorMessage] = useState(false);
+  const nameErrorMessage =
+    "Please ensure that the Name of the patient is filled in.";
   const [showBedErrorMessage, setShowBedErrorMessage] = useState(false);
+  const bedErrorMessage = "Please ensure that a bed is selected.";
+  const [showConditionErrorMessage, setShowConditionErrorMessage] =
+    useState(false);
+  const nricConditionMessage = "Please ensure that condition is filled in.";
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -66,10 +74,17 @@ function createPatient() {
     } else {
       setShowBedErrorMessage(false);
     }
+    if (!condition) {
+      setShowConditionErrorMessage(true);
+    } else {
+      setShowConditionErrorMessage(false);
+    }
     if (showNameErrorMessage || showBedErrorMessage || showNricErrorMessage) {
       return;
     }
+    console.log("DETAILS VALID");
     const res = await createNewPatient(patientName, patientNric, condition);
+    console.log(res?.status);
     if (res?.status === 200) {
       const updateBedRes = await updateSmartbedByBedId(
         bedAssigned,
@@ -85,6 +100,14 @@ function createPatient() {
         }, 1500);
       }
     }
+  };
+
+  const ErrorMessage = (message: string) => {
+    return (
+      <Grid>
+        <p className="text-red-600">{message}</p>
+      </Grid>
+    );
   };
 
   const [vacantBeds, setVacantBeds] = useState<BedWithWardNumObject[]>([]);
@@ -154,6 +177,7 @@ function createPatient() {
             ></TextField>
             <TextField
               margin="normal"
+              required
               fullWidth
               id="condition"
               label="Any conditions to take note of"
@@ -187,28 +211,22 @@ function createPatient() {
                 <p className="text-green-600">New patient created.</p>
               </Grid>
             ) : null}
-            {showNameErrorMessage ? (
-              <Grid>
-                <p className="text-red-600">
-                  Please ensure that the Name of the patient is filled in.
-                </p>
-              </Grid>
-            ) : null}
-            {showNricErrorMessage ? (
-              <Grid>
-                <p className="text-red-600">
-                  Please ensure that NRIC is filled in and is of the right
-                  format.
-                </p>
-              </Grid>
-            ) : null}
-            {showBedErrorMessage ? (
-              <Grid>
-                <p className="text-red-600">
-                  Please ensure that a bed is selected.
-                </p>
-              </Grid>
-            ) : null}
+            {showNameErrorMessage
+              ? ErrorMessage(
+                  "Please ensure that the Name of the patient is filled in."
+                )
+              : null}
+            {showNricErrorMessage
+              ? ErrorMessage(
+                  "Please ensure that NRIC is filled in and is of the right format."
+                )
+              : null}
+            {showConditionErrorMessage
+              ? ErrorMessage("Please ensure that condition is filled in.")
+              : null}
+            {showBedErrorMessage
+              ? ErrorMessage("Please ensure that a bed is selected.")
+              : null}
           </Box>
         </Box>
       </Box>
