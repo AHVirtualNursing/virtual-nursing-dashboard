@@ -11,6 +11,8 @@ import ApartmentIcon from "@mui/icons-material/Apartment";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { signOut } from "next-auth/react";
+import { useState } from "react";
+
 export interface ISideBarTab {
   text: string;
   key: string;
@@ -22,6 +24,8 @@ export default function DashboardSideBar({
 }: {
   handleSideBarTabClick: (key: string) => void;
 }) {
+  const [activeTab, setActiveTab] = useState("patients");
+
   const drawerWidth = 240;
   const patientsTab: ISideBarTab = {
     text: "General Patients Visualisation",
@@ -61,8 +65,14 @@ export default function DashboardSideBar({
           <ListItem
             key={tab.text}
             disablePadding
-            onClick={() => handleSideBarTabClick(tab.key)}>
-            <ListItemButton>
+            onClick={() => {
+              handleSideBarTabClick(tab.key);
+              setActiveTab(tab.key);
+            }}
+          >
+            <ListItemButton
+              sx={{ backgroundColor: activeTab === tab.key ? "lightblue" : "" }}
+            >
               <ListItemIcon>{tab.icon}</ListItemIcon>
               <ListItemText primary={tab.text} />
             </ListItemButton>

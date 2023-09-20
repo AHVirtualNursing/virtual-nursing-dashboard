@@ -12,10 +12,10 @@ type AppPropsWithAuth = AppProps & {
 export default function App({ Component, pageProps }: AppPropsWithAuth) {
   const content =
     Component.requireAuth === undefined ? (
-      <ProtectedLayout>
-        <Component {...pageProps} />
-      </ProtectedLayout>
+      // <ProtectedLayout>
+      <Component {...pageProps} />
     ) : (
+      // </ProtectedLayout>
       <Component {...pageProps} />
     );
 
