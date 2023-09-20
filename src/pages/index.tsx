@@ -14,20 +14,32 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/router";
 
 function LoginPage() {
+  const router = useRouter();
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const identifier = data.get("identifier") as string;
     const password = data.get("password") as string;
 
-    await signIn("credentials", {
-      identifier: identifier,
-      password: password,
-      redirect: true,
-      callbackUrl: "/dashboard",
-    });
+    try {
+      const res = await signIn("credentials", {
+        identifier: identifier,
+        password: password,
+        redirect: false,
+      });
+
+      if (res != undefined && res.status == 200) {
+        router.push("/dashboard");
+      } else {
+        alert("Wrong credentials");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
