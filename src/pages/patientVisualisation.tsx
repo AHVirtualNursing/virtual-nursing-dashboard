@@ -14,7 +14,7 @@ import { Inter } from "next/font/google";
 import { useRouter } from "next/router";
 import styles from "@/styles/Dashboard.module.css";
 import Image from "next/image";
-import profilePic from "../../public/doctor.png";
+import profilePic from "../../public/profilepic.jpg";
 import MonitorHeartIcon from "@mui/icons-material/MonitorHeart";
 import ThermostatIcon from "@mui/icons-material/Thermostat";
 import BloodtypeIcon from "@mui/icons-material/Bloodtype";
@@ -277,10 +277,10 @@ const patientVisualisationPage = () => {
                 borderRadius: 3,
               }}
             >
-              <Box>
+              <Box sx={{ padding: "20px" }}>
                 <Image
                   style={{
-                    width: "50%",
+                    width: "40%",
                     height: "auto",
                     borderRadius: "50%",
                   }}
