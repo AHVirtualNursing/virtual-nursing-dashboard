@@ -12,6 +12,7 @@ export default function Wards() {
 
   useEffect(() => {
     fetchAllWards().then((res) => setWardsList(res.data));
+    console.log(wardsList);
   }, [wardsList.length]);
 
   const viewWardVisualisation = (wardId: string, wardNum: string) => {
@@ -35,14 +36,14 @@ export default function Wards() {
           <Grid item xs={12} sm={6} md={4} lg={3} key={ward._id}>
             <Paper
               sx={{ ":hover": { cursor: "pointer" } }}
-              onClick={() => viewWardVisualisation(ward._id, ward.wardNum)}
+              onClick={() => viewWardVisualisation(ward._id, ward.num)}
               elevation={3}
               style={{
                 padding: "16px",
               }}
             >
               <Typography variant="h6">
-                Ward: {ward.wardNum}, Bed Count : {ward.smartBeds?.length}
+                Ward: {ward.num}, Bed Count : {ward.smartBeds?.length}
               </Typography>
             </Paper>
           </Grid>
