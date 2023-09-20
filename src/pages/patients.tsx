@@ -39,9 +39,11 @@ export default function Patients() {
     roomNum: number,
     bedNum: number
   ) => {
-    router.push(
-      `/patientVisualisation?patientId=${patientId}&wardNum=${wardNum}&roomNum=${roomNum}&bedNum=${bedNum}`
-    );
+    if (patientId != undefined) {
+      router.push(
+        `/patientVisualisation?patientId=${patientId}&wardNum=${wardNum}&roomNum=${roomNum}&bedNum=${bedNum}`
+      );
+    }
   };
 
   return (

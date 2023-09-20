@@ -19,6 +19,8 @@ import { SmartBed } from "@/models/smartBed";
 import axios from "axios";
 import { Patient } from "@/models/patient";
 import { fetchAllWards, fetchBedsByWardId } from "./api/wards_api";
+import { createNewPatient } from "./api/patients_api";
+import { updateSmartbedByBedId } from "./api/smartbed_api";
 
 const inter = Inter({ subsets: ["latin"] });
 const handleSideBarTabClick = (key: string) => {
@@ -35,9 +37,15 @@ function createPatient() {
 
   const handleChange = (event: SelectChangeEvent) => {
     setAssignedBed(event.target.value);
+    setShowBedErrorMessage(false);
   };
 
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showNricErrorMessage, setShowNricErrorMessage] = useState(false);
+  const [showNameErrorMessage, setShowNameErrorMessage] = useState(false);
+  const [showBedErrorMessage, setShowBedErrorMessage] = useState(false);
+  const [showConditionErrorMessage, setShowConditionErrorMessage] =
+    useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -45,33 +53,56 @@ function createPatient() {
     const patientName = data.get("patientName") as string;
     const condition = data.get("condition") as string;
     const patientNric = data.get("patientNric") as string;
-    // update smart bed status to occupied, require ObjectId of newly created patient
-
-    try {
-      const res = await axios.post("http://localhost:3001/patient", {
-        name: patientName,
-        nric: patientNric,
-        condition: condition,
-      });
-      console.log(res);
-      if (res.status === 200) {
-        const updateBedRes = await axios.put(
-          "http://localhost:3001/smartbed/" + bedAssigned,
-          {
-            patient: res.data.data._id,
-          }
-        );
-        console.log(updateBedRes);
-        if (updateBedRes.status == 200) {
-          setShowSuccessMessage(true);
-          setTimeout(() => {
-            router.push("/dashboard");
-          }, 1500);
-        }
-      }
-    } catch (err) {
-      console.log(err);
+    const nricRegex = /^\d{3}[A-Za-z]$/;
+    if (!patientName) {
+      setShowNameErrorMessage(true);
+    } else {
+      setShowNameErrorMessage(false);
     }
+    if (!patientNric || !nricRegex.test(patientNric)) {
+      setShowNricErrorMessage(true);
+    } else {
+      setShowNricErrorMessage(false);
+    }
+    if (bedAssigned == "") {
+      setShowBedErrorMessage(true);
+    } else {
+      setShowBedErrorMessage(false);
+    }
+    if (!condition) {
+      setShowConditionErrorMessage(true);
+    } else {
+      setShowConditionErrorMessage(false);
+    }
+    if (showNameErrorMessage || showBedErrorMessage || showNricErrorMessage) {
+      return;
+    }
+    console.log("DETAILS VALID");
+    const res = await createNewPatient(patientName, patientNric, condition);
+    console.log(res?.status);
+    if (res?.status === 200) {
+      const updateBedRes = await updateSmartbedByBedId(
+        bedAssigned,
+        res.data.data._id
+      );
+      if (updateBedRes?.status == 200) {
+        setShowSuccessMessage(true);
+        setShowNricErrorMessage(false);
+        setShowNameErrorMessage(false);
+        setShowBedErrorMessage(false);
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
+      }
+    }
+  };
+
+  const ErrorMessage = (message: string) => {
+    return (
+      <Grid>
+        <p className="text-red-600">{message}</p>
+      </Grid>
+    );
   };
 
   const [vacantBeds, setVacantBeds] = useState<BedWithWardNumObject[]>([]);
@@ -135,7 +166,7 @@ function createPatient() {
               required
               fullWidth
               id="patientNric"
-              label="NRIC of Patient"
+              label="Masked NRIC of Patient: e.g S1234567D would be 567D"
               name="patientNric"
               autoFocus
             ></TextField>
@@ -157,6 +188,7 @@ function createPatient() {
               value={bedAssigned}
               label="Available Beds"
               onChange={handleChange}
+              required
             >
               {vacantBeds.map(({ wardNum, smartbeds }) =>
                 smartbeds.map((bed) => (
@@ -174,6 +206,22 @@ function createPatient() {
                 <p className="text-green-600">New patient created.</p>
               </Grid>
             ) : null}
+            {showNameErrorMessage
+              ? ErrorMessage(
+                  "Please ensure that the Name of the patient is filled in."
+                )
+              : null}
+            {showNricErrorMessage
+              ? ErrorMessage(
+                  "Please ensure that NRIC is filled in and is of the right format."
+                )
+              : null}
+            {showConditionErrorMessage
+              ? ErrorMessage("Please ensure that condition is filled in.")
+              : null}
+            {showBedErrorMessage
+              ? ErrorMessage("Please ensure that a bed is selected.")
+              : null}
           </Box>
         </Box>
       </Box>

@@ -18,6 +18,10 @@ import React, { useEffect, useState } from "react";
 import { SmartBed } from "@/models/smartBed";
 import axios from "axios";
 import { Patient } from "@/models/patient";
+import {
+  fetchPatientByPatientId,
+  updatePatientByPatientId,
+} from "./api/patients_api";
 
 const inter = Inter({ subsets: ["latin"] });
 const handleSideBarTabClick = (key: string) => {
@@ -31,20 +35,7 @@ function updatePatient() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   useEffect(() => {
-    const selectPatientById = async () => {
-      try {
-        await axios
-          .get("http://localhost:3001/patient/" + patientId)
-          .then((res) => {
-            console.log(res.data);
-            setSelectedPatient(res.data);
-            console.log(patientSelected);
-          });
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    selectPatientById();
+    fetchPatientByPatientId(patientId).then((res) => setSelectedPatient(res));
   }, [patientId]);
 
   if (patientSelected === undefined) {
@@ -54,28 +45,13 @@ function updatePatient() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const patientName = data.get("patientName") as string;
     const condition = data.get("condition") as string;
-    const patientNric = data.get("patientNric") as string;
-
-    try {
-      const res = await axios.put(
-        "http://localhost:3001/patient/" + patientId,
-        {
-          name: patientName,
-          nric: patientNric,
-          condition: condition,
-        }
-      );
-      console.log(res);
-      if (res.status === 200) {
-        setShowSuccessMessage(true);
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 1500);
-      }
-    } catch (err) {
-      console.log(err);
+    const res = await updatePatientByPatientId(patientId, condition);
+    if (res?.status === 200) {
+      setShowSuccessMessage(true);
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1500);
     }
   };
 
