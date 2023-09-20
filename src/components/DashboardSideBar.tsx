@@ -1,16 +1,27 @@
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
-import BedIcon from '@mui/icons-material/Bed';
-import ApartmentIcon from '@mui/icons-material/Apartment';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+import BedIcon from "@mui/icons-material/Bed";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { signOut } from "next-auth/react";
 export interface ISideBarTab {
   text: string;
   key: string;
   icon: JSX.Element;
 }
 
-export default function DashboardSideBar({handleSideBarTabClick} : {handleSideBarTabClick: (key:string) => void}) {
-
+export default function DashboardSideBar({
+  handleSideBarTabClick,
+}: {
+  handleSideBarTabClick: (key: string) => void;
+}) {
   const drawerWidth = 240;
   const patientsTab: ISideBarTab = {
     text: "General Patients Visualisation",
@@ -30,12 +41,8 @@ export default function DashboardSideBar({handleSideBarTabClick} : {handleSideBa
     icon: <NotificationsIcon />,
   };
 
-  const drawerTabs: ISideBarTab[] = [
-    patientsTab,
-    wardsTab,
-    alertsTab,
-  ];
-  
+  const drawerTabs: ISideBarTab[] = [patientsTab, wardsTab, alertsTab];
+
   return (
     <Drawer
       sx={{
@@ -48,21 +55,27 @@ export default function DashboardSideBar({handleSideBarTabClick} : {handleSideBa
         },
       }}
       variant="permanent"
-      anchor="left"
-    >
+      anchor="left">
       <List>
         {drawerTabs.map((tab) => (
           <ListItem
             key={tab.text}
             disablePadding
-            onClick={() => handleSideBarTabClick(tab.key)}
-          >
+            onClick={() => handleSideBarTabClick(tab.key)}>
             <ListItemButton>
               <ListItemIcon>{tab.icon}</ListItemIcon>
               <ListItemText primary={tab.text} />
             </ListItemButton>
           </ListItem>
         ))}
+        <ListItem disablePadding onClick={() => signOut()}>
+          <ListItemButton>
+            <ListItemIcon>
+              <LogoutIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Log Out"} />
+          </ListItemButton>
+        </ListItem>
       </List>
     </Drawer>
   );

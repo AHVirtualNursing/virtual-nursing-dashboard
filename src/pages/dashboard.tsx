@@ -16,10 +16,6 @@ const inter = Inter({ subsets: ["latin"] });
 export default function Dashboard() {
   const router = useRouter();
 
-  const handleLogoutButton = () => {
-    signOut();
-  };
-
   console.log(router.query);
   console.log(router.query["state"]);
   const [currentPage, setCurrentPage] =
@@ -200,12 +196,6 @@ export default function Dashboard() {
                       </Grid>
                     ))}
                   </Grid>
-                  <Button
-                    sx={{ marginTop: "20px" }}
-                    variant="contained"
-                    onClick={handleLogoutButton}>
-                    Temporary Logout
-                  </Button>
                 </>
               )}
               {currentPage === "wards" && (
@@ -231,12 +221,6 @@ export default function Dashboard() {
                       )
                     )}
                   </Grid>
-                  <Button
-                    sx={{ marginTop: "20px" }}
-                    variant="contained"
-                    onClick={handleLogoutButton}>
-                    Temporary Logout
-                  </Button>
                 </>
               )}
               {currentPage === "alerts" && (
@@ -264,12 +248,6 @@ export default function Dashboard() {
                       getRowClassName={(params) => `alert-${params.row.Status}`}
                     />
                   </Box>
-                  <Button
-                    sx={{ marginTop: "20px" }}
-                    variant="contained"
-                    onClick={handleLogoutButton}>
-                    Temporary Logout
-                  </Button>
                 </>
               )}
             </Box>
@@ -279,4 +257,3 @@ export default function Dashboard() {
     </>
   );
 }
-Dashboard.requireAuth = true;
