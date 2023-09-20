@@ -2,14 +2,14 @@ import { SmartBed } from "./smartBed";
 
 export class Ward {
   _id: string;
-  num: string;
+  wardNum: string;
   wardType: string;
   numRooms: number;
   smartBeds?: SmartBed[];
 
-  constructor(_id: string, num: string, wardType: string, numRooms: number, smartBeds?: SmartBed[]) {
+  constructor(_id: string, wardNum: string, wardType: string, numRooms: number, smartBeds?: SmartBed[]) {
     this._id = _id;
-    this.num = num;
+    this.wardNum = wardNum;
     this.wardType = wardType;
     this.numRooms = numRooms;
     this.smartBeds = smartBeds;

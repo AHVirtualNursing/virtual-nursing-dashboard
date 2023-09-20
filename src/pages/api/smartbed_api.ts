@@ -1,5 +1,15 @@
 import axios from "axios";
 
+export const fetchBedByBedId = async (bedId: string | string[] | undefined) => {
+  try {
+    const res = await axios.get(`http://localhost:3001/smartbed/${bedId}`)
+    console.log(res)
+    return res.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const updateSmartbedByBedId = async (bedId : string | string[] | undefined, patientId: string) => {
   try {
     const res = await axios.put(`http://localhost:3001/smartbed/${bedId}/`, {

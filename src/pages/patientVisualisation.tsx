@@ -36,12 +36,14 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { fetchPatientByPatientId } from "./api/patients_api";
+import { fetchBedByBedId } from "./api/smartbed_api";
+import { SmartBed } from "@/models/smartBed";
 
 const inter = Inter({ subsets: ["latin"] });
 
 const patientVisualisationPage = () => {
   const router = useRouter();
-  const { patientId, wardNum, roomNum, bedNum } = router.query;
+  const { patientId, bedId } = router.query;
 
   const handleSideBarTabClick = (key: string) => {
     router.push(
@@ -50,11 +52,13 @@ const patientVisualisationPage = () => {
     );
   };
 
-  const [selectedPatient, setSelectedPatient] = useState<Patient>();
+  // const [selectedPatient, setSelectedPatient] = useState<Patient>();
+  const [selectedBed, setSelectedBed] = useState<SmartBed>();
 
   useEffect(() => {
-    fetchPatientByPatientId(patientId).then((res) => setSelectedPatient(res));
-  }, [patientId]);
+    fetchBedByBedId(bedId).then((res) => setSelectedBed(res));
+    // fetchPatientByPatientId(patientId).then((res) => setSelectedPatient(res));
+  }, [bedId]);
 
   const vitals = {
     heartRate: 60,
@@ -73,13 +77,13 @@ const patientVisualisationPage = () => {
 
   function getAlerts(status: string) {
     const listOfAlerts: GridRowModel[] = [];
-    if (selectedPatient?.alerts !== undefined) {
-      for (let i = 0; i < selectedPatient.alerts.length; i++) {
-        if (selectedPatient.alerts[i].status == status) {
+    if (selectedBed?.patient?.alerts !== undefined) {
+      for (let i = 0; i < selectedBed.patient.alerts.length; i++) {
+        if (selectedBed.patient.alerts[i].status == status) {
           listOfAlerts.push({
-            status: selectedPatient.alerts[i].status,
-            description: selectedPatient.alerts[i].description,
-            notes: selectedPatient.alerts[i].notes,
+            status: selectedBed.patient.alerts[i].status,
+            description: selectedBed.patient.alerts[i].description,
+            notes: selectedBed.patient.alerts[i].notes,
           });
         }
       }
@@ -206,7 +210,7 @@ const patientVisualisationPage = () => {
         {value === index && (
           <Box>
             <Grid item xs={6} style={{ flex: 1 }}>
-              {selectedPatient?.alerts?.length != undefined &&
+              {selectedBed?.patient?.alerts?.length != undefined &&
               getAlerts(status).length > 0 ? (
                 <Box>
                   <StyledDataGrid
@@ -252,7 +256,7 @@ const patientVisualisationPage = () => {
   };
 
   function updateSelectedPatient() {
-    router.push("/updatePatient?patientId=" + selectedPatient?._id);
+    router.push("/updatePatient?patientId=" + selectedBed?.patient?._id);
   }
 
   return (
@@ -284,18 +288,19 @@ const patientVisualisationPage = () => {
                   alt="Picture of Patient"
                 />
                 <h3>
-                  {selectedPatient?.name} ({selectedPatient?.nric})
+                  {selectedBed?.patient?.name} ({selectedBed?.patient?.nric})
                 </h3>
               </Box>
               <Box style={{ width: "100%" }}>
                 <Box display={"flex"} sx={{ paddingTop: "20px" }}>
                   <p>
-                    Ward: {wardNum}, Room: {roomNum}, Bed: {bedNum}
+                    Ward: {selectedBed?.ward.wardNum}, Room:{" "}
+                    {selectedBed?.roomNum}, Bed: {selectedBed?.bedNum}
                   </p>
                 </Box>
                 <Box textAlign={"left"}>
-                  <p>Condition: {selectedPatient?.condition} </p>
-                  <p>Additional Info: {selectedPatient?.addInfo} </p>
+                  <p>Condition: {selectedBed?.patient?.condition} </p>
+                  <p>Additional Info: {selectedBed?.patient?.addInfo} </p>
                 </Box>
                 <Box textAlign={"right"} marginRight={2}>
                   <Button
