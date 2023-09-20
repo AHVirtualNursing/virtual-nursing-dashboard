@@ -94,14 +94,10 @@ export default function ChangePasswordPage() {
             alignItems: "center",
             justifyContent: "space-around",
             marginTop: "16px",
-          }}>
+          }}
+        >
           <Button variant="outlined" onClick={() => changePassword()}>
             CONFIRM
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={() => setChangePasswordModalOpen(false)}>
-            BACK
           </Button>
         </Box>
       </form>
