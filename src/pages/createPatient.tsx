@@ -19,6 +19,8 @@ import { SmartBed } from "@/models/smartBed";
 import axios from "axios";
 import { Patient } from "@/models/patient";
 import { fetchAllWards, fetchBedsByWardId } from "./api/wards_api";
+import { createNewPatient } from "./api/patients_api";
+import { updateSmartbedByBedId } from "./api/smartbed_api";
 
 const inter = Inter({ subsets: ["latin"] });
 const handleSideBarTabClick = (key: string) => {
@@ -46,31 +48,18 @@ function createPatient() {
     const condition = data.get("condition") as string;
     const patientNric = data.get("patientNric") as string;
     // update smart bed status to occupied, require ObjectId of newly created patient
-
-    try {
-      const res = await axios.post("http://localhost:3001/patient", {
-        name: patientName,
-        nric: patientNric,
-        condition: condition,
-      });
-      console.log(res);
-      if (res.status === 200) {
-        const updateBedRes = await axios.put(
-          "http://localhost:3001/smartbed/" + bedAssigned,
-          {
-            patient: res.data.data._id,
-          }
-        );
-        console.log(updateBedRes);
-        if (updateBedRes.status == 200) {
-          setShowSuccessMessage(true);
-          setTimeout(() => {
-            router.push("/dashboard");
-          }, 1500);
-        }
+    const res = await createNewPatient(patientName, patientNric, condition);
+    if (res?.status === 200) {
+      const updateBedRes = await updateSmartbedByBedId(
+        bedAssigned,
+        res.data.data._id
+      );
+      if (updateBedRes?.status == 200) {
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
       }
-    } catch (err) {
-      console.log(err);
     }
   };
 
