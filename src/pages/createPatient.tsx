@@ -40,6 +40,9 @@ function createPatient() {
   };
 
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showNricErrorMessage, setShowNricErrorMessage] = useState(false);
+  const [showNameErrorMessage, setShowNameErrorMessage] = useState(false);
+  const [showBedErrorMessage, setShowBedErrorMessage] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -47,7 +50,25 @@ function createPatient() {
     const patientName = data.get("patientName") as string;
     const condition = data.get("condition") as string;
     const patientNric = data.get("patientNric") as string;
-    // update smart bed status to occupied, require ObjectId of newly created patient
+    const nricRegex = /^\d{3}[A-Za-z]$/;
+    if (!patientName) {
+      setShowNameErrorMessage(true);
+    } else {
+      setShowNameErrorMessage(false);
+    }
+    if (!patientNric || !nricRegex.test(patientNric)) {
+      setShowNricErrorMessage(true);
+    } else {
+      setShowNricErrorMessage(false);
+    }
+    if (bedAssigned == "") {
+      setShowBedErrorMessage(true);
+    } else {
+      setShowBedErrorMessage(false);
+    }
+    if (showNameErrorMessage || showBedErrorMessage || showNricErrorMessage) {
+      return;
+    }
     const res = await createNewPatient(patientName, patientNric, condition);
     if (res?.status === 200) {
       const updateBedRes = await updateSmartbedByBedId(
@@ -56,6 +77,9 @@ function createPatient() {
       );
       if (updateBedRes?.status == 200) {
         setShowSuccessMessage(true);
+        setShowNricErrorMessage(false);
+        setShowNameErrorMessage(false);
+        setShowBedErrorMessage(false);
         setTimeout(() => {
           router.push("/dashboard");
         }, 1500);
@@ -124,13 +148,12 @@ function createPatient() {
               required
               fullWidth
               id="patientNric"
-              label="NRIC of Patient"
+              label="Masked NRIC of Patient: e.g S1234567D would be 567D"
               name="patientNric"
               autoFocus
             ></TextField>
             <TextField
               margin="normal"
-              required
               fullWidth
               id="condition"
               label="Any conditions to take note of"
@@ -146,6 +169,7 @@ function createPatient() {
               value={bedAssigned}
               label="Available Beds"
               onChange={handleChange}
+              required
             >
               {vacantBeds.map(({ wardNum, smartbeds }) =>
                 smartbeds.map((bed) => (
@@ -161,6 +185,28 @@ function createPatient() {
             {showSuccessMessage ? (
               <Grid>
                 <p className="text-green-600">New patient created.</p>
+              </Grid>
+            ) : null}
+            {showNameErrorMessage ? (
+              <Grid>
+                <p className="text-red-600">
+                  Please ensure that the Name of the patient is filled in.
+                </p>
+              </Grid>
+            ) : null}
+            {showNricErrorMessage ? (
+              <Grid>
+                <p className="text-red-600">
+                  Please ensure that NRIC is filled in and is of the right
+                  format.
+                </p>
+              </Grid>
+            ) : null}
+            {showBedErrorMessage ? (
+              <Grid>
+                <p className="text-red-600">
+                  Please ensure that a bed is selected.
+                </p>
               </Grid>
             ) : null}
           </Box>
