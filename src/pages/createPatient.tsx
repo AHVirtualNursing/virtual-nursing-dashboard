@@ -37,20 +37,15 @@ function createPatient() {
 
   const handleChange = (event: SelectChangeEvent) => {
     setAssignedBed(event.target.value);
+    setShowBedErrorMessage(false);
   };
 
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showNricErrorMessage, setShowNricErrorMessage] = useState(false);
-  const nricErrorMessage =
-    "Please ensure that NRIC is filled in and is of the right format.";
   const [showNameErrorMessage, setShowNameErrorMessage] = useState(false);
-  const nameErrorMessage =
-    "Please ensure that the Name of the patient is filled in.";
   const [showBedErrorMessage, setShowBedErrorMessage] = useState(false);
-  const bedErrorMessage = "Please ensure that a bed is selected.";
   const [showConditionErrorMessage, setShowConditionErrorMessage] =
     useState(false);
-  const nricConditionMessage = "Please ensure that condition is filled in.";
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
