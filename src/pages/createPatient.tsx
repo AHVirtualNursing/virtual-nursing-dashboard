@@ -175,7 +175,7 @@ function createPatient() {
               required
               fullWidth
               id="condition"
-              label="Any conditions to take note of"
+              label="Patient Condition"
               name="condition"
               autoFocus
               sx={{ paddingBottom: "10px" }}
