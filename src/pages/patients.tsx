@@ -24,7 +24,7 @@ export default function Patients() {
       let beds: BedWithWardNumObject[] = [];
       Promise.all(promises).then((res) => {
         res.forEach((w, index) => {
-          const wardNum = wards[index].num;
+          const wardNum = wards[index].wardNum;
           const obj = { wardNum, smartbeds: w };
           beds.push(obj);
         });

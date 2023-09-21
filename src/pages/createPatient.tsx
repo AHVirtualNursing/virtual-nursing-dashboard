@@ -118,7 +118,7 @@ function createPatient() {
       let beds: BedWithWardNumObject[] = [];
       Promise.all(promises).then((res) => {
         res.forEach((w, index) => {
-          const wardNum = wards[index].num;
+          const wardNum = wards[index].wardNum;
           const vacantBeds = w.filter(
             (bed: { bedStatus: string; patient: Patient }) =>
               bed.bedStatus === "vacant" && bed.patient === undefined
@@ -166,7 +166,7 @@ function createPatient() {
               required
               fullWidth
               id="patientNric"
-              label="Masked NRIC of Patient: e.g S1234567D would be 567D"
+              label="Last 4 characters of Patient NRIC: e.g S1234567D would be 567D"
               name="patientNric"
               autoFocus
             ></TextField>
@@ -186,7 +186,6 @@ function createPatient() {
             <Select
               fullWidth
               value={bedAssigned}
-              label="Available Beds"
               onChange={handleChange}
               required
             >
