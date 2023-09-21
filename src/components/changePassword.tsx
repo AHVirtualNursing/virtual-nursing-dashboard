@@ -43,7 +43,7 @@ export default function ChangePasswordPage() {
         }
       } catch (error: any) {
         if (error.response.data.message == "Old password is incorrect") {
-          setErrorText("Wrong password");
+          setErrorText("Old password is incorrect");
         } else {
           setErrorText("Failed to change password");
         }
@@ -71,6 +71,12 @@ export default function ChangePasswordPage() {
           fullWidth
           margin="normal"
           value={newPassword}
+          error={newPassword.length < 8}
+          helperText={
+            newPassword.length < 8
+              ? "Password must be more than 8 characters long"
+              : ""
+          }
           onChange={(e) => setNewPassword(e.target.value)}
         />
         <TextField
@@ -94,8 +100,7 @@ export default function ChangePasswordPage() {
             alignItems: "center",
             justifyContent: "space-around",
             marginTop: "16px",
-          }}
-        >
+          }}>
           <Button variant="outlined" onClick={() => changePassword()}>
             CONFIRM
           </Button>
