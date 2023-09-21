@@ -33,6 +33,32 @@ function updatePatient() {
   const patientId = router.query["patientId"];
   const [patientSelected, setSelectedPatient] = useState<Patient>();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showConditionErrorMessage, setShowConditionErrorMessage] =
+    useState(false);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const condition = data.get("condition") as string;
+    console.log(condition);
+    if (!condition || condition === "") {
+      console.log("set to true");
+      setShowConditionErrorMessage(true);
+      return;
+    } else {
+      setShowConditionErrorMessage(false);
+    }
+    console.log(showConditionErrorMessage);
+    console.log("running");
+    const res = await updatePatientByPatientId(patientId, condition);
+    if (res?.status === 200) {
+      setShowSuccessMessage(true);
+      setShowConditionErrorMessage(false);
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1500);
+    }
+  };
 
   useEffect(() => {
     fetchPatientByPatientId(patientId).then((res) => setSelectedPatient(res));
@@ -41,19 +67,6 @@ function updatePatient() {
   if (patientSelected === undefined) {
     return <p>Loading</p>;
   }
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const condition = data.get("condition") as string;
-    const res = await updatePatientByPatientId(patientId, condition);
-    if (res?.status === 200) {
-      setShowSuccessMessage(true);
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 1500);
-    }
-  };
 
   return (
     <main className={`${styles.main} ${inter.className}`}>
@@ -103,7 +116,7 @@ function updatePatient() {
               required
               fullWidth
               id="condition"
-              label="Any conditions to take note of"
+              label="Patient Condition"
               defaultValue={patientSelected?.condition}
               name="condition"
               autoFocus
@@ -115,6 +128,13 @@ function updatePatient() {
             {showSuccessMessage ? (
               <Grid>
                 <p className="text-green-600">Patient Updated.</p>
+              </Grid>
+            ) : null}
+            {showConditionErrorMessage ? (
+              <Grid>
+                <p className="text-red-600">
+                  Please ensure that condition is filled in.
+                </p>
               </Grid>
             ) : null}
           </Box>
