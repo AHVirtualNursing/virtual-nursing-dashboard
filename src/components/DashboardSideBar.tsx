@@ -61,6 +61,11 @@ export default function DashboardSideBar({
 
   return (
     <Drawer
+      PaperProps={{
+        style: {
+          position: "absolute",
+        },
+      }}
       sx={{
         width: drawerWidth,
         flexShrink: 0,
@@ -71,7 +76,8 @@ export default function DashboardSideBar({
         },
       }}
       variant="permanent"
-      anchor="left">
+      anchor="left"
+    >
       <List>
         {drawerTabs.map((tab) => (
           <ListItem
