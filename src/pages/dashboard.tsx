@@ -1,11 +1,12 @@
 import Head from "next/head";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Dashboard.module.css";
-import { Box, Grid, Paper, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import Header from "@/components/Header";
 import { useState } from "react";
 import DashboardSideBar from "@/components/DashboardSideBar";
+import { Box } from "@mui/material";
+import ChangePasswordPage from "@/components/changePassword";
 import Wards from "./wards";
 import Patients from "./patients";
 import Alerts from "./alerts";
@@ -46,6 +47,7 @@ export default function Dashboard() {
               p: 3,
             }}>
             <Box>
+              {currentPage === "changePassword" && <ChangePasswordPage />}
               {currentPage === "patients" && <Patients />}
               {currentPage === "wards" && <Wards />}
               {currentPage === "alerts" && <Alerts />}

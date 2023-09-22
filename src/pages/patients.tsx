@@ -35,13 +35,11 @@ export default function Patients() {
 
   const viewPatientVisualisation = (
     patientId: string | undefined,
-    wardNum: string,
-    roomNum: number,
-    bedNum: number
+    bedId: string
   ) => {
     if (patientId != undefined) {
       router.push(
-        `/patientVisualisation?patientId=${patientId}&wardNum=${wardNum}&roomNum=${roomNum}&bedNum=${bedNum}`
+        `/patientVisualisation?patientId=${patientId}&bedId=${bedId}`
       );
     }
   };
@@ -71,12 +69,7 @@ export default function Patients() {
               <Paper
                 sx={{ ":hover": { cursor: "pointer" } }}
                 onClick={() =>
-                  viewPatientVisualisation(
-                    bed.patient?._id,
-                    wardNum,
-                    bed.roomNum,
-                    bed.bedNum
-                  )
+                  viewPatientVisualisation(bed.patient?._id, bed._id)
                 }
                 elevation={3}
                 style={{

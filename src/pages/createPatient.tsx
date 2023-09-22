@@ -74,7 +74,12 @@ function createPatient() {
     } else {
       setShowConditionErrorMessage(false);
     }
-    if (showNameErrorMessage || showBedErrorMessage || showNricErrorMessage) {
+    if (
+      showNameErrorMessage ||
+      showBedErrorMessage ||
+      showNricErrorMessage ||
+      showConditionErrorMessage
+    ) {
       return;
     }
     console.log("DETAILS VALID");
@@ -90,6 +95,7 @@ function createPatient() {
         setShowNricErrorMessage(false);
         setShowNameErrorMessage(false);
         setShowBedErrorMessage(false);
+        setShowConditionErrorMessage(false);
         setTimeout(() => {
           router.push("/dashboard");
         }, 1500);
@@ -121,7 +127,8 @@ function createPatient() {
           const wardNum = wards[index].wardNum;
           const vacantBeds = w.filter(
             (bed: { bedStatus: string; patient: Patient }) =>
-              bed.bedStatus === "vacant" && bed.patient === undefined
+              bed.bedStatus === "vacant" &&
+              (bed.patient === undefined || bed.patient === null)
           );
           const obj = { wardNum, smartbeds: vacantBeds };
           beds.push(obj);
@@ -175,7 +182,7 @@ function createPatient() {
               required
               fullWidth
               id="condition"
-              label="Any conditions to take note of"
+              label="Patient Condition"
               name="condition"
               autoFocus
               sx={{ paddingBottom: "10px" }}
