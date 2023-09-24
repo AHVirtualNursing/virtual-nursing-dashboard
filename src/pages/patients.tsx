@@ -59,7 +59,7 @@ export default function Patients() {
           sx={{ margin: "10px" }}
           href="/createPatient"
         >
-          Assign New Patient
+          Create New Patient
         </Button>
       </Box>
       <Grid container spacing={3}>
