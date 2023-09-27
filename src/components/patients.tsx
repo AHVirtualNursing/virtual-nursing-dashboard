@@ -4,10 +4,10 @@ export default function Patients() {
   const patientData = [
     {
       name: "Jack Hunt",
-      condition: "Ligma balls ay lmao goteem",
+      condition: "Lorem ipsum fhfjdf  iashdas  aids",
       bp: "120/80",
       adh: "70%",
-      temp: "36.0",
+      glucose: "115",
       hr: "96",
     },
     {
@@ -15,7 +15,15 @@ export default function Patients() {
       condition: "Sugma",
       bp: "121/50",
       adh: "70%",
-      temp: "36.0",
+      glucose: "90",
+      hr: "100",
+    },
+    {
+      name: "Mike Oxlong",
+      condition: "Ligma dasdsdasweefwe fsdf sf",
+      bp: "121/50",
+      adh: "70%",
+      glucose: "90",
       hr: "100",
     },
   ];
@@ -30,14 +38,15 @@ export default function Patients() {
   );
 
   return (
-    <table className="table-fixed w-full border-collapse">
+    <table className="table-auto w-full border-collapse">
       <thead className="text-sm bg-sky-200">
         <tr>
           <th className="p-2">Patient</th>
           <th>Condition</th>
-          <th>Blood Pressure</th>
-          <th>Temperature</th>
+          <th colSpan={2}>Blood Pressure</th>
+          <th colSpan={2}>Glucose</th>
           <th>Heart Rate</th>
+          <th>Saturation</th>
         </tr>
       </thead>
       <tbody>
@@ -48,22 +57,20 @@ export default function Patients() {
           <td>
             <TableSearchbar />
           </td>
-          <td className="flex justify-center gap-12 pt-4">
-            <td className="text-xs font-bold">Result</td>
-            <td className="text-xs font-bold">Adh</td>
-          </td>
-          <td>hello</td>
-          <td>hello</td>
+          <td>Result</td>
+          <td>Adh</td>
+          <td>Level</td>
+          <td>Updated:</td>
+          <td>HR</td>
         </tr>
         {patientData.map((pd) => (
           <tr className="border-b border-black">
-            <td className="text-sm py-2">{pd.name}</td>
-            <td className="text-sm py-2">{pd.condition}</td>
-            <td className="flex justify-center gap-12 pt-2">
-              <td className="text-sm py-2">{pd.bp}</td>
-              <td className="text-sm py-2">{pd.adh}</td>
-            </td>
-            <td className="text-sm py-2">{pd.temp}</td>
+            <td className="text-sm py-2 w-1/5">{pd.name}</td>
+            <td className="text-sm py-2 w-1/5">{pd.condition}</td>
+            <td className="text-sm py-2 w-1/12">{pd.bp}</td>
+            <td className="text-sm py-2 w-1/12">{pd.adh}</td>
+            <td className="text-sm py-2 w-1/12">{pd.glucose}</td>
+            <td className="text-sm py-2 w-1/12">1 day ago</td>
             <td className="text-sm py-2">{pd.hr}</td>
           </tr>
         ))}
