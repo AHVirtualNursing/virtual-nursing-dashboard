@@ -153,17 +153,6 @@ export default function VisualisationComponent(prop: ComponentProp) {
     setValue(newValue);
   };
 
-  const defaultLayout = {
-    lg: [
-      { i: "rr", x: 0, y: 0, w: 4, h: 4, minW: 2, minH: 2 },
-      { i: "hr", x: 4, y: 0, w: 4, h: 4, minW: 2, minH: 2 },
-      { i: "o2", x: 8, y: 0, w: 4, h: 4, minW: 2, minH: 2 },
-      { i: "bp", x: 0, y: 1, w: 4, h: 4, minW: 2, minH: 2 },
-      { i: "tp", x: 4, y: 1, w: 4, h: 4, minW: 2, minH: 2 },
-      { i: "alerts", x: 8, y: 1, w: 4, h: 4, minW: 3, minH: 3 },
-    ],
-  };
-
   function getAlerts(status: string) {
     const listOfAlerts: GridRowModel[] = [];
     if (prop.patient?.alerts !== undefined) {
