@@ -5,6 +5,8 @@ export default function Patients() {
     {
       name: "Jack Hunt",
       condition: "Lorem ipsum fhfjdf  iashdas  aids",
+      ward: "1",
+      bed: "1",
       bp: "120/80",
       adh: "70%",
       glucose: "115",
@@ -13,6 +15,8 @@ export default function Patients() {
     {
       name: "Mike Cont",
       condition: "Sugma",
+      ward: "1",
+      bed: "2",
       bp: "121/50",
       adh: "70%",
       glucose: "90",
@@ -21,6 +25,8 @@ export default function Patients() {
     {
       name: "Mike Oxlong",
       condition: "Ligma dasdsdasweefwe fsdf sf",
+      ward: "1",
+      bed: "3",
       bp: "121/50",
       adh: "70%",
       glucose: "90",
@@ -43,6 +49,8 @@ export default function Patients() {
         <tr>
           <th className="p-2">Patient</th>
           <th>Condition</th>
+          <th>Bed</th>
+          <th>Ward</th>
           <th colSpan={2}>Blood Pressure</th>
           <th colSpan={2}>Glucose</th>
           <th>Heart Rate</th>
@@ -57,16 +65,20 @@ export default function Patients() {
           <td>
             <TableSearchbar />
           </td>
-          <td>Result</td>
-          <td>Adh</td>
-          <td>Level</td>
-          <td>Updated:</td>
-          <td>HR</td>
+          <td></td>
+          <td></td>
+          <td className="text-sm">Result</td>
+          <td className="text-sm">Adh</td>
+          <td className="text-sm">Level</td>
+          <td className="text-sm">Updated:</td>
+          <td className="text-sm">HR</td>
         </tr>
         {patientData.map((pd) => (
           <tr className="border-b border-black">
-            <td className="text-sm py-2 w-1/5">{pd.name}</td>
+            <td className="text-sm py-2 w-1/12">{pd.name}</td>
             <td className="text-sm py-2 w-1/5">{pd.condition}</td>
+            <td className="text-sm py-2 w-1/12">{pd.bed}</td>
+            <td className="text-sm py-2 w-1/12">{pd.ward}</td>
             <td className="text-sm py-2 w-1/12">{pd.bp}</td>
             <td className="text-sm py-2 w-1/12">{pd.adh}</td>
             <td className="text-sm py-2 w-1/12">{pd.glucose}</td>
