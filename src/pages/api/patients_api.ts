@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Layout, Layouts} from "react-grid-layout";
 
 export const fetchPatientByPatientId = async (patientId : string | string[] | undefined) => {
   try {
@@ -9,10 +10,21 @@ export const fetchPatientByPatientId = async (patientId : string | string[] | un
   }
 };
 
-export const updatePatientByPatientId = async (patientId : string | string[] | undefined, condition: string) => {
+export const updatePatientConditionByPatientId = async (patientId : string | string[] | undefined, condition: string) => {
   try {
     const res = await axios.put(`http://localhost:3001/patient/${patientId}`, {
       condition: condition,
+    });
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const updatePatientLayoutByPatientId = async (patientId : string | string[] | undefined, layout: Layouts) => {
+  try {
+    const res = await axios.put(`http://localhost:3001/patient/${patientId}`, {
+      layout: layout,
     });
     return res;
   } catch (error) {

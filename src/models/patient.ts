@@ -3,6 +3,7 @@ import { Reminder } from "./reminder";
 import { Vital } from "./vital";
 import { Report } from "./report";
 import { AlertConfig } from "./alertConfig";
+import { Layouts } from "react-grid-layout";
 
 export class Patient {
   _id: string;
@@ -22,6 +23,7 @@ export class Patient {
   isDischarged?: boolean;
   vital?: Vital;
   reports?: Report[];
+  layout?: Layouts;
 
   constructor(
     _id: string,
@@ -41,6 +43,7 @@ export class Patient {
     isDischarged?: boolean,
     vital?: Vital,
     reports?: Report[],
+    layout?: Layouts
   ) {
     this._id = _id;
     this.name = name;
@@ -59,5 +62,6 @@ export class Patient {
     this.isDischarged = isDischarged;
     this.vital = vital;
     this.reports = reports;
+    this.layout = layout;
   }
 }

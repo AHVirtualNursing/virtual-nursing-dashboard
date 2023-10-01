@@ -16,6 +16,9 @@ import { Line } from "react-chartjs-2";
 import { Box, Grid, Tab, Tabs, Typography, styled } from "@mui/material";
 import { DataGrid, GridRowModel } from "@mui/x-data-grid";
 import { Patient } from "@/models/patient";
+import { updatePatientLayoutByPatientId } from "@/pages/api/patients_api";
+import { Layouts } from "react-grid-layout";
+import { Layout } from "react-grid-layout";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 ChartJS.register(
@@ -220,28 +223,21 @@ export default function VisualisationComponent(prop: ComponentProp) {
     );
   }
 
-  // const [savedLayout, setSavedLayout] = useState(defaultLayout);
-  // const [currentLayout, setCurrentLayout] = useState(savedLayout);
-  // const onLayoutChange = (newLayout) => {
-  //   console.log("CHANGING LAYOUT, this is the current savedlayout");
-  //   console.log(savedLayout);
-  //   setSavedLayout(newLayout);
-  //   console.log("new layout should match saved layout");
-  //   console.log(newLayout);
-  //   console.log(savedLayout);
-  // };
+  const [retrieveLayout, setLayouts] = useState(prop.patient?.layout);
 
-  // useEffect(() => {
-  //   console.log("TRIGGER USE EFFECT");
-  //   setCurrentLayout(savedLayout);
-  //   console.log(savedLayout);
-  // }, [savedLayout]);
+  const onLayoutChange = (_: Layout[], allLayouts: Layouts) => {
+    updatePatientLayoutByPatientId(prop?.patient?._id, allLayouts);
+  };
+
+  useEffect(() => {
+    setLayouts(prop.patient?.layout);
+  }, [prop.patient?.layout]);
 
   return (
     <ResponsiveGridLayout
       className="layout"
-      layouts={defaultLayout}
-      // onLayoutChange={onLayoutChange}
+      layouts={retrieveLayout}
+      onLayoutChange={onLayoutChange}
       breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
       cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
       rowHeight={60}
