@@ -38,6 +38,7 @@ import { Line } from "react-chartjs-2";
 import { fetchPatientByPatientId } from "./api/patients_api";
 import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
+import { io } from "socket.io-client";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -54,6 +55,15 @@ const patientVisualisationPage = () => {
 
   // const [selectedPatient, setSelectedPatient] = useState<Patient>();
   const [selectedBed, setSelectedBed] = useState<SmartBed>();
+
+  useEffect(() => {
+    const socket = io("http://localhost:3001");
+    socket.emit("connectDashboard", patientId);
+
+    socket.on("updateVitals", (data) => {
+      console.log(data);
+    });
+  }, []);
 
   useEffect(() => {
     fetchBedByBedId(bedId).then((res) => setSelectedBed(res));
