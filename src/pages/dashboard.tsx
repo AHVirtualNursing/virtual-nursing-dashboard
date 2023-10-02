@@ -1,6 +1,6 @@
 import PendingFollowUps from "@/components/PendingFollowUps";
-import Patients from "@/components/patients";
-import Summary from "@/components/summary";
+import Patients from "@/components/Patients";
+import Summary from "@/components/Summary";
 
 export default function Dashboard() {
   return (
