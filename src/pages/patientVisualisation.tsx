@@ -63,6 +63,10 @@ const patientVisualisationPage = () => {
     socket.on("updateVitals", (data) => {
       console.log(data);
     });
+
+    return () => {
+      socket.close()
+    }
   }, []);
 
   useEffect(() => {
