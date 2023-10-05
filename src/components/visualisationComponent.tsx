@@ -2,101 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Line } from "react-chartjs-2";
 import { Box, Grid, Tab, Tabs, Typography, styled } from "@mui/material";
 import { DataGrid, GridRowModel } from "@mui/x-data-grid";
 import { Patient } from "@/models/patient";
 import { updatePatientLayoutByPatientId } from "@/pages/api/patients_api";
 import { Layouts } from "react-grid-layout";
 import { Layout } from "react-grid-layout";
+import LineChartComponent from "./lineChart";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
-const labels = ["9/9", "10/9", "11/9", "12/9", "13/9", "14/9", "15/9"];
-const options = { maintainAspectRatio: false };
-const respData = {
-  labels,
-  datasets: [
-    {
-      label: "Respiratory Rate",
-      data: [61, 73, 89, 75, 61, 53, 99],
-      borderColor: "rgb(255, 102, 102)",
-      backgroundColor: "rgba(255, 102, 102, 0.5)",
-    },
-  ],
-};
-
-const heartData = {
-  labels,
-  datasets: [
-    {
-      label: "Heart Rate",
-      data: [86, 94, 105, 91, 72, 95, 80],
-      borderColor: "rgb(255, 178, 102)",
-      backgroundColor: "rgba(255, 178, 102, 0.5)",
-    },
-  ],
-};
-
-const bpData = {
-  labels,
-  datasets: [
-    {
-      label: "Systolic",
-      data: [121, 115, 102, 98, 130, 128, 86],
-      borderColor: "rgb(178, 255, 102)",
-      backgroundColor: "rgba(178, 255, 102, 0.5)",
-    },
-    {
-      label: "Diastolic",
-      data: [61, 73, 89, 75, 61, 53, 99],
-      borderColor: "rgb(76, 153, 0)",
-      backgroundColor: "rgba(76, 153, 0, 0.5)",
-    },
-  ],
-};
-
-const tempData = {
-  labels,
-  datasets: [
-    {
-      label: "Temperature",
-      data: [36.7, 35.9, 38.9, 39.9, 40.0, 37.8, 36.5],
-      borderColor: "rgb(102, 178, 255)",
-      backgroundColor: "rgba(102, 178, 255, 0.5)",
-    },
-  ],
-};
-
-const spo2Data = {
-  labels,
-  datasets: [
-    {
-      label: "SpO2",
-      data: [80, 90, 85, 80, 50, 40, 30],
-      borderColor: "rgb(255, 102, 178)",
-      backgroundColor: "rgba(255, 102, 178, 0.5)",
-    },
-  ],
-};
 
 const alertColumns = [
   { field: "id", headerName: "ID" },
@@ -222,6 +136,38 @@ export default function VisualisationComponent(prop: ComponentProp) {
     setLayouts(prop.patient?.layout);
   }, [prop.patient?.layout]);
 
+  const [data, setData] = useState([
+    { timestamp: "t1", reading: 61 },
+    { timestamp: "t2", reading: 73 },
+    { timestamp: "t3", reading: 89 },
+    { timestamp: "t4", reading: 75 },
+    { timestamp: "t5", reading: 61 },
+    { timestamp: "t6", reading: 53 },
+    { timestamp: "t7", reading: 99 },
+  ]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setData((previousData) => {
+        const newData = previousData.slice(1);
+        const currDate = new Date();
+        const hours = currDate.getHours().toString().padStart(2, "0");
+        const minutes = currDate.getMinutes().toString().padStart(2, "0");
+        const seconds = currDate.getSeconds().toString().padStart(2, "0");
+        const random = Math.floor(60 + Math.random() * (160 - 60 + 1));
+        return [
+          ...newData,
+          {
+            timestamp: `${hours}:${minutes}:${seconds}`,
+            reading: random,
+          },
+        ];
+      });
+    }, 5000);
+
+    return () => clearInterval(interval);
+  });
+
   return (
     <ResponsiveGridLayout
       className="layout"
@@ -232,19 +178,19 @@ export default function VisualisationComponent(prop: ComponentProp) {
       rowHeight={60}
     >
       <div key="rr">
-        <Line options={options} data={respData} />
+        <LineChartComponent data={data} vital="rr" />
       </div>
       <div key="hr">
-        <Line options={options} data={heartData} />
+        <LineChartComponent data={data} vital="hr" />
       </div>
       <div key="o2">
-        <Line options={options} data={spo2Data} />
+        <LineChartComponent data={data} vital="o2" />
       </div>
       <div key="bp">
-        <Line options={options} data={bpData} />
+        <LineChartComponent data={data} vital="bp" />
       </div>
       <div key="tp">
-        <Line options={options} data={tempData} />
+        <LineChartComponent data={data} vital="tp" />
       </div>
       <div key="alerts">
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
