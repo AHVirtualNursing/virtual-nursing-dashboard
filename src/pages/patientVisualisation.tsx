@@ -65,8 +65,8 @@ const patientVisualisationPage = () => {
     });
 
     return () => {
-      socket.close()
-    }
+      socket.close();
+    };
   }, []);
 
   useEffect(() => {
