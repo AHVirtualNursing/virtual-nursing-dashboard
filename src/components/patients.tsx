@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 export default function Patients() {
   const patientData = [
     {
+      id: 1,
       name: "Jack Hunt",
       condition: "Lorem ipsum fhfjdf  iashdas  aids",
       ward: "1",
@@ -13,6 +14,7 @@ export default function Patients() {
       hr: "96",
     },
     {
+      id: 2,
       name: "Mike Cont",
       condition: "Sugma",
       ward: "1",
@@ -23,6 +25,7 @@ export default function Patients() {
       hr: "100",
     },
     {
+      id: 3,
       name: "Mike Oxlong",
       condition: "Ligma dasdsdasweefwe fsdf sf",
       ward: "1",
@@ -42,6 +45,22 @@ export default function Patients() {
       name="search"
     />
   );
+
+  const [number, setNumber] = useState(0);
+  // useEffect(() => {
+  //   function getRandomInteger(min, max) {
+  //     min = Math.ceil(min);
+  //     max = Math.floor(max);
+  //     return Math.floor(Math.random() * (max - min + 1)) + min;
+  //   }
+  //   const interval = setInterval(() => {
+  //     const num = getRandomInteger(0, 100);
+  //     setNumber(num);
+  //   }, 2000);
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, [number]);
 
   return (
     <table className="table-auto w-full border-collapse">
@@ -74,9 +93,9 @@ export default function Patients() {
           <td className="text-sm">HR</td>
         </tr>
         {patientData.map((pd) => (
-          <tr className="border-b border-black">
-            <td className="text-sm py-2 w-1/12">{pd.name}</td>
-            <td className="text-sm py-2 w-1/5">{pd.condition}</td>
+          <tr className="border-b border-black" key={pd.id}>
+            <td className="text-sm py-2 w-1/6">{pd.name}</td>
+            <td className="text-sm py-2 w-1/6">{pd.condition}</td>
             <td className="text-sm py-2 w-1/12">{pd.bed}</td>
             <td className="text-sm py-2 w-1/12">{pd.ward}</td>
             <td className="text-sm py-2 w-1/12">{pd.bp}</td>
@@ -84,6 +103,7 @@ export default function Patients() {
             <td className="text-sm py-2 w-1/12">{pd.glucose}</td>
             <td className="text-sm py-2 w-1/12">1 day ago</td>
             <td className="text-sm py-2">{pd.hr}</td>
+            <td className="text-sm py-2">{number}</td>
           </tr>
         ))}
       </tbody>

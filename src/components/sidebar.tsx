@@ -17,7 +17,7 @@ export default function Sidebar() {
         dest={"alerts"}
       />
       <SidebarTab
-        name={"Configurations"}
+        name={"Configs"}
         icon={<SettingsSuggestIcon />}
         dest={"configs"}
       />
@@ -36,7 +36,7 @@ const SidebarTab = ({ name, icon, dest }: SidebarTabProps) => {
     <Link href={dest}>
       <div className="flex group gap-3 hover:bg-slate-200 cursor-pointer p-4 rounded-md">
         {icon}
-        <span>{name}</span>
+        <span className="text-md">{name}</span>
       </div>
     </Link>
   );
