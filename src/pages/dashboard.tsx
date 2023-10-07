@@ -5,7 +5,7 @@ import Summary from "@/components/Summary";
 export default function Dashboard() {
   return (
     <div className="flex flex-col p-8 gap-8 bg-blue-100 w-full shadow-lg">
-      <h1>Virtual Nurse Dashboard</h1>
+      <h4>Virtual Nurse Dashboard</h4>
       <div className="bg-white rounded-2xl h-2/6 p-4 flex shadow-lg ">
         <PendingFollowUps />
         <Summary />

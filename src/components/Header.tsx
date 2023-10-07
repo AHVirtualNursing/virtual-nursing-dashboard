@@ -1,9 +1,9 @@
 import Image from "next/image";
 import styles from "@/styles/Header.module.css";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
-  const router = useRouter();
+  // const router = useRouter();
   return (
     <div className={styles.header}>
       <div className={styles.imageContainer}>
@@ -12,7 +12,7 @@ export default function Header() {
           alt="Logo"
           fill
           priority
-          onClick={() => router.push("/dashboard")}
+          // onClick={() => router.push("/dashboard")}
         />
       </div>
       <span>

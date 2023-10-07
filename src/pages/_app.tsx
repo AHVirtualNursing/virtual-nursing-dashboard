@@ -3,6 +3,7 @@ import type { AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
 import { ProtectedLayout } from "@/components/layouts/protectedLayout";
 import { PasswordProtectedLayout } from "@/components/layouts/passwordProtectedLayout";
+import Layout from "./layout";
 
 type AppPropsWithAuth = AppProps & {
   Component: {
@@ -15,7 +16,9 @@ export default function App({ Component, pageProps }: AppPropsWithAuth) {
     Component.requireAuth === undefined ? (
       <ProtectedLayout>
         <PasswordProtectedLayout>
-          <Component {...pageProps} />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
         </PasswordProtectedLayout>
       </ProtectedLayout>
     ) : (
