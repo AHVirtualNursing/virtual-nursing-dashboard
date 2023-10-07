@@ -1,0 +1,54 @@
+import React from "react";
+import {
+  BarChart,
+  Bar,
+  Legend,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  LabelList,
+} from "recharts";
+
+const data = [
+  {
+    name: "Page B",
+    uv: 3000,
+    pv: 1398,
+    amt: 2210,
+  },
+];
+
+export default function Summary() {
+  return (
+    <div className="flex flex-col w-1/2 p-4 gap-y-3">
+      <h3 className="text-left">Patients Summary</h3>
+      <div className="h-full flex gap-x-5 justify-start">
+        <div className="w-full">
+          <ResponsiveContainer width="80%" height="100%">
+            <BarChart width={150} height={40} data={data} barCategoryGap="10%">
+              <Legend
+                layout="vertical"
+                verticalAlign="middle"
+                align="right"
+                wrapperStyle={{
+                  paddingLeft: "30px",
+                }}
+              />
+              <XAxis dataKey="name" type="category" hide />
+              <YAxis type="number" hide />
+              <Bar dataKey="uv" fill="#8884d8" radius={10}>
+                <LabelList dataKey={"uv"} position={"center"} fill="black" />
+              </Bar>
+              <Bar dataKey="pv" fill="#ffc658" radius={10}>
+                <LabelList dataKey={"pv"} position={"center"} fill="black" />
+              </Bar>
+              <Bar dataKey="amt" fill="#82ca9d" radius={10}>
+                <LabelList dataKey={"amt"} position={"center"} fill="black" />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+}
