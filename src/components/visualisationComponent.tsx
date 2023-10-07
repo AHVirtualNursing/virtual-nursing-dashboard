@@ -9,6 +9,7 @@ import { updatePatientLayoutByPatientId } from "@/pages/api/patients_api";
 import { Layouts } from "react-grid-layout";
 import { Layout } from "react-grid-layout";
 import LineChartComponent from "./lineChart";
+import { io } from "socket.io-client";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -146,6 +147,7 @@ export default function VisualisationComponent(prop: ComponentProp) {
     { timestamp: "t7", reading: 99 },
   ]);
 
+  // ============================================================== SET INTERVAL
   useEffect(() => {
     const interval = setInterval(() => {
       setData((previousData) => {
@@ -167,6 +169,35 @@ export default function VisualisationComponent(prop: ComponentProp) {
 
     return () => clearInterval(interval);
   });
+
+  // ============================================================== SOCKET IMPLEMENTATION
+  // interface SocketData {
+  //   time: string;
+  //   patientId: string;
+  //   heartrate: number;
+  // }
+
+  // useEffect(() => {
+  //   const socket = io("http://localhost:3001");
+  //   socket.emit("connectDashboard", prop.patient?._id);
+
+  //   socket.on("updateVitals", (data: SocketData) => {
+  //     console.log(data);
+  //     setData((previousData) => {
+  //       const newData = previousData.slice(1);
+  //       const datetime = new Date(data.time);
+  //       const hours = datetime.getHours().toString().padStart(2, "0");
+  //       const minutes = datetime.getMinutes().toString().padStart(2, "0");
+  //       const seconds = datetime.getSeconds().toString().padStart(2, "0");
+  //       const roundedReading = Math.floor(data.heartrate)
+  //       return [...newData, {timestamp: `${hours}:${minutes}:${seconds}`, reading: roundedReading}];
+  //     });
+  //   });
+
+  //   return () => {
+  //     socket.close();
+  //   };
+  // }, []);
 
   return (
     <ResponsiveGridLayout

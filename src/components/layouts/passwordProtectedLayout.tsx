@@ -17,19 +17,23 @@ export const PasswordProtectedLayout = ({ children }: Props): JSX.Element => {
     fetchVirtualNurseByNurseId(sessionData?.user.id).then((res) => {
       setNurse(res.data);
     });
-  }, [sessionData, router]);
+  }, []);
 
   useEffect(() => {
-    if (nurse?.username == "virtualnurse2") {
-      console.log("enter");
-      router.push({
-        pathname: "/",
-        query: {
-          returnUrl: router.asPath,
-        },
-      });
-    }
-  }, [nurse, router]);
+    console.log(nurse);
+  }, [nurse]);
+
+  // useEffect(() => {
+  //   if (nurse?.username == "virtualnurse1") {
+  //     console.log(nurse);
+  //     router.push({
+  //       pathname: "/createPatient",
+  //       query: {
+  //         returnUrl: router.asPath,
+  //       },
+  //     });
+  //   }
+  // }, [nurse]);
 
   return <div>{children}</div>;
 };
