@@ -22,7 +22,6 @@ export default function Sidebar() {
         icon={<SettingsSuggestIcon />}
         dest={"configs"}
       />
-      <SidebarTab name={"Change Password"} icon={<LockReset />} dest={""} />
     </div>
   );
 }
