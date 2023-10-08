@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import CampaignIcon from "@mui/icons-material/Campaign";
 
 export default function Patients() {
   const patientData = [
@@ -82,19 +83,23 @@ export default function Patients() {
   return (
     <table className="table-auto w-full border-collapse">
       <thead className="text-sm bg-sky-200">
+        {/* ------ column headers ------ */}
         <tr>
+          <th>Alerts</th>
           <th className="p-2">Patient</th>
           <th>Condition</th>
           <th>Bed</th>
           <th>Ward</th>
           <th colSpan={2}>Blood Pressure</th>
           <th colSpan={2}>Glucose</th>
-          <th>Heart Rate</th>
-          <th>Saturation</th>
+          <th>HR</th>
+          <th className="pr-2">Saturation</th>
         </tr>
       </thead>
       <tbody>
+        {/* ------ sub-headers ------ */}
         <tr>
+          <td></td>
           <td className="p-2">
             <input
               className="placeholder:italic placeholder:text-slate-400 w-2/3 rounded-md placeholder:text-sm px-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
@@ -123,8 +128,13 @@ export default function Patients() {
           <td className="text-sm">Updated:</td>
           <td className="text-sm">HR</td>
         </tr>
+
+        {/* ------ data rows ------ */}
         {data.map((pd) => (
           <tr className="border-b border-black" key={pd.id}>
+            <td className="w-1/16">
+              <CampaignIcon style={{ color: "red" }} />
+            </td>
             <td className="text-sm py-2 w-1/6">{pd.name}</td>
             <td className="text-sm py-2 w-1/6">{pd.condition}</td>
             <td className="text-sm py-2 w-1/12">{pd.bed}</td>
@@ -133,8 +143,8 @@ export default function Patients() {
             <td className="text-sm py-2 w-1/12">{pd.adh}</td>
             <td className="text-sm py-2 w-1/12">{pd.glucose}</td>
             <td className="text-sm py-2 w-1/12">1 day ago</td>
-            <td className="text-sm py-2">{pd.hr}</td>
-            <td className="text-sm py-2">{number}</td>
+            <td className="text-sm py-2 w-1/12">{pd.hr}</td>
+            <td className="text-sm py-2 w-1/12">{number}</td>
           </tr>
         ))}
       </tbody>
