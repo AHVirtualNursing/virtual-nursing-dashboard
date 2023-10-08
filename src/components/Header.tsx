@@ -1,9 +1,10 @@
 import Image from "next/image";
 import styles from "@/styles/Header.module.css";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 export default function Header() {
-  // const router = useRouter();
+  const router = useRouter();
   return (
     <div className={styles.header}>
       <div className={styles.imageContainer}>
@@ -12,7 +13,7 @@ export default function Header() {
           alt="Logo"
           fill
           priority
-          // onClick={() => router.push("/dashboard")}
+          onClick={() => router.push("/dashboard")}
         />
       </div>
       <span>
@@ -27,6 +28,7 @@ export default function Header() {
           fill="none"
           strokeLinecap="round"
           strokeLinejoin="round"
+          onClick={() => signOut()}
         >
           <path stroke="none" d="M0 0h24v24H0z" fill="none" />
           <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" />
