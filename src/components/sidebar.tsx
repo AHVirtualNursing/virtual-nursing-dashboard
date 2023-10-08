@@ -5,11 +5,11 @@ import { SvgIconProps } from "@material-ui/core";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
 import Link from "next/link";
-import LockResetIcon from "@mui/icons-material/LockReset";
+import LockReset from "@mui/icons-material/LockReset";
 
 export default function Sidebar() {
   return (
-    <div className="left-0 flex flex-col h-[calc(100vh-114px)] pt-9 shadow-lg gap-4 w-48">
+    <div className="left-0 flex flex-col h-[calc(100vh-114px)] pt-9 shadow-lg gap-4 w-64">
       <SidebarTab name={"Patients"} icon={<GroupIcon />} dest={"dashboard"} />
       <SidebarTab name={"Wards"} icon={<BedIcon />} dest={"wards"} />
       <SidebarTab
@@ -22,11 +22,7 @@ export default function Sidebar() {
         icon={<SettingsSuggestIcon />}
         dest={"configs"}
       />
-      <SidebarTab
-        name={"Change Password"}
-        icon={<LockResetIcon />}
-        dest={"changePassword"}
-      />
+      <SidebarTab name={"Change Password"} icon={<LockReset />} dest={""} />
     </div>
   );
 }
@@ -42,7 +38,7 @@ const SidebarTab = ({ name, icon, dest }: SidebarTabProps) => {
     <Link href={dest} className="no-underline text-black">
       <div className="flex group gap-3 hover:bg-slate-200 cursor-pointer p-4 rounded-md">
         {icon}
-        <span className="text-md max-sm:hidden">{name}</span>
+        <span className="text-md text-left max-sm:hidden">{name}</span>
       </div>
     </Link>
   );

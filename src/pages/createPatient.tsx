@@ -16,7 +16,6 @@ import { Inter } from "next/font/google";
 import router from "next/router";
 import React, { useEffect, useState } from "react";
 import { SmartBed } from "@/models/smartBed";
-import axios from "axios";
 import { Patient } from "@/models/patient";
 import { fetchAllWards, fetchBedsByWardId } from "./api/wards_api";
 import { createNewPatient } from "./api/patients_api";
@@ -139,99 +138,96 @@ function createPatient() {
   }, [vacantBeds.length]);
 
   return (
-    <main className={`${styles.main} ${inter.className}`}>
-      <Header />
-      <Box sx={{ display: "flex" }}>
-        <DashboardSideBar handleSideBarTabClick={handleSideBarTabClick} />
-        <Box
-          component="main"
-          sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
+    // <main className={`${styles.main} ${inter.className}`}>
+    //   <Header />
+    //   <Box sx={{ display: "flex" }}>
+    //     <DashboardSideBar handleSideBarTabClick={handleSideBarTabClick} />
+    <div className="flex flex-col p-8 gap-8 bg-blue-100 w-full shadow-lg">
+      <Box
+        component="main"
+        sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
+      >
+        <Typography
+          sx={{ marginBottom: "20px", textAlign: "left" }}
+          variant="h6"
         >
-          <Typography
-            sx={{ marginBottom: "20px", textAlign: "left" }}
-            variant="h6"
+          Create New Patient/Assign To Bed
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="patientName"
+            label="Name of Patient"
+            name="patientName"
+            autoFocus
+          ></TextField>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="patientNric"
+            label="Last 4 characters of Patient NRIC: e.g S1234567D would be 567D"
+            name="patientNric"
+            autoFocus
+          ></TextField>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="condition"
+            label="Patient Condition"
+            name="condition"
+            autoFocus
+            sx={{ paddingBottom: "10px" }}
+          ></TextField>
+          <InputLabel sx={{ textAlign: "left" }} id="wardRoomBedLabel">
+            Selected Bed
+          </InputLabel>
+          <Select
+            fullWidth
+            value={bedAssigned}
+            onChange={handleChange}
+            required
           >
-            Create New Patient/Assign To Bed
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1 }}
-          >
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="patientName"
-              label="Name of Patient"
-              name="patientName"
-              autoFocus
-            ></TextField>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="patientNric"
-              label="Last 4 characters of Patient NRIC: e.g S1234567D would be 567D"
-              name="patientNric"
-              autoFocus
-            ></TextField>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="condition"
-              label="Patient Condition"
-              name="condition"
-              autoFocus
-              sx={{ paddingBottom: "10px" }}
-            ></TextField>
-            <InputLabel sx={{ textAlign: "left" }} id="wardRoomBedLabel">
-              Selected Bed
-            </InputLabel>
-            <Select
-              fullWidth
-              value={bedAssigned}
-              onChange={handleChange}
-              required
-            >
-              {vacantBeds.map(({ wardNum, smartbeds }) =>
-                smartbeds.map((bed) => (
-                  <MenuItem key={bed._id} value={bed._id}>
-                    Ward: {wardNum}, Room: {bed.roomNum}, Bed: {bed.bedNum}
-                  </MenuItem>
-                ))
-              )}
-            </Select>
-            <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
-              Assign Patient
-            </Button>
-            {showSuccessMessage ? (
-              <Grid>
-                <p className="text-green-600">New patient created.</p>
-              </Grid>
-            ) : null}
-            {showNameErrorMessage
-              ? ErrorMessage(
-                  "Please ensure that the Name of the patient is filled in."
-                )
-              : null}
-            {showNricErrorMessage
-              ? ErrorMessage(
-                  "Please ensure that NRIC is filled in and is of the right format."
-                )
-              : null}
-            {showConditionErrorMessage
-              ? ErrorMessage("Please ensure that condition is filled in.")
-              : null}
-            {showBedErrorMessage
-              ? ErrorMessage("Please ensure that a bed is selected.")
-              : null}
-          </Box>
+            {vacantBeds.map(({ wardNum, smartbeds }) =>
+              smartbeds.map((bed) => (
+                <MenuItem key={bed._id} value={bed._id}>
+                  Ward: {wardNum}, Room: {bed.roomNum}, Bed: {bed.bedNum}
+                </MenuItem>
+              ))
+            )}
+          </Select>
+          <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
+            Assign Patient
+          </Button>
+          {showSuccessMessage ? (
+            <Grid>
+              <p className="text-green-600">New patient created.</p>
+            </Grid>
+          ) : null}
+          {showNameErrorMessage
+            ? ErrorMessage(
+                "Please ensure that the Name of the patient is filled in."
+              )
+            : null}
+          {showNricErrorMessage
+            ? ErrorMessage(
+                "Please ensure that NRIC is filled in and is of the right format."
+              )
+            : null}
+          {showConditionErrorMessage
+            ? ErrorMessage("Please ensure that condition is filled in.")
+            : null}
+          {showBedErrorMessage
+            ? ErrorMessage("Please ensure that a bed is selected.")
+            : null}
         </Box>
       </Box>
-    </main>
+    </div>
+    //   </Box>
+    // </main>
   );
 }
 
