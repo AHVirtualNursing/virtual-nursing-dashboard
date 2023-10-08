@@ -138,10 +138,6 @@ function createPatient() {
   }, [vacantBeds.length]);
 
   return (
-    // <main className={`${styles.main} ${inter.className}`}>
-    //   <Header />
-    //   <Box sx={{ display: "flex" }}>
-    //     <DashboardSideBar handleSideBarTabClick={handleSideBarTabClick} />
     <div className="flex flex-col p-8 gap-8 bg-blue-100 w-full shadow-lg">
       <Box
         component="main"
