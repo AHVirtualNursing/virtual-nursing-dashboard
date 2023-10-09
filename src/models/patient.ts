@@ -21,7 +21,7 @@ export class Patient {
   alertConfig?: AlertConfig[];
   reminders?: Reminder[];
   isDischarged?: boolean;
-  vital?: Vital;
+  vital?: string;
   reports?: Report[];
   layout?: Layouts;
 
@@ -41,7 +41,7 @@ export class Patient {
     alertConfig?: AlertConfig[],
     reminders?: Reminder[],
     isDischarged?: boolean,
-    vital?: Vital,
+    vital?: string,
     reports?: Report[],
     layout?: Layouts
   ) {
