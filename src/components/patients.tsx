@@ -1,43 +1,9 @@
 import React, { useEffect, useState } from "react";
 import CampaignIcon from "@mui/icons-material/Campaign";
+import { patientData } from "@/mockData";
+import { fetchAllPatients } from "@/pages/api/patients_api";
 
 export default function Patients() {
-  const patientData = [
-    {
-      id: 1,
-      name: "Jack Hunt",
-      condition: "Lorem ipsum fhfjdf  iashdas  aids",
-      ward: "1",
-      bed: "1",
-      bp: "120/80",
-      adh: "70%",
-      glucose: "115",
-      hr: "96",
-    },
-    {
-      id: 2,
-      name: "Mike Cont",
-      condition: "Sugma",
-      ward: "1",
-      bed: "2",
-      bp: "121/50",
-      adh: "70%",
-      glucose: "90",
-      hr: "100",
-    },
-    {
-      id: 3,
-      name: "Mike Oxlong",
-      condition: "Ligma dasdsdasweefwe fsdf sf",
-      ward: "1",
-      bed: "3",
-      bp: "121/50",
-      adh: "70%",
-      glucose: "90",
-      hr: "100",
-    },
-  ];
-
   const [number, setNumber] = useState(0);
   const [data, setData] = useState(patientData);
   const [searchPatient, setSearchPatient] = useState<string>("");
@@ -60,6 +26,12 @@ export default function Patients() {
     );
     setData(filteredList);
   };
+
+  useEffect(() => {
+    fetchAllPatients().then((res) => {
+      console.log(res);
+    });
+  }, [data.length]);
 
   /* The code chunk below is for testing purposes where we mock values that change every 5 seconds. This is done by generating a random integer in 5 second intervals, then re-rendering the component with useEffect
 

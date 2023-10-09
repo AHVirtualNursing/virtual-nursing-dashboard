@@ -35,3 +35,39 @@ export const columns = [
     editable: false,
   },
 ];
+
+export const patientData = [
+  {
+    id: 1,
+    name: "Jack Hunt",
+    condition: "Lorem ipsum fhfjdf  iashdas  aids",
+    ward: "1",
+    bed: "1",
+    bp: "120/80",
+    adh: "70%",
+    glucose: "115",
+    hr: "96",
+  },
+  {
+    id: 2,
+    name: "Mike Cont",
+    condition: "Sugma",
+    ward: "1",
+    bed: "2",
+    bp: "121/50",
+    adh: "70%",
+    glucose: "90",
+    hr: "100",
+  },
+  {
+    id: 3,
+    name: "Mike Oxlong",
+    condition: "Ligma dasdsdasweefwe fsdf sf",
+    ward: "1",
+    bed: "3",
+    bp: "121/50",
+    adh: "70%",
+    glucose: "90",
+    hr: "100",
+  },
+];
