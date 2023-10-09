@@ -23,17 +23,7 @@ export const PasswordProtectedLayout = ({ children }: Props): JSX.Element => {
     console.log(nurse);
   }, [nurse]);
 
-  // useEffect(() => {
-  //   if (nurse?.username == "virtualnurse1") {
-  //     console.log(nurse);
-  //     router.push({
-  //       pathname: "/createPatient",
-  //       query: {
-  //         returnUrl: router.asPath,
-  //       },
-  //     });
-  //   }
-  // }, [nurse]);
+  // password reset logic handled in change password modal
 
   return <div>{children}</div>;
 };
