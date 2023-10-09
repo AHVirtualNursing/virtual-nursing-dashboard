@@ -10,6 +10,7 @@ import { Layouts } from "react-grid-layout";
 import { Layout } from "react-grid-layout";
 import LineChartComponent from "./lineChart";
 import { io } from "socket.io-client";
+import { useRouter } from "next/router";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -172,24 +173,26 @@ export default function VisualisationComponent(prop: ComponentProp) {
 
   // ============================================================== SOCKET IMPLEMENTATION
   // interface SocketData {
-  //   time: string;
+  //   datetime: string;
   //   patientId: string;
-  //   heartrate: number;
+  //   heartRate: number;
   // }
+
+  // const router = useRouter();
 
   // useEffect(() => {
   //   const socket = io("http://localhost:3001");
-  //   socket.emit("connectDashboard", prop.patient?._id);
-
+  //   const patientId = router.query.patiendId
+  //   socket.emit("connectDashboard", patientId);
   //   socket.on("updateVitals", (data: SocketData) => {
   //     console.log(data);
   //     setData((previousData) => {
   //       const newData = previousData.slice(1);
-  //       const datetime = new Date(data.time);
+  //       const datetime = new Date(data.datetime);
   //       const hours = datetime.getHours().toString().padStart(2, "0");
   //       const minutes = datetime.getMinutes().toString().padStart(2, "0");
   //       const seconds = datetime.getSeconds().toString().padStart(2, "0");
-  //       const roundedReading = Math.floor(data.heartrate)
+  //       const roundedReading = Math.floor(data.heartRate)
   //       return [...newData, {timestamp: `${hours}:${minutes}:${seconds}`, reading: roundedReading}];
   //     });
   //   });
