@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LockResetIcon from "@mui/icons-material/LockReset";
 import { callChangePasswordApi } from "@/pages/api/user";
 import { Typography, Box, TextField, Button, Modal } from "@mui/material";
 import { signOut, useSession } from "next-auth/react";
+import { VirtualNurse } from "@/models/virtualNurse";
+import { fetchVirtualNurseByNurseId } from "@/pages/api/nurse_api";
 
 const style = {
   position: "absolute" as "absolute",
@@ -18,6 +20,24 @@ const style = {
 };
 
 export default function ChangePasswordModal() {
+  const { data: sessionData } = useSession();
+  const [nurse, setNurse] = useState<VirtualNurse>();
+  useEffect(() => {
+    fetchVirtualNurseByNurseId(sessionData?.user.id).then((res) => {
+      setNurse(res.data);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (nurse !== undefined) {
+      if (!nurse.passwordReset) {
+        console.log(nurse.passwordReset);
+        console.log("RAN");
+        setOpen(true);
+      }
+    }
+  });
+
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
