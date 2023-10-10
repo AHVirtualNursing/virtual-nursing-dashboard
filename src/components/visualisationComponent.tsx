@@ -138,30 +138,32 @@ export default function VisualisationComponent(prop: ComponentProp) {
     setLayouts(prop.patient?.layout);
   }, [prop.patient?.layout]);
 
-  const [data, setData] = useState([
-    { timestamp: "t1", reading: 61 },
-    { timestamp: "t2", reading: 73 },
-    { timestamp: "t3", reading: 89 },
-    { timestamp: "t4", reading: 75 },
-    { timestamp: "t5", reading: 61 },
-    { timestamp: "t6", reading: 53 },
-    { timestamp: "t7", reading: 99 },
-  ]);
+  // const [data, setData] = useState([
+  //   { datetime: "t1", reading: 61 },
+  //   { datetime: "t2", reading: 73 },
+  //   { datetime: "t3", reading: 89 },
+  //   { datetime: "t4", reading: 75 },
+  //   { datetime: "t5", reading: 61 },
+  //   { datetime: "t6", reading: 53 },
+  //   { datetime: "t7", reading: 99 },
+  // ]);
+
+  const [data, setData] = useState(prop?.patient?.vital?.respRate);
 
   // ============================================================== SET INTERVAL
   useEffect(() => {
     const interval = setInterval(() => {
       setData((previousData) => {
-        const newData = previousData.slice(1);
+        const newData = previousData?.slice(1);
         const currDate = new Date();
         const hours = currDate.getHours().toString().padStart(2, "0");
         const minutes = currDate.getMinutes().toString().padStart(2, "0");
         const seconds = currDate.getSeconds().toString().padStart(2, "0");
         const random = Math.floor(60 + Math.random() * (160 - 60 + 1));
         return [
-          ...newData,
+          ...newData!,
           {
-            timestamp: `${hours}:${minutes}:${seconds}`,
+            datetime: `${hours}:${minutes}:${seconds}`,
             reading: random,
           },
         ];
@@ -193,7 +195,7 @@ export default function VisualisationComponent(prop: ComponentProp) {
   //       const minutes = datetime.getMinutes().toString().padStart(2, "0");
   //       const seconds = datetime.getSeconds().toString().padStart(2, "0");
   //       const roundedReading = Math.floor(data.heartRate)
-  //       return [...newData, {timestamp: `${hours}:${minutes}:${seconds}`, reading: roundedReading}];
+  //       return [...newData, {datetime: `${hours}:${minutes}:${seconds}`, reading: roundedReading}];
   //     });
   //   });
 
@@ -212,19 +214,19 @@ export default function VisualisationComponent(prop: ComponentProp) {
       rowHeight={60}
     >
       <div key="rr">
-        <LineChartComponent data={data} vital="rr" />
+        <LineChartComponent data={data!} vital="rr" />
       </div>
       <div key="hr">
-        <LineChartComponent data={data} vital="hr" />
+        <LineChartComponent data={data!} vital="hr" />
       </div>
       <div key="o2">
-        <LineChartComponent data={data} vital="o2" />
+        <LineChartComponent data={data!} vital="o2" />
       </div>
       <div key="bp">
-        <LineChartComponent data={data} vital="bp" />
+        <LineChartComponent data={data!} vital="bp" />
       </div>
       <div key="tp">
-        <LineChartComponent data={data} vital="tp" />
+        <LineChartComponent data={data!} vital="tp" />
       </div>
       <div key="alerts">
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>

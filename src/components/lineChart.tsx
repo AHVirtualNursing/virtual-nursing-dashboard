@@ -10,7 +10,7 @@ import {
 } from "recharts";
 
 interface dataInterface {
-  timestamp: string;
+  datetime: string;
   reading: number;
 }
 
@@ -47,7 +47,7 @@ export default function LineChartComponent({
       >
         <Line type="monotone" dataKey="reading" stroke={lineColour} />
         <CartesianGrid stroke="#ccc" strokeDasharray="1" />
-        <XAxis dataKey="timestamp">
+        <XAxis dataKey="datetime">
           <Label value={axisName} offset={-20} position="insideBottom" />
         </XAxis>
         <YAxis />

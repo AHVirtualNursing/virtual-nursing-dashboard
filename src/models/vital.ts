@@ -1,24 +1,32 @@
+interface VitalsReading {
+  reading: number
+  datetime: string
+}
+
 export class Vital {
-  _id: string;
-  respRate: Object;
-  heartRate: Object;
-  bloodPressure: Object;
-  spO2: Object;
-  pulse: Object;
+  respRate: VitalsReading[];
+  heartRate: VitalsReading[];
+  bloodPressureSys: VitalsReading[];
+  bloodPressureDia: VitalsReading[];
+  spO2: VitalsReading[];
+  news2Score: VitalsReading[];
+  temperature: VitalsReading[];
 
   constructor(
-    _id: string,
-    respRate: Object,
-    heartRate: Object,
-    bloodPressure: Object,
-    spO2: Object,
-    pulse: Object
+    respRate: VitalsReading[],
+    heartRate: VitalsReading[],
+    bloodPressureSys: VitalsReading[],
+    bloodPressureDia: VitalsReading[],
+    spO2: VitalsReading[],
+    news2Score: VitalsReading[],
+    temperature: VitalsReading[]
   ) {
-    this._id = _id;
     this.respRate = respRate;
     this.heartRate = heartRate;
-    this.bloodPressure = bloodPressure;
+    this.bloodPressureSys = bloodPressureSys;
+    this.bloodPressureDia = bloodPressureDia;
     this.spO2 = spO2;
-    this.pulse = pulse;
+    this.news2Score = news2Score;
+    this.temperature = temperature;
   }
 }
