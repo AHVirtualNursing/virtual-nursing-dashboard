@@ -44,19 +44,25 @@ export default function Patients() {
     }
   };
 
+  const fetchPatientVitals = async () => {
+    let patientVitalsArr: any[] = [];
+    for (const bedData of data) {
+      let patientVitals = bedData.patient?.vital;
+      console.log(patientVitals);
+      const res = await fetchVitalByVitalId(patientVitals);
+      console.log(res);
+      patientVitalsArr.push(res);
+    }
+    setVitals(patientVitalsArr);
+  };
+
   useEffect(() => {
     fetchAllSmartBeds().then((res) => {
       setData(res.data);
     });
 
-    let patientVitalsArr: any[] = [];
-    data.forEach((bedData) => {
-      let patientVitals = bedData.patient?.vital;
-      fetchVitalByVitalId(patientVitals).then((res) => {
-        patientVitalsArr.push(res);
-      });
-    });
-    setVitals(patientVitalsArr);
+    fetchPatientVitals();
+    console.log(vitals);
   }, [data.length]);
 
   /* The code chunk below is for testing purposes where we mock values that change every 5 seconds. This is done by generating a random integer in 5 second intervals, then re-rendering the component with useEffect
@@ -149,17 +155,24 @@ export default function Patients() {
                 {pd.ward.wardNum}
               </td>
               <td id="bpReading" className="text-sm py-2 w-1/12">
-                {vitals[0]?.bloodPressureDia[index]?.reading}/
-                {vitals[0]?.bloodPressureSys[index]?.reading}
+                {vitals[index]?.bloodPressureDia[index]?.reading}/
+                {vitals[index]?.bloodPressureSys[index]?.reading}
               </td>
               <td id="bpDateTime" className="text-sm py-2 w-1/12">
-                {vitals[0]?.bloodPressureDia[index]?.datetime}
+                {vitals[index]?.bloodPressureDia[index]?.datetime.split(" ")[1]}
               </td>
               <td id="hrReading" className="text-sm py-2 w-1/12">
-                {vitals[0]?.heartRate[index].reading}
+                {Math.round(
+                  vitals[index]?.heartRate[vitals[index]?.heartRate.length - 1]
+                    .reading
+                )}
               </td>
               <td id="hrDateTime" className="text-sm py-2 w-1/12">
-                {vitals[0]?.heartRate[index].datetime}
+                {
+                  vitals[index]?.heartRate[
+                    vitals[index]?.heartRate.length - 1
+                  ].datetime.split(" ")[1]
+                }
               </td>
             </tr>
           ))}
