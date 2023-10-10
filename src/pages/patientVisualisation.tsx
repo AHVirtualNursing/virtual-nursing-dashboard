@@ -36,64 +36,55 @@ const patientVisualisationPage = () => {
   }
 
   return (
-    <main className={`${styles.main} ${inter.className}`}>
-      <Header />
-      <Box sx={{ display: "flex" }}>
-        <DashboardSideBar handleSideBarTabClick={handleSideBarTabClick} />
+    <div className="flex flex-col p-8 gap-8 bg-blue-100 w-full shadow-lg">
+      <Box>
         <Box
-          component="main"
-          sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
+          sx={{
+            backgroundColor: "lightblue",
+            display: "flex",
+            border: 1,
+            borderRadius: 3,
+          }}
         >
-          <Box>
-            <Box
-              sx={{
-                backgroundColor: "lightblue",
-                display: "flex",
-                border: 1,
-                borderRadius: 3,
+          <Box sx={{ padding: "20px" }}>
+            <Image
+              style={{
+                width: "40%",
+                height: "auto",
+                borderRadius: "50%",
               }}
-            >
-              <Box sx={{ padding: "20px" }}>
-                <Image
-                  style={{
-                    width: "40%",
-                    height: "auto",
-                    borderRadius: "50%",
-                  }}
-                  src={profilePic}
-                  alt="Picture of Patient"
-                />
-                <h3>
-                  {selectedBed?.patient?.name} ({selectedBed?.patient?.nric})
-                </h3>
-              </Box>
-              <Box style={{ width: "100%" }}>
-                <Box display={"flex"} sx={{ paddingTop: "20px" }}>
-                  <p>
-                    Ward: {selectedBed?.ward.wardNum}, Room:{" "}
-                    {selectedBed?.roomNum}, Bed: {selectedBed?.bedNum}
-                  </p>
-                </Box>
-                <Box textAlign={"left"}>
-                  <p>Condition: {selectedBed?.patient?.condition} </p>
-                  <p>Additional Info: {selectedBed?.patient?.addInfo} </p>
-                </Box>
-                <Box textAlign={"right"} marginRight={2}>
-                  <Button
-                    size="small"
-                    variant="contained"
-                    onClick={updateSelectedPatient}
-                  >
-                    Update Details
-                  </Button>
-                </Box>
-              </Box>
+              src={profilePic}
+              alt="Picture of Patient"
+            />
+            <h3>
+              {selectedBed?.patient?.name} ({selectedBed?.patient?.nric})
+            </h3>
+          </Box>
+          <Box style={{ width: "100%" }}>
+            <Box display={"flex"} sx={{ paddingTop: "20px" }}>
+              <p>
+                Ward: {selectedBed?.ward.wardNum}, Room: {selectedBed?.roomNum},
+                Bed: {selectedBed?.bedNum}
+              </p>
             </Box>
-            <VisualisationComponent patient={selectedBed?.patient} />
+            <Box textAlign={"left"}>
+              <p>Condition: {selectedBed?.patient?.condition} </p>
+              <p>Additional Info: {selectedBed?.patient?.addInfo} </p>
+            </Box>
+            <Box textAlign={"right"} marginRight={2}>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={updateSelectedPatient}
+              >
+                Update Details
+              </Button>
+            </Box>
           </Box>
         </Box>
+        <VisualisationComponent patient={selectedBed?.patient} />
       </Box>
-    </main>
+    </div>
   );
 };
 

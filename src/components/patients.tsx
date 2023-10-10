@@ -5,8 +5,10 @@ import { fetchAllPatients } from "@/pages/api/patients_api";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import { fetchAllSmartBeds } from "@/pages/api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
+import { useRouter } from "next/navigation";
 
 export default function Patients() {
+  const router = useRouter();
   const [number, setNumber] = useState(0);
   const [data, setData] = useState<SmartBed[]>([]);
   const [searchPatient, setSearchPatient] = useState<string>("");
@@ -29,6 +31,17 @@ export default function Patients() {
       bed.patient?.condition.toLowerCase().includes(event.target.value)
     );
     setData(filteredList);
+  };
+
+  const viewPatientVisualisation = (
+    patientId: string | undefined,
+    bedId: string
+  ) => {
+    if (patientId != undefined) {
+      router.push(
+        `/patientVisualisation?patientId=${patientId}&bedId=${bedId}`
+      );
+    }
   };
 
   useEffect(() => {
@@ -67,7 +80,6 @@ export default function Patients() {
 
   return (
     <>
-      {console.log(vitals)}
       <table className="table-auto w-full border-collapse">
         <thead className="text-sm bg-sky-200">
           {/* ------ column headers ------ */}
@@ -116,7 +128,11 @@ export default function Patients() {
 
           {/* ------ data rows ------ */}
           {data.map((pd, index) => (
-            <tr className="border-b border-black" key={pd._id}>
+            <tr
+              className="border-b border-black"
+              key={pd._id}
+              onClick={() => viewPatientVisualisation(pd.patient?._id, pd._id)}
+            >
               <td className="w-1/16">
                 <CampaignIcon style={{ color: "red" }} />
               </td>
@@ -133,11 +149,11 @@ export default function Patients() {
                 {pd.ward.wardNum}
               </td>
               <td id="bpReading" className="text-sm py-2 w-1/12">
-                {vitals[0]?.bloodPressureDia[index].reading}/
-                {vitals[0]?.bloodPressureSys[index].reading}
+                {vitals[0]?.bloodPressureDia[index]?.reading}/
+                {vitals[0]?.bloodPressureSys[index]?.reading}
               </td>
               <td id="bpDateTime" className="text-sm py-2 w-1/12">
-                {vitals[0]?.bloodPressureDia[index].datetime}
+                {vitals[0]?.bloodPressureDia[index]?.datetime}
               </td>
               <td id="hrReading" className="text-sm py-2 w-1/12">
                 {vitals[0]?.heartRate[index].reading}
