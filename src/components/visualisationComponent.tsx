@@ -11,6 +11,8 @@ import { Layout } from "react-grid-layout";
 import LineChartComponent from "./lineChart";
 import { io } from "socket.io-client";
 import { useRouter } from "next/router";
+import { Vital } from "@/models/vital";
+import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -138,71 +140,143 @@ export default function VisualisationComponent(prop: ComponentProp) {
     setLayouts(prop.patient?.layout);
   }, [prop.patient?.layout]);
 
-  // const [data, setData] = useState([
-  //   { datetime: "t1", reading: 61 },
-  //   { datetime: "t2", reading: 73 },
-  //   { datetime: "t3", reading: 89 },
-  //   { datetime: "t4", reading: 75 },
-  //   { datetime: "t5", reading: 61 },
-  //   { datetime: "t6", reading: 53 },
-  //   { datetime: "t7", reading: 99 },
-  // ]);
+  const [patientVitals, setPatientVitals] = useState<Vital>();
 
-  const [data, setData] = useState(prop?.patient?.vital?.respRate);
+  useEffect(() => {
+    fetchVitalByVitalId(prop?.patient?.vital).then((res) =>
+      setPatientVitals(res)
+    );
+  }, [prop?.patient?.vital]);
+
+  useEffect(() => {
+    if (patientVitals) {
+      setHRData(patientVitals.heartRate);
+      setBpDiaData(patientVitals.bloodPressureDia);
+      setBpSysData(patientVitals.bloodPressureSys);
+      setSpO2Data(patientVitals.spO2);
+    }
+  }, [patientVitals]);
+
+  const placeholder_data = [
+    { datetime: "t1", reading: 61 },
+    { datetime: "t2", reading: 73 },
+    { datetime: "t3", reading: 89 },
+    { datetime: "t4", reading: 75 },
+    { datetime: "t5", reading: 61 },
+    { datetime: "t6", reading: 53 },
+    { datetime: "t7", reading: 99 },
+  ];
+
+  const [rrData, setRRData] = useState(placeholder_data);
+  const [hrData, setHRData] = useState(placeholder_data);
+  const [bpSysData, setBpSysData] = useState(placeholder_data);
+  const [bpDiaData, setBpDiaData] = useState(placeholder_data);
+  const [tempData, setTempData] = useState(placeholder_data);
+  const [spO2Data, setSpO2Data] = useState(placeholder_data);
 
   // ============================================================== SET INTERVAL
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setData((previousData) => {
-        const newData = previousData?.slice(1);
-        const currDate = new Date();
-        const hours = currDate.getHours().toString().padStart(2, "0");
-        const minutes = currDate.getMinutes().toString().padStart(2, "0");
-        const seconds = currDate.getSeconds().toString().padStart(2, "0");
-        const random = Math.floor(60 + Math.random() * (160 - 60 + 1));
-        return [
-          ...newData!,
-          {
-            datetime: `${hours}:${minutes}:${seconds}`,
-            reading: random,
-          },
-        ];
-      });
-    }, 2000);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setData((previousData) => {
+  //       const newData = previousData?.slice(1);
+  //       const currDate = new Date();
+  //       const hours = currDate.getHours().toString().padStart(2, "0");
+  //       const minutes = currDate.getMinutes().toString().padStart(2, "0");
+  //       const seconds = currDate.getSeconds().toString().padStart(2, "0");
+  //       const random = Math.floor(60 + Math.random() * (160 - 60 + 1));
+  //       return [
+  //         ...newData!,
+  //         {
+  //           datetime: `${hours}:${minutes}:${seconds}`,
+  //           reading: random,
+  //         },
+  //       ];
+  //     });
+  //   }, 2000);
 
-    return () => clearInterval(interval);
-  });
+  //   return () => clearInterval(interval);
+  // });
 
   // ============================================================== SOCKET IMPLEMENTATION
-  // interface SocketData {
-  //   datetime: string;
-  //   patientId: string;
-  //   heartRate: number;
-  // }
+  interface SocketData {
+    datetime: string;
+    patientId: string;
+    heartRate?: number;
+    bloodPressureSys?: number;
+    bloodPressureDia?: number;
+    spO2?: number;
+    // bloodPressureSys?: string;
+    // bloodPressureDia?: string;
+    // spO2?: string;
+  }
 
-  // const router = useRouter();
+  const router = useRouter();
 
-  // useEffect(() => {
-  //   const socket = io("http://localhost:3001");
-  //   const patientId = router.query.patientId
-  //   socket.emit("connectDashboard", patientId);
-  //   socket.on("updateVitals", (data: SocketData) => {
-  //     console.log(data);
-  //     setData((previousData) => {
-  //       const newData = previousData.slice(1);
-  //       const datetime = new Date(data.datetime);
-  //       const hours = datetime.getHours().toString().padStart(2, "0");
-  //       const minutes = datetime.getMinutes().toString().padStart(2, "0");
-  //       const seconds = datetime.getSeconds().toString().padStart(2, "0");
-  //       const roundedReading = Math.floor(data.heartRate)
-  //       return [...newData, {datetime: `${hours}:${minutes}:${seconds}`, reading: roundedReading}];
-  //     });
-  //   });
+  useEffect(() => {
+    const socket = io("http://localhost:3001");
+    const patientId = router.query.patientId;
+    socket.emit("connectDashboard", patientId);
+    socket.on("updateVitals", (data: SocketData) => {
+      console.log(data);
+      const datetime = new Date(data.datetime);
+      const hours = datetime.getHours().toString().padStart(2, "0");
+      const minutes = datetime.getMinutes().toString().padStart(2, "0");
+      const seconds = datetime.getSeconds().toString().padStart(2, "0");
+      const formattedDateTime = `${hours}:${minutes}:${seconds}`;
+      if (data.heartRate) {
+        setHRData((previousData) => {
+          const newData = previousData!.slice(1);
+          return [
+            ...newData,
+            {
+              datetime: formattedDateTime,
+              reading: Math.floor(data.heartRate!),
+            },
+          ];
+        });
+      }
+      if (data.bloodPressureDia) {
+        setBpDiaData((previousData) => {
+          const newData = previousData!.slice(1);
+          return [
+            ...newData,
+            {
+              datetime: formattedDateTime,
+              reading: Math.floor(data.bloodPressureDia!),
+            },
+          ];
+        });
+      }
+      if (data.bloodPressureSys) {
+        setBpSysData((previousData) => {
+          const newData = previousData!.slice(1);
+          return [
+            ...newData,
+            {
+              datetime: formattedDateTime,
+              reading: Math.floor(data.bloodPressureSys!),
+            },
+          ];
+        });
+      }
+      if (data.spO2) {
+        setSpO2Data((previousData) => {
+          const newData = previousData!.slice(1);
+          return [
+            ...newData,
+            {
+              datetime: formattedDateTime,
+              reading: Math.floor(data.spO2!),
+            },
+          ];
+        });
+      }
+    });
 
-  //   return () => {
-  //     socket.close();
-  //   };
-  // }, []);
+    return () => {
+      socket.close();
+    };
+  }, []);
 
   return (
     <ResponsiveGridLayout
@@ -214,19 +288,20 @@ export default function VisualisationComponent(prop: ComponentProp) {
       rowHeight={60}
     >
       <div key="rr">
-        <LineChartComponent data={data!} vital="rr" />
+        <LineChartComponent data={rrData!} vital="rr" />
       </div>
       <div key="hr">
-        <LineChartComponent data={data!} vital="hr" />
+        <LineChartComponent data={hrData!} vital="hr" />
       </div>
       <div key="o2">
-        <LineChartComponent data={data!} vital="o2" />
+        <LineChartComponent data={spO2Data!} vital="o2" />
       </div>
       <div key="bp">
-        <LineChartComponent data={data!} vital="bp" />
+        <LineChartComponent data={bpDiaData!} vital="bp" />
+        {/* add in one more line for bpsys */}
       </div>
       <div key="tp">
-        <LineChartComponent data={data!} vital="tp" />
+        <LineChartComponent data={tempData!} vital="tp" />
       </div>
       <div key="alerts">
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
