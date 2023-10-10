@@ -1,3 +1,4 @@
+import { StringLiteral } from "typescript";
 import { Patient } from "./patient";
 import { Ward } from "./ward";
 
@@ -11,6 +12,8 @@ export class SmartBed {
   railStatus: boolean;
   updatedAt: string;
   ward: Ward;
+  roomNum: string;
+  bedNum: string;
 
   constructor(
     _id: string,
@@ -21,6 +24,8 @@ export class SmartBed {
     railStatus: boolean,
     updatedAt: string,
     ward: Ward,
+    roomNum: string,
+    bedNum: string,
     patient?: Patient
   ) {
     this._id = _id;
@@ -32,5 +37,7 @@ export class SmartBed {
     this.railStatus = railStatus;
     this.updatedAt = updatedAt;
     this.ward = ward;
+    this.roomNum = roomNum;
+    this.bedNum = bedNum;
   }
 }
