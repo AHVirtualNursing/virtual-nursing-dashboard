@@ -184,7 +184,7 @@ export default function VisualisationComponent(prop: ComponentProp) {
 
   // useEffect(() => {
   //   const socket = io("http://localhost:3001");
-  //   const patientId = router.query.patiendId
+  //   const patientId = router.query.patientId
   //   socket.emit("connectDashboard", patientId);
   //   socket.on("updateVitals", (data: SocketData) => {
   //     console.log(data);
