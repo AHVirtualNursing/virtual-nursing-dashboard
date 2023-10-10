@@ -44,6 +44,10 @@ export default function Patients() {
     }
   };
 
+  /* this function iterates all patients, extracts the vital id of each patient, and fetches the vital object by vital id.
+   Vital object is then pushed into a vitals array and set in the state (vitals variable in component state)
+   This function is invoked every 10 seconds. */
+
   const fetchPatientVitals = async () => {
     let patientVitalsArr: any[] = [];
     for (const bedData of data) {
@@ -54,16 +58,21 @@ export default function Patients() {
       patientVitalsArr.push(res);
     }
     setVitals(patientVitalsArr);
+    console.log("Method called");
   };
 
+  /* this useEffect calls the above method fetchPatientVitals() at 10 second intervals, and re-renders the vitals dynamically in the frontend */
   useEffect(() => {
     fetchAllSmartBeds().then((res) => {
       setData(res.data);
     });
-
-    fetchPatientVitals();
-    console.log(vitals);
-  }, [data.length]);
+    const interval = setInterval(() => {
+      fetchPatientVitals();
+    }, 10000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [vitals]);
 
   /* The code chunk below is for testing purposes where we mock values that change every 5 seconds. This is done by generating a random integer in 5 second intervals, then re-rendering the component with useEffect
 
@@ -132,7 +141,15 @@ export default function Patients() {
             <td className="text-xs">Updated</td>
           </tr>
 
-          {/* ------ data rows ------ */}
+          {/* ------ data rows ------ 
+            The vitals are displayed based on the latest vitals data/numbers updated into the db. For blood pressure (both DIA and SYS) and Heart Rate, the number displayed is the latest value (value at the last index) of the bloodPressureDia, bloodPressureSys and heartRate arrays.
+            
+            For eg, to display the heart rate reading, 
+
+            {Math.round(vitals[index]?.heartRate[vitals[index]?.heartRate. length - 1].reading)}
+
+            This code extracts the vitals object matching the patient index, to ensure the correct vitals object of the patient. Then the last element of the heartRate array (latest value) is extracted and rounded to nearest whole number to display the heart rate value (This changes every 10 seconds since we update the latest value of the heartRate array)
+          */}
           {data.map((pd, index) => (
             <tr
               className="border-b border-black"
@@ -155,11 +172,24 @@ export default function Patients() {
                 {pd.ward.wardNum}
               </td>
               <td id="bpReading" className="text-sm py-2 w-1/12">
-                {vitals[index]?.bloodPressureDia[index]?.reading}/
-                {vitals[index]?.bloodPressureSys[index]?.reading}
+                {
+                  vitals[index]?.bloodPressureDia[
+                    vitals[index]?.heartRate.length - 1
+                  ]?.reading
+                }
+                /
+                {
+                  vitals[index]?.bloodPressureSys[
+                    vitals[index]?.heartRate.length - 1
+                  ]?.reading
+                }
               </td>
               <td id="bpDateTime" className="text-sm py-2 w-1/12">
-                {vitals[index]?.bloodPressureDia[index]?.datetime.split(" ")[1]}
+                {
+                  vitals[index]?.bloodPressureDia[
+                    vitals[index]?.heartRate.length - 1
+                  ]?.datetime.split(" ")[1]
+                }
               </td>
               <td id="hrReading" className="text-sm py-2 w-1/12">
                 {Math.round(
