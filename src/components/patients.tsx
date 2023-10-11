@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import { patientData } from "@/mockData";
-import { fetchAllPatients } from "@/pages/api/patients_api";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import { fetchAllSmartBeds } from "@/pages/api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
@@ -9,7 +8,6 @@ import { useRouter } from "next/navigation";
 
 export default function Patients() {
   const router = useRouter();
-  const [number, setNumber] = useState(0);
   const [data, setData] = useState<SmartBed[]>([]);
   const [searchPatient, setSearchPatient] = useState<string>("");
   const [searchCondition, setSearchCondition] = useState<string>("");
@@ -20,6 +18,7 @@ export default function Patients() {
     const filteredList = data.filter((bed) =>
       bed.patient?.name.toLowerCase().includes(event.target.value)
     );
+    console.log(filteredList);
     setData(filteredList);
   };
 
@@ -52,13 +51,12 @@ export default function Patients() {
     let patientVitalsArr: any[] = [];
     for (const bedData of data) {
       let patientVitals = bedData.patient?.vital;
-      console.log(patientVitals);
-      const res = await fetchVitalByVitalId(patientVitals);
-      console.log(res);
-      patientVitalsArr.push(res);
+      if (patientVitals) {
+        const res = await fetchVitalByVitalId(patientVitals);
+        patientVitalsArr.push(res);
+      }
     }
     setVitals(patientVitalsArr);
-    console.log("Method called");
   };
 
   /* this useEffect calls the above method fetchPatientVitals() at 10 second intervals, and re-renders the vitals dynamically in the frontend */
@@ -95,6 +93,7 @@ export default function Patients() {
 
   return (
     <>
+      {console.log(data)}
       <table className="table-auto w-full border-collapse">
         <thead className="text-sm bg-sky-200">
           {/* ------ column headers ------ */}
