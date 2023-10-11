@@ -136,27 +136,6 @@ export default function VisualisationComponent(prop: ComponentProp) {
     updatePatientLayoutByPatientId(prop?.patient?._id, allLayouts);
   };
 
-  useEffect(() => {
-    setLayouts(prop.patient?.layout);
-  }, [prop.patient?.layout]);
-
-  const [patientVitals, setPatientVitals] = useState<Vital>();
-
-  useEffect(() => {
-    fetchVitalByVitalId(prop?.patient?.vital).then((res) =>
-      setPatientVitals(res)
-    );
-  }, [prop?.patient?.vital]);
-
-  useEffect(() => {
-    if (patientVitals) {
-      setHRData(patientVitals.heartRate);
-      setBpDiaData(patientVitals.bloodPressureDia);
-      setBpSysData(patientVitals.bloodPressureSys);
-      setSpO2Data(patientVitals.spO2);
-    }
-  }, [patientVitals]);
-
   const placeholder_data = [
     { datetime: "t1", reading: 61 },
     { datetime: "t2", reading: 73 },
@@ -173,6 +152,35 @@ export default function VisualisationComponent(prop: ComponentProp) {
   const [bpDiaData, setBpDiaData] = useState(placeholder_data);
   const [tempData, setTempData] = useState(placeholder_data);
   const [spO2Data, setSpO2Data] = useState(placeholder_data);
+
+  useEffect(() => {
+    setLayouts(prop.patient?.layout);
+  }, [prop.patient?.layout]);
+
+  const [patientVitals, setPatientVitals] = useState<Vital>();
+
+  useEffect(() => {
+    fetchVitalByVitalId(prop?.patient?.vital).then((res) =>
+      setPatientVitals(res)
+    );
+  }, [prop?.patient?.vital]);
+
+  useEffect(() => {
+    if (patientVitals) {
+      if (patientVitals.spO2.length > 0) {
+        setSpO2Data(patientVitals.spO2);
+      }
+      if (patientVitals.heartRate.length > 0) {
+        setHRData(patientVitals.heartRate);
+      }
+      if (patientVitals.bloodPressureDia.length > 0) {
+        setBpDiaData(patientVitals.bloodPressureDia);
+      }
+      if (patientVitals.bloodPressureSys.length > 0) {
+        setBpSysData(patientVitals.bloodPressureSys);
+      }
+    }
+  }, [patientVitals]);
 
   // ============================================================== SET INTERVAL
   // useEffect(() => {
