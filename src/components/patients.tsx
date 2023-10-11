@@ -62,11 +62,16 @@ export default function Patients() {
   /* this useEffect calls the above method fetchPatientVitals() at 10 second intervals, and re-renders the vitals dynamically in the frontend */
   useEffect(() => {
     fetchAllSmartBeds().then((res) => {
-      setData(res.data);
+      console.log(res.data);
+      setData(
+        res.data.filter(
+          (smartbed: SmartBed) => smartbed.ward && smartbed.patient
+        )
+      );
     });
     const interval = setInterval(() => {
       fetchPatientVitals();
-    }, 10000);
+    }, 5000);
     return () => {
       clearInterval(interval);
     };
