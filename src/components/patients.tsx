@@ -15,21 +15,21 @@ export default function Patients() {
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
-    const filteredList = data.filter((bed) =>
-      bed.patient?.name.toLowerCase().includes(event.target.value)
-    );
-    console.log(filteredList);
-    setData(filteredList);
+    // const filteredList = data.filter((bed) =>
+    //   bed.patient?.name.toLowerCase().includes(event.target.value)
+    // );
+    // console.log(filteredList);
+    // setData(filteredList);
   };
 
   const handleConditionSearch = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setSearchCondition(event.target.value);
-    const filteredList = data.filter((bed) =>
-      bed.patient?.condition.toLowerCase().includes(event.target.value)
-    );
-    setData(filteredList);
+    // const filteredList = data.filter((bed) =>
+    //   bed.patient?.condition.toLowerCase().includes(event.target.value)
+    // );
+    // setData(filteredList);
   };
 
   const viewPatientVisualisation = (
@@ -138,7 +138,7 @@ export default function Patients() {
               />
             </td>
             <td className="text-xs">Bed No.</td>
-            <td className="text-xs">Ward Number</td>
+            <td className="text-xs">Ward No</td>
             <td className="text-xs">Result</td>
             <td className="text-xs">Updated</td>
             <td className="text-xs">Reading</td>
@@ -154,62 +154,74 @@ export default function Patients() {
 
             This code extracts the vitals object matching the patient index, to ensure the correct vitals object of the patient. Then the last element of the heartRate array (latest value) is extracted and rounded to nearest whole number to display the heart rate value (This changes every 10 seconds since we update the latest value of the heartRate array)
           */}
-          {data.map((pd, index) => (
-            <tr
-              className="border-b border-black"
-              key={pd._id}
-              onClick={() => viewPatientVisualisation(pd.patient?._id, pd._id)}
-            >
-              <td className="w-1/16">
-                <CampaignIcon style={{ color: "red" }} />
-              </td>
-              <td id="patientName" className="text-sm py-2 w-1/6">
-                {pd.patient?.name}
-              </td>
-              <td id="patientCondition" className="text-sm py-2 w-1/6">
-                {pd.patient?.condition}
-              </td>
-              <td id="bedNum" className="text-sm py-2 w-1/12">
-                {pd.name}
-              </td>
-              <td id="wardNum" className="text-sm py-2 w-1/12">
-                {pd.ward.wardNum}
-              </td>
-              <td id="bpReading" className="text-sm py-2 w-1/12">
-                {
-                  vitals[index]?.bloodPressureDia[
-                    vitals[index]?.heartRate.length - 1
-                  ]?.reading
+          {data
+            .filter((bed) =>
+              bed.patient?.name
+                .toLowerCase()
+                .includes(searchPatient || searchCondition)
+            )
+            .map((pd, index) => (
+              <tr
+                className="border-b border-black"
+                key={pd._id}
+                onClick={() =>
+                  viewPatientVisualisation(pd.patient?._id, pd._id)
                 }
-                /
-                {
-                  vitals[index]?.bloodPressureSys[
-                    vitals[index]?.heartRate.length - 1
-                  ]?.reading
-                }
-              </td>
-              <td id="bpDateTime" className="text-sm py-2 w-1/12">
-                {
-                  vitals[index]?.bloodPressureDia[
-                    vitals[index]?.heartRate.length - 1
-                  ]?.datetime.split(" ")[1]
-                }
-              </td>
-              <td id="hrReading" className="text-sm py-2 w-1/12">
-                {Math.round(
-                  vitals[index]?.heartRate[vitals[index]?.heartRate.length - 1]
-                    .reading
-                )}
-              </td>
-              <td id="hrDateTime" className="text-sm py-2 w-1/12">
-                {
-                  vitals[index]?.heartRate[
-                    vitals[index]?.heartRate.length - 1
-                  ].datetime.split(" ")[1]
-                }
-              </td>
-            </tr>
-          ))}
+              >
+                <td className="w-1/16">
+                  <CampaignIcon style={{ color: "red" }} />
+                </td>
+                <td id="patientName" className="text-sm py-2 w-1/6">
+                  {pd.patient?.name}
+                </td>
+                <td id="patientCondition" className="text-sm py-2 w-1/6">
+                  {pd.patient?.condition}
+                </td>
+                <td id="bedNum" className="text-sm py-2 w-1/12">
+                  {pd.name.split(" ")[2]}
+                </td>
+                <td id="wardNum" className="text-sm py-2 w-1/12">
+                  {pd.ward.wardNum}
+                </td>
+                <td id="bpReading" className="text-sm py-2 w-1/12">
+                  {
+                    vitals[index]?.bloodPressureDia[
+                      vitals[index]?.heartRate.length - 1
+                    ]?.reading
+                  }
+                  /
+                  {
+                    vitals[index]?.bloodPressureSys[
+                      vitals[index]?.heartRate.length - 1
+                    ]?.reading
+                  }
+                </td>
+                <td id="bpDateTime" className="text-sm py-2 w-1/12">
+                  {
+                    vitals[index]?.bloodPressureDia[
+                      vitals[index]?.heartRate.length - 1
+                    ]?.datetime.split(" ")[1]
+                  }
+                </td>
+                <td id="hrReading" className="text-sm py-2 w-1/12">
+                  {Math.round(
+                    vitals[index]?.heartRate[
+                      vitals[index]?.heartRate.length - 1
+                    ].reading
+                  )}
+                </td>
+                <td id="hrDateTime" className="text-sm py-2 w-1/12">
+                  {
+                    vitals[index]?.heartRate[
+                      vitals[index]?.heartRate.length - 1
+                    ].datetime.split(" ")[1]
+                  }
+                </td>
+                <td id="spo2" className="text-sm py-2 w-1/12">
+                  0
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </>
