@@ -7,6 +7,7 @@ import {
   XAxis,
   YAxis,
   LabelList,
+  Label,
 } from "recharts";
 
 const data = [
@@ -36,15 +37,25 @@ export default function Summary() {
               />
               <XAxis dataKey="name" type="category" hide />
               <YAxis type="number" hide />
-              <Bar dataKey="uv" fill="#8884d8" radius={10}>
-                <LabelList dataKey={"uv"} position={"center"} fill="black" />
-              </Bar>
-              <Bar dataKey="pv" fill="#ffc658" radius={10}>
-                <LabelList dataKey={"pv"} position={"center"} fill="black" />
-              </Bar>
-              <Bar dataKey="amt" fill="#82ca9d" radius={10}>
-                <LabelList dataKey={"amt"} position={"center"} fill="black" />
-              </Bar>
+              <Bar
+                dataKey="uv"
+                fill="#8884d8"
+                radius={10}
+                isAnimationActive={false}
+                label={{ fill: "black", fontSize: 10 }}
+              />
+              <Bar
+                dataKey="pv"
+                fill="#ffc658"
+                radius={10}
+                label={{ fill: "black", fontSize: 10 }}
+              />
+              <Bar
+                dataKey="amt"
+                fill="#82ca9d"
+                radius={10}
+                label={{ fill: "black", fontSize: 10 }}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>

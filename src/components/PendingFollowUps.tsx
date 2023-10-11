@@ -47,9 +47,8 @@ export default function PendingFollowUps() {
                   height: 15,
                 }}
                 radius={[10, 10, 10, 10]}
-              >
-                <LabelList dataKey={"uv"} position={"center"} fill="black" />
-              </Bar>
+                label={{ fill: "black", fontSize: 10 }}
+              />
               <Bar
                 dataKey="pv"
                 fill="#82ca9d"
@@ -58,9 +57,8 @@ export default function PendingFollowUps() {
                   height: 15,
                 }}
                 radius={[10, 10, 10, 10]}
-              >
-                <LabelList dataKey={"pv"} position={"center"} fill="black" />
-              </Bar>
+                label={{ fill: "black", fontSize: 10 }}
+              />
               <Bar
                 dataKey="amt"
                 fill="#ffc658"
@@ -69,9 +67,8 @@ export default function PendingFollowUps() {
                   height: 15,
                 }}
                 radius={[10, 10, 10, 10]}
-              >
-                <LabelList dataKey={"amt"} position={"center"} fill="black" />
-              </Bar>
+                label={{ fill: "black", fontSize: 10 }}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
