@@ -17,7 +17,8 @@ interface dataInterface {
 const colours: { [key: string]: string } = {
   rr: "rgb(255, 102, 102)",
   hr: "rgb(255, 178, 102)",
-  bp: "rgb(76, 153, 0)",
+  bpSys: "rgb(76, 153, 0)",
+  bpDia: "rgb(76, 153, 0)",
   tp: "rgb(102, 178, 255)",
   o2: "rgb(255, 102, 178)",
 };
@@ -25,7 +26,8 @@ const colours: { [key: string]: string } = {
 const vitals: { [key: string]: string } = {
   rr: "Respiratory Rate",
   hr: "Heart Rate",
-  bp: "Blood Pressure",
+  bpSys: "Blood Pressure Systolic",
+  bpDia: "Blood Pressure Diastolic",
   tp: "Temperature",
   o2: "SpO2",
 };

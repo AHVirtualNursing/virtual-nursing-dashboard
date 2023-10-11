@@ -225,50 +225,62 @@ export default function VisualisationComponent(prop: ComponentProp) {
       const formattedDateTime = `${hours}:${minutes}:${seconds}`;
       if (data.heartRate) {
         setHRData((previousData) => {
-          const newData = previousData!.slice(1);
-          return [
-            ...newData,
+          const newData = [
+            ...previousData,
             {
               datetime: formattedDateTime,
               reading: Math.floor(data.heartRate!),
             },
           ];
+          if (newData.length > 7) {
+            return newData.slice(newData.length - 7);
+          }
+          return newData;
         });
       }
       if (data.bloodPressureDia) {
         setBpDiaData((previousData) => {
-          const newData = previousData!.slice(1);
-          return [
-            ...newData,
+          const newData = [
+            ...previousData,
             {
               datetime: formattedDateTime,
               reading: Math.floor(data.bloodPressureDia!),
             },
           ];
+          if (newData.length > 7) {
+            return newData.slice(newData.length - 7);
+          }
+          return newData;
         });
       }
       if (data.bloodPressureSys) {
         setBpSysData((previousData) => {
-          const newData = previousData!.slice(1);
-          return [
-            ...newData,
+          const newData = [
+            ...previousData,
             {
               datetime: formattedDateTime,
               reading: Math.floor(data.bloodPressureSys!),
             },
           ];
+          if (newData.length > 7) {
+            return newData.slice(newData.length - 7);
+          }
+          return newData;
         });
       }
       if (data.spO2) {
         setSpO2Data((previousData) => {
-          const newData = previousData!.slice(1);
-          return [
-            ...newData,
+          const newData = [
+            ...previousData,
             {
               datetime: formattedDateTime,
               reading: Math.floor(data.spO2!),
             },
           ];
+          if (newData.length > 7) {
+            return newData.slice(newData.length - 7);
+          }
+          return newData;
         });
       }
     });
@@ -296,9 +308,11 @@ export default function VisualisationComponent(prop: ComponentProp) {
       <div key="o2">
         <LineChartComponent data={spO2Data!} vital="o2" />
       </div>
-      <div key="bp">
-        <LineChartComponent data={bpDiaData!} vital="bp" />
-        {/* add in one more line for bpsys */}
+      <div key="bpDia">
+        <LineChartComponent data={bpDiaData!} vital="bpDia" />
+      </div>
+      <div key="bpSys">
+        <LineChartComponent data={bpSysData!} vital="bpSys" />
       </div>
       <div key="tp">
         <LineChartComponent data={tempData!} vital="tp" />
