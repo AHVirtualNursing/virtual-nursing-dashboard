@@ -179,6 +179,12 @@ export default function VisualisationComponent(prop: ComponentProp) {
       if (patientVitals.bloodPressureSys.length > 0) {
         setBpSysData(patientVitals.bloodPressureSys);
       }
+      if (patientVitals.temperature.length > 0) {
+        setTempData(patientVitals.temperature);
+      }
+      if (patientVitals.respRate.length > 0) {
+        setRRData(patientVitals.respRate);
+      }
     }
   }, [patientVitals]);
 
