@@ -9,7 +9,7 @@ import LockReset from "@mui/icons-material/LockReset";
 
 export default function Sidebar() {
   return (
-    <div className="left-0 flex flex-col h-[calc(100vh-114px)] pt-9 shadow-lg gap-4 w-64">
+    <div className="left-0 flex flex-col h-[calc(100vh-114px)] sticky top-1 pt-9  gap-4 w-64">
       <SidebarTab name={"Patients"} icon={<GroupIcon />} dest={"dashboard"} />
       <SidebarTab name={"Wards"} icon={<BedIcon />} dest={"wards"} />
       <SidebarTab
