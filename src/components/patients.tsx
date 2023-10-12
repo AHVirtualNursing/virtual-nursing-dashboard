@@ -166,8 +166,7 @@ export default function Patients() {
                 key={pd._id}
                 onClick={() =>
                   viewPatientVisualisation(pd.patient?._id, pd._id)
-                }
-              >
+                }>
                 <td className="w-1/16">
                   <CampaignIcon style={{ color: "red" }} />
                 </td>
@@ -185,13 +184,13 @@ export default function Patients() {
                 </td>
                 <td id="bpReading" className="text-sm py-2 w-1/12">
                   {
-                    vitals[index]?.bloodPressureDia[
+                    vitals[index]?.bloodPressureSys[
                       vitals[index]?.heartRate.length - 1
                     ]?.reading
                   }
                   /
                   {
-                    vitals[index]?.bloodPressureSys[
+                    vitals[index]?.bloodPressureDia[
                       vitals[index]?.heartRate.length - 1
                     ]?.reading
                   }
