@@ -98,7 +98,7 @@ export default function Patients() {
 
   return (
     <>
-      {console.log(vitals)}
+      {console.log(data)}
       <table className="table-auto w-full border-collapse">
         <thead className="text-sm bg-sky-200">
           {/* ------ column headers ------ */}
@@ -178,7 +178,7 @@ export default function Patients() {
                   {pd.patient?.condition}
                 </td>
                 <td id="bedNum" className="text-sm py-2 w-1/12">
-                  {pd.name.split(" ")[2]}
+                  {pd.bedNum}
                 </td>
                 <td id="wardNum" className="text-sm py-2 w-1/12">
                   {pd.ward.wardNum}
@@ -186,20 +186,20 @@ export default function Patients() {
                 <td id="bpReading" className="text-sm py-2 w-1/12">
                   {
                     vitals[index]?.bloodPressureSys[
-                      vitals[index]?.heartRate.length - 1
+                      vitals[index]?.bloodPressureSys.length - 1
                     ]?.reading
                   }
                   /
                   {
                     vitals[index]?.bloodPressureDia[
-                      vitals[index]?.heartRate.length - 1
+                      vitals[index]?.bloodPressureDia.length - 1
                     ]?.reading
                   }
                 </td>
                 <td id="bpDateTime" className="text-sm py-2 w-1/12">
                   {
                     vitals[index]?.bloodPressureDia[
-                      vitals[index]?.heartRate.length - 1
+                      vitals[index]?.bloodPressureDia.length - 1
                     ]?.datetime.split(" ")[1]
                   }
                 </td>
@@ -214,7 +214,7 @@ export default function Patients() {
                   {
                     vitals[index]?.heartRate[
                       vitals[index]?.heartRate.length - 1
-                    ].datetime.split(" ")[1]
+                    ]?.datetime.split(" ")[1]
                   }
                 </td>
                 <td id="spo2" className="text-sm py-2 w-1/12">
