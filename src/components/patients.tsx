@@ -98,7 +98,7 @@ export default function Patients() {
 
   return (
     <>
-      {console.log(data)}
+      {console.log(vitals)}
       <table className="table-auto w-full border-collapse">
         <thead className="text-sm bg-sky-200">
           {/* ------ column headers ------ */}
@@ -166,7 +166,8 @@ export default function Patients() {
                 key={pd._id}
                 onClick={() =>
                   viewPatientVisualisation(pd.patient?._id, pd._id)
-                }>
+                }
+              >
                 <td className="w-1/16">
                   <CampaignIcon style={{ color: "red" }} />
                 </td>
@@ -206,7 +207,7 @@ export default function Patients() {
                   {Math.round(
                     vitals[index]?.heartRate[
                       vitals[index]?.heartRate.length - 1
-                    ].reading
+                    ]?.reading
                   )}
                 </td>
                 <td id="hrDateTime" className="text-sm py-2 w-1/12">
@@ -217,7 +218,7 @@ export default function Patients() {
                   }
                 </td>
                 <td id="spo2" className="text-sm py-2 w-1/12">
-                  0
+                  {vitals[index]?.spO2[vitals[index]?.spO2.length - 1]?.reading}
                 </td>
               </tr>
             ))}
