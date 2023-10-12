@@ -5,6 +5,7 @@ import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import { fetchAllSmartBeds } from "@/pages/api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
 import { useRouter } from "next/navigation";
+import TableSubHeader from "./TableSubHeader";
 
 export default function Patients() {
   const router = useRouter();
@@ -110,7 +111,7 @@ export default function Patients() {
             <th>Ward</th>
             <th colSpan={2}>Blood Pressure</th>
             <th colSpan={2}>HR</th>
-            <th className="pr-2">Saturation</th>
+            <th colSpan={2}>Saturation</th>
           </tr>
         </thead>
         <tbody>
@@ -137,12 +138,14 @@ export default function Patients() {
                 onChange={handleConditionSearch}
               />
             </td>
-            <td className="text-xs">Bed No.</td>
-            <td className="text-xs">Ward No</td>
-            <td className="text-xs">Result</td>
-            <td className="text-xs">Updated</td>
-            <td className="text-xs">Reading</td>
-            <td className="text-xs">Updated</td>
+            <TableSubHeader subheaderText="Bed No." />
+            <TableSubHeader subheaderText="Ward No." />
+            <TableSubHeader subheaderText="Result" />
+            <TableSubHeader subheaderText="Updated" />
+            <TableSubHeader subheaderText="Reading" />
+            <TableSubHeader subheaderText="Updated" />
+            <TableSubHeader subheaderText="Reading" />
+            <TableSubHeader subheaderText="Updated" />
           </tr>
 
           {/* ------ data rows ------ 
@@ -219,6 +222,11 @@ export default function Patients() {
                 </td>
                 <td id="spo2" className="text-sm py-2 w-1/12">
                   {vitals[index]?.spO2[vitals[index]?.spO2.length - 1]?.reading}
+                </td>
+                <td id="spo2Datetime" className="text-sm py-2 w-1/12">
+                  {vitals[index]?.spO2[
+                    vitals[index]?.spO2.length - 1
+                  ]?.datetime.substring(11, 23)}
                 </td>
               </tr>
             ))}
