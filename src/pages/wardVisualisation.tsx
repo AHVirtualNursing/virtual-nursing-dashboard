@@ -11,8 +11,6 @@ import { Ward } from "@/models/ward";
 import { SmartBed } from "@/models/smartBed";
 import { fetchBedsByWardId } from "./api/wards_api";
 
-const inter = Inter({ subsets: ["latin"] });
-
 const wardVisualisationPage = () => {
   const router = useRouter();
   const { wardId, wardNum } = router.query;
@@ -22,13 +20,6 @@ const wardVisualisationPage = () => {
   useEffect(() => {
     fetchBedsByWardId(wardId).then((res) => setBeds(res));
   }, [wardId]);
-
-  const handleSideBarTabClick = (key: string) => {
-    router.push(
-      { pathname: "/dashboard", query: { state: key } },
-      "/dashboard"
-    );
-  };
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", flex: 1 },
@@ -108,47 +99,38 @@ const wardVisualisationPage = () => {
   }
 
   return (
-    <main className={`${styles.main} ${inter.className}`}>
-      <Header />
-      <Box sx={{ display: "flex" }}>
-        <DashboardSideBar handleSideBarTabClick={handleSideBarTabClick} />
-        <Box
-          component="main"
-          sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
-        >
-          <Box>
-            <Typography sx={{ marginBottom: "20px" }} variant="h6">
-              Ward {wardNum} Visualisation
-            </Typography>
-            <DataGrid
-              rows={getBedsInWard(bedsInWards)}
-              columns={columns}
-              initialState={{
-                pagination: {
-                  paginationModel: {
-                    pageSize: 10,
-                  },
-                },
-              }}
-              pageSizeOptions={[10]}
-              onRowDoubleClick={() => alert("You clicked me")}
-              sx={{
-                "& .MuiDataGrid-row:hover": {
-                  cursor: "pointer",
-                },
-              }}
-            />
-          </Box>
-          <Button
-            sx={{ marginTop: "20px" }}
-            variant="contained"
-            onClick={() => router.back()}
-          >
-            BACK
-          </Button>
-        </Box>
+    <div className="flex flex-col p-8 gap-8 bg-blue-100 w-full shadow-lg">
+      <Box>
+        <Typography sx={{ marginBottom: "20px" }} variant="h6">
+          Ward {wardNum} Visualisation
+        </Typography>
+        <DataGrid
+          rows={getBedsInWard(bedsInWards)}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 10,
+              },
+            },
+          }}
+          pageSizeOptions={[10]}
+          onRowDoubleClick={() => alert("You clicked me")}
+          sx={{
+            "& .MuiDataGrid-row:hover": {
+              cursor: "pointer",
+            },
+          }}
+        />
       </Box>
-    </main>
+      <Button
+        sx={{ marginTop: "20px" }}
+        variant="contained"
+        onClick={() => router.back()}
+      >
+        BACK
+      </Button>
+    </div>
   );
 };
 

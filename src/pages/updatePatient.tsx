@@ -20,7 +20,7 @@ import axios from "axios";
 import { Patient } from "@/models/patient";
 import {
   fetchPatientByPatientId,
-  updatePatientByPatientId,
+  updatePatientConditionByPatientId,
 } from "./api/patients_api";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -50,7 +50,7 @@ function updatePatient() {
     }
     console.log(showConditionErrorMessage);
     console.log("running");
-    const res = await updatePatientByPatientId(patientId, condition);
+    const res = await updatePatientConditionByPatientId(patientId, condition);
     if (res?.status === 200) {
       setShowSuccessMessage(true);
       setShowConditionErrorMessage(false);

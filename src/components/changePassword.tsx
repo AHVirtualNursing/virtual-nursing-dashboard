@@ -2,7 +2,6 @@ import { callChangePasswordApi } from "@/pages/api/user";
 import { Typography, Box, TextField, Button } from "@mui/material";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
-import { modalStyle } from "./styles/style";
 
 export default function ChangePasswordPage() {
   const [oldPassword, setOldPassword] = useState("");
@@ -53,7 +52,7 @@ export default function ChangePasswordPage() {
   }
 
   return (
-    <Box sx={modalStyle}>
+    <Box>
       <Typography id="modal-modal-title" variant="h6" component="h2">
         Change Password
       </Typography>
@@ -99,7 +98,8 @@ export default function ChangePasswordPage() {
             alignItems: "center",
             justifyContent: "space-around",
             marginTop: "16px",
-          }}>
+          }}
+        >
           <Button variant="outlined" onClick={() => changePassword()}>
             CONFIRM
           </Button>

@@ -34,7 +34,7 @@ export default function Alerts() {
     signOut();
   };
   return (
-    <div>
+    <div className="flex flex-col p-8 gap-8 bg-blue-100 w-full shadow-lg">
       <Typography textAlign="left" sx={{ marginBottom: "20px" }} variant="h6">
         View List of Alerts
       </Typography>
