@@ -16,7 +16,10 @@ function Configs() {
   return (
     <div className="flex flex-col p-8 gap-8 bg-blue-100 w-full shadow-lg">
       <div className="flex flex-start gap-8">
-        <div className="bg-blue-400 p-2 rounded-xl flex justify-between items-center gap-x-5 ">
+        <div
+          id="pageTabs"
+          className="bg-blue-400 p-2 rounded-xl flex justify-between items-center gap-x-5"
+        >
           {tabPages.map((tab, index) => (
             <button
               key={index}
@@ -34,10 +37,13 @@ function Configs() {
       </div>
       <div className="flex h-full gap-6">
         {selectedTab === 0 && (
-          <div className="w-1/12 flex flex-col gap-y-7 pt-8">
+          <div
+            id="sideVitalButtons"
+            className="w-1/12 flex flex-col gap-y-7 pt-8 align-middle"
+          >
             {vitalSelections.map((vital, index) => (
               <button
-                className="border-none bg-slate-300 rounded-xl p-5 text-center flex-1"
+                className="border-none bg-slate-300 rounded-xl p-5 justify-center flex"
                 key={index}
               >
                 {vital.name}
