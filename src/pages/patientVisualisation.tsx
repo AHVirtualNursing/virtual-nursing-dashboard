@@ -11,12 +11,19 @@ import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
 import VisualisationComponent from "@/components/visualisationComponent";
 import { Patient } from "@/models/patient";
+import PatientChart from "@/components/patientChart";
 
 const inter = Inter({ subsets: ["latin"] });
 
 const patientVisualisationPage = () => {
   const router = useRouter();
   const { patientId, bedId } = router.query;
+  const [selectedBed, setSelectedBed] = useState<SmartBed>();
+  const [showPatientChartView, setShowPatientChartView] = useState(false);
+
+  useEffect(() => {
+    fetchBedByBedId(bedId).then((res) => setSelectedBed(res));
+  }, [bedId]);
 
   const handleSideBarTabClick = (key: string) => {
     router.push(
@@ -24,12 +31,6 @@ const patientVisualisationPage = () => {
       "/dashboard"
     );
   };
-
-  const [selectedBed, setSelectedBed] = useState<SmartBed>();
-
-  useEffect(() => {
-    fetchBedByBedId(bedId).then((res) => setSelectedBed(res));
-  }, [bedId]);
 
   function updateSelectedPatient() {
     router.push("/updatePatient?patientId=" + selectedBed?.patient?._id);
@@ -44,8 +45,7 @@ const patientVisualisationPage = () => {
             display: "flex",
             border: 1,
             borderRadius: 3,
-          }}
-        >
+          }}>
           <Box sx={{ padding: "20px" }}>
             <Image
               style={{
@@ -75,14 +75,27 @@ const patientVisualisationPage = () => {
               <Button
                 size="small"
                 variant="contained"
-                onClick={updateSelectedPatient}
-              >
+                onClick={updateSelectedPatient}>
                 Update Details
+              </Button>
+            </Box>
+            <Box textAlign={"right"} marginRight={2} marginTop={2}>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={() =>
+                  setShowPatientChartView((prevState) => !prevState)
+                }>
+                {showPatientChartView ? "Visualisation View" : "Chart View"}
               </Button>
             </Box>
           </Box>
         </Box>
-        <VisualisationComponent patient={selectedBed?.patient} />
+        {showPatientChartView ? (
+          <PatientChart patient={selectedBed?.patient} />
+        ) : (
+          <VisualisationComponent patient={selectedBed?.patient} />
+        )}
       </Box>
     </div>
   );
