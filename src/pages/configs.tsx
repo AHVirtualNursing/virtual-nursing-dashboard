@@ -12,6 +12,7 @@ function Configs() {
     { name: "Temp" },
   ];
   const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedVital, setSelectedVital] = useState(0);
 
   return (
     <div className="flex flex-col p-8 gap-8 bg-blue-100 w-full shadow-lg">
@@ -39,12 +40,13 @@ function Configs() {
         {selectedTab === 0 && (
           <div
             id="sideVitalButtons"
-            className="w-1/12 flex flex-col gap-y-7 pt-8 align-middle"
+            className="w-1/12 flex flex-col gap-y-5 pt-8 align-middle"
           >
             {vitalSelections.map((vital, index) => (
               <button
-                className="border-none bg-slate-300 rounded-xl p-5 justify-center flex"
+                className="bg-slate-200 rounded-xl p-5 justify-center flex shadow-inner border-b-2"
                 key={index}
+                onClick={() => setSelectedVital(index)}
               >
                 {vital.name}
               </button>
