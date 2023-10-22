@@ -11,7 +11,7 @@ import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
 import VisualisationComponent from "@/components/visualisationComponent";
 import { Patient } from "@/models/patient";
-import PatientChart from "@/components/patientChart";
+import PatientChart from "@/components/patientAnalyticsChart/patientAnalyticsChart";
 
 const inter = Inter({ subsets: ["latin"] });
 
