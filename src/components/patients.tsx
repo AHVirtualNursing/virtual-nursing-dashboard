@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import CampaignIcon from "@mui/icons-material/Campaign";
-import { patientData } from "@/mockData";
-import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
-import { fetchAllSmartBeds } from "@/pages/api/smartbed_api";
-import { SmartBed } from "@/models/smartBed";
-import { useRouter } from "next/navigation";
+import {patientData} from "@/mockData";
+import {fetchVitalByVitalId} from "@/pages/api/vitals_api";
+import {fetchAllSmartBeds} from "@/pages/api/smartbed_api";
+import {SmartBed} from "@/models/smartBed";
+import {useRouter} from "next/navigation";
 import TableSubHeader from "./TableSubHeader";
 
 export default function Patients() {
@@ -72,164 +72,144 @@ export default function Patients() {
     });
     const interval = setInterval(() => {
       fetchPatientVitals();
-    }, 5000);
+    }, 10000);
     return () => {
       clearInterval(interval);
     };
   }, [vitals]);
-
-  /* The code chunk below is for testing purposes where we mock values that change every 5 seconds. This is done by generating a random integer in 5 second intervals, then re-rendering the component with useEffect
-
-  useEffect(() => {
-    function getRandomInteger(min, max) {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-    const interval = setInterval(() => {
-      const num = getRandomInteger(0, 100);
-      setNumber(num);
-    }, 2000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [number]);
-
-  */
-
   return (
     <>
-      {console.log(data)}
       <table className="table-auto w-full border-collapse">
-        <thead className="text-sm bg-sky-200">
-          {/* ------ column headers ------ */}
-          <tr>
-            <th>Alerts</th>
-            <th className="p-2">Patient</th>
-            <th>Condition</th>
-            <th>Bed</th>
-            <th>Ward</th>
-            <th colSpan={2}>Blood Pressure</th>
-            <th colSpan={2}>HR</th>
-            <th colSpan={2}>Saturation</th>
-          </tr>
+        <thead className="text-sm text-left">
+        {/* ------ column headers ------ */}
+        <tr>
+          <th></th>
+          <th className="p-2">Patient</th>
+          <th>Condition</th>
+          <th>Bed</th>
+          <th>Ward</th>
+          <th colSpan={2}>Blood Pressure</th>
+          <th colSpan={2}>Heart Rate</th>
+          <th colSpan={2}>Saturation</th>
+        </tr>
         </thead>
         <tbody>
-          {/* ------ sub-headers ------ */}
-          <tr>
-            <td></td>
-            <td className="p-2">
-              <input
-                className="placeholder:italic placeholder:text-slate-400 w-2/3 rounded-md placeholder:text-sm px-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
-                placeholder="Search"
-                type="text"
-                name="search"
-                value={searchPatient}
-                onChange={handlePatientSearch}
-              />
-            </td>
-            <td>
-              <input
-                className="placeholder:italic placeholder:text-slate-400 w-2/3 rounded-md placeholder:text-sm px-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
-                placeholder="Search"
-                type="text"
-                name="search"
-                value={searchCondition}
-                onChange={handleConditionSearch}
-              />
-            </td>
-            <TableSubHeader subheaderText="Bed No." />
-            <TableSubHeader subheaderText="Ward No." />
-            <TableSubHeader subheaderText="Result" />
-            <TableSubHeader subheaderText="Updated" />
-            <TableSubHeader subheaderText="Reading" />
-            <TableSubHeader subheaderText="Updated" />
-            <TableSubHeader subheaderText="Reading" />
-            <TableSubHeader subheaderText="Updated" />
-          </tr>
+        {/* ------ sub-headers ------ */}
+        <tr className="text-left">
+          <td></td>
+          <td className="p-2">
+            <input
+              className="placeholder:italic placeholder:text-slate-400 w-2/3 rounded-md placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
+              placeholder="Search"
+              type="text"
+              name="search"
+              value={searchPatient}
+              onChange={handlePatientSearch}
+            />
+          </td>
+          <td>
+            <input
+              className="placeholder:italic placeholder:text-slate-400 w-2/3 rounded-md placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
+              placeholder="Search"
+              type="text"
+              name="search"
+              value={searchCondition}
+              onChange={handleConditionSearch}
+            />
+          </td>
+          <TableSubHeader subheaderText="Bed No."/>
+          <TableSubHeader subheaderText="Ward No."/>
+          <TableSubHeader subheaderText="Result"/>
+          <TableSubHeader subheaderText="Updated"/>
+          <TableSubHeader subheaderText="Reading"/>
+          <TableSubHeader subheaderText="Updated"/>
+          <TableSubHeader subheaderText="Reading"/>
+          <TableSubHeader subheaderText="Updated"/>
+        </tr>
 
-          {/* ------ data rows ------ 
+        {/* ------ data rows ------
             The vitals are displayed based on the latest vitals data/numbers updated into the db. For blood pressure (both DIA and SYS) and Heart Rate, the number displayed is the latest value (value at the last index) of the bloodPressureDia, bloodPressureSys and heartRate arrays.
-            
-            For eg, to display the heart rate reading, 
+
+            For eg, to display the heart rate reading,
 
             {Math.round(vitals[index]?.heartRate[vitals[index]?.heartRate. length - 1].reading)}
 
             This code extracts the vitals object matching the patient index, to ensure the correct vitals object of the patient. Then the last element of the heartRate array (latest value) is extracted and rounded to nearest whole number to display the heart rate value (This changes every 10 seconds since we update the latest value of the heartRate array)
           */}
-          {data
-            .filter((bed) =>
-              bed.patient?.name
-                .toLowerCase()
-                .includes(searchPatient || searchCondition)
-            )
-            .map((pd, index) => (
-              <tr className="border-b border-black" key={pd._id}>
-                <td className="w-1/16">
-                  <CampaignIcon style={{ color: "red" }} />
-                </td>
-                <td
-                  id="patientName"
-                  className="text-sm py-2 w-1/6"
-                  onClick={() =>
-                    viewPatientVisualisation(pd.patient?._id, pd._id)
-                  }
-                >
-                  {pd.patient?.name}
-                </td>
-                <td id="patientCondition" className="text-sm py-2 w-1/6">
-                  {pd.patient?.condition}
-                </td>
-                <td id="bedNum" className="text-sm py-2 w-1/12">
-                  {pd.bedNum}
-                </td>
-                <td id="wardNum" className="text-sm py-2 w-1/12">
-                  {pd.ward.wardNum}
-                </td>
-                <td id="bpReading" className="text-sm py-2 w-1/12">
-                  {
-                    vitals[index]?.bloodPressureSys[
-                      vitals[index]?.bloodPressureSys.length - 1
+        {data
+          .filter((bed) =>
+            bed.patient?.name
+              .toLowerCase()
+              .includes(searchPatient || searchCondition)
+          )
+          .map((pd, index) => (
+            <tr className="text-left" key={pd._id}>
+              <td className="w-1/12 text-center">
+                <CampaignIcon style={{color: "red"}}/>
+              </td>
+              <td
+                id="patientName"
+                className="text-sm p-2 w-1/8 border-solid border-0 border-l border-slate-400 hover:cursor-pointer"
+                onClick={() =>
+                  viewPatientVisualisation(pd.patient?._id, pd._id)
+                }
+              >
+                {pd.patient?.name}
+              </td>
+              <td id="patientCondition" className="text-sm p-2 w-1/8 border-solid border-0 border-l border-slate-400">
+                {pd.patient?.condition}
+              </td>
+              <td id="bedNum" className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400">
+                {pd.bedNum}
+              </td>
+              <td id="wardNum" className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400">
+                {pd.ward.wardNum}
+              </td>
+              <td id="bpReading" className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400">
+                {
+                  vitals[index]?.bloodPressureSys[
+                  vitals[index]?.bloodPressureSys.length - 1
                     ]?.reading
-                  }
-                  /
-                  {
-                    vitals[index]?.bloodPressureDia[
-                      vitals[index]?.bloodPressureDia.length - 1
+                }
+                /
+                {
+                  vitals[index]?.bloodPressureDia[
+                  vitals[index]?.bloodPressureDia.length - 1
                     ]?.reading
-                  }
-                </td>
-                <td id="bpDateTime" className="text-sm py-2 w-1/12">
-                  {
-                    vitals[index]?.bloodPressureDia[
-                      vitals[index]?.bloodPressureDia.length - 1
+                }
+              </td>
+              <td id="bpDateTime" className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400">
+                {
+                  vitals[index]?.bloodPressureDia[
+                  vitals[index]?.bloodPressureDia.length - 1
                     ]?.datetime.split(" ")[1]
-                  }
-                </td>
-                <td id="hrReading" className="text-sm py-2 w-1/12">
-                  {Math.round(
-                    vitals[index]?.heartRate[
-                      vitals[index]?.heartRate.length - 1
+                }
+              </td>
+              <td id="hrReading"
+                  className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400">
+                {Math.round(
+                  vitals[index]?.heartRate[
+                  vitals[index]?.heartRate.length - 1
                     ]?.reading
-                  )}
-                </td>
-                <td id="hrDateTime" className="text-sm py-2 w-1/12">
-                  {
-                    vitals[index]?.heartRate[
-                      vitals[index]?.heartRate.length - 1
+                )}
+              </td>
+              <td id="hrDateTime" className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400">
+                {
+                  vitals[index]?.heartRate[
+                  vitals[index]?.heartRate.length - 1
                     ]?.datetime.split(" ")[1]
-                  }
-                </td>
-                <td id="spo2" className="text-sm py-2 w-1/12">
-                  {vitals[index]?.spO2[vitals[index]?.spO2.length - 1]?.reading}
-                </td>
-                <td id="spo2Datetime" className="text-sm py-2 w-1/12">
-                  {vitals[index]?.spO2[
-                    vitals[index]?.spO2.length - 1
+                }
+              </td>
+              <td id="spo2" className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400">
+                {vitals[index]?.spO2[vitals[index]?.spO2.length - 1]?.reading}
+              </td>
+              <td id="spo2Datetime" className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400">
+                {vitals[index]?.spO2[
+                vitals[index]?.spO2.length - 1
                   ]?.datetime.substring(11, 23)}
-                </td>
-              </tr>
-            ))}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </>
