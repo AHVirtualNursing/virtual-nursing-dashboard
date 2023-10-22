@@ -164,17 +164,17 @@ export default function Patients() {
                 .includes(searchPatient || searchCondition)
             )
             .map((pd, index) => (
-              <tr
-                className="border-b border-black"
-                key={pd._id}
-                onClick={() =>
-                  viewPatientVisualisation(pd.patient?._id, pd._id)
-                }
-              >
+              <tr className="border-b border-black" key={pd._id}>
                 <td className="w-1/16">
                   <CampaignIcon style={{ color: "red" }} />
                 </td>
-                <td id="patientName" className="text-sm py-2 w-1/6">
+                <td
+                  id="patientName"
+                  className="text-sm py-2 w-1/6"
+                  onClick={() =>
+                    viewPatientVisualisation(pd.patient?._id, pd._id)
+                  }
+                >
                   {pd.patient?.name}
                 </td>
                 <td id="patientCondition" className="text-sm py-2 w-1/6">
