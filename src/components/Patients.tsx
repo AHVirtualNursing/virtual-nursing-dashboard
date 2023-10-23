@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import { patientData } from "@/mockData";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
@@ -6,6 +6,7 @@ import { fetchAllSmartBeds } from "@/pages/api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
 import { useRouter } from "next/navigation";
 import TableSubHeader from "./TableSubHeader";
+import autoAnimate from "@formkit/auto-animate";
 
 export default function Patients() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function Patients() {
   const [searchPatient, setSearchPatient] = useState<string>("");
   const [searchCondition, setSearchCondition] = useState<string>("");
   const [vitals, setVitals] = useState<any[]>([]);
+  // const [loadingState, setLoadingState] = useState(true);
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
@@ -22,6 +24,10 @@ export default function Patients() {
     // console.log(filteredList);
     // setData(filteredList);
   };
+  const parent = useRef(null);
+  useEffect(() => {
+    parent.current && autoAnimate(parent.current);
+  }, [parent]);
 
   const handleConditionSearch = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -62,11 +68,64 @@ export default function Patients() {
         patientVitalsArr.push(undefined);
       }
     }
-    setVitals(patientVitalsArr);
+    const combined = data.map((bedData, index) => ({
+      bed: bedData,
+      vital: patientVitalsArr[index],
+    }));
+    console.log(combined);
+    combined.sort((vital1, vital2) => {
+      if (vital1.vital === undefined && vital2.vital === undefined) {
+        return 0;
+      } else if (vital1.vital === undefined) {
+        return 1;
+      } else if (vital2.vital === undefined) {
+        return -1;
+      } else {
+        if (
+          (vital1.vital.heartRate === undefined ||
+            vital1.vital.heartRate.length == 0) &&
+          (vital2.vital.heartRate === undefined ||
+            vital2.vital.heartRate.length == 0)
+        ) {
+          return 0;
+        } else if (
+          vital1.vital.heartRate === undefined ||
+          vital1.vital.heartRate.length == 0
+        ) {
+          return 1;
+        } else if (
+          vital2.vital.heartRate === undefined ||
+          vital2.vital.heartRate.length == 0
+        ) {
+          return -1;
+        } else {
+          console.log(vital1);
+          console.log(vital1.vital);
+          console.log(vital1.vital.heartRate);
+          console.log(vital1.vital.heartRate[1].reading);
+          return (
+            Math.round(
+              vital2.vital.heartRate[vital2.vital.heartRate.length - 1].reading
+            ) -
+            Math.round(
+              vital1.vital.heartRate[vital1.vital.heartRate.length - 1].reading
+            )
+          );
+        }
+      }
+    });
+    console.log(combined);
+    const sortedBeds = combined.map((x) => x.bed);
+    const sortedVitals = combined.map((x) => x.vital);
+    console.log(sortedBeds);
+    console.log(sortedVitals);
+    setData(sortedBeds);
+    setVitals(sortedVitals);
   };
 
   /* this useEffect calls the above method fetchPatientVitals() at 10 second intervals, and re-renders the vitals dynamically in the frontend */
   useEffect(() => {
+    console.log("fetch beds use effect");
     fetchAllSmartBeds().then((res) => {
       console.log(res.data);
       setData(
@@ -75,15 +134,26 @@ export default function Patients() {
         )
       );
     });
-    const interval = setInterval(() => {
-      fetchPatientVitals();
-    }, 10000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [vitals]);
+  }, []);
+
+  useEffect(() => {
+    console.log("fetch vitals interval use effect");
+    if (data.length > 0) {
+      const interval = setInterval(() => {
+        fetchPatientVitals();
+      }, 10000);
+      return () => {
+        clearInterval(interval);
+      };
+    }
+    // setLoadingState(false);
+  }, [vitals, data]);
+
   return (
     <>
+      {/* {loadingState ? (
+        <p>Loading...</p>
+      ) : ( */}
       <table className="table-auto w-full border-collapse">
         <thead className="text-sm text-left">
           {/* ------ column headers ------ */}
@@ -98,7 +168,7 @@ export default function Patients() {
             <th colSpan={2}>Saturation</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody ref={parent}>
           {/* ------ sub-headers ------ */}
           <tr className="text-left">
             <td></td>
@@ -271,6 +341,7 @@ export default function Patients() {
             ))}
         </tbody>
       </table>
+      {/* )} */}
     </>
   );
 }

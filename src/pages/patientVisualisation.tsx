@@ -38,14 +38,7 @@ const patientVisualisationPage = () => {
   return (
     <div className="flex flex-col p-8 gap-8 bg-slate-100 w-full shadow-lg">
       <Box>
-        <Box
-          sx={{
-            backgroundColor: "lightblue",
-            display: "flex",
-            border: 1,
-            borderRadius: 3,
-          }}
-        >
+        <div className="flex bg-white mb-8 rounded-2xl shadow-lg">
           <Box sx={{ padding: "20px" }}>
             <Image
               style={{
@@ -72,16 +65,15 @@ const patientVisualisationPage = () => {
               <p>Additional Info: {selectedBed?.patient?.addInfo} </p>
             </Box>
             <Box textAlign={"right"} marginRight={2}>
-              <Button
-                size="small"
-                variant="contained"
+              <button
+                className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full border-none"
                 onClick={updateSelectedPatient}
               >
                 Update Details
-              </Button>
+              </button>
             </Box>
           </Box>
-        </Box>
+        </div>
         <VisualisationComponent patient={selectedBed?.patient} />
       </Box>
     </div>
