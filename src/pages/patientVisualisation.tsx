@@ -16,7 +16,6 @@ const patientVisualisationPage = () => {
   const router = useRouter();
   const { bedId } = router.query;
   const [selectedBed, setSelectedBed] = useState<SmartBed>();
-  const [showPatientChartView, setShowPatientChartView] = useState(false);
   const [currentTab, setCurrentTab] = useState("overview");
 
   useEffect(() => {
@@ -74,16 +73,6 @@ const patientVisualisationPage = () => {
                 Update Details
               </Button>
             </Box>
-            <Box textAlign={"right"} marginRight={2} marginTop={2}>
-              <Button
-                size="small"
-                variant="contained"
-                onClick={() =>
-                  setShowPatientChartView((prevState) => !prevState)
-                }>
-                {showPatientChartView ? "Visualisation View" : "Chart View"}
-              </Button>
-            </Box>
           </Box>
         </Box>
         <Tabs
@@ -96,13 +85,13 @@ const patientVisualisationPage = () => {
           <Tab value="alerts" label="Alerts" />
           <Tab value="reports" label="Reports" />
         </Tabs>
-
-        {currentTab === "overview" ? (
-          <VisualisationComponent patient={selectedBed?.patient} />
-        ) : currentTab === "analytics" ? (
-          <PatientChart patient={selectedBed?.patient} />
-        ) : currentTab === "reports" ? null : currentTab === // to add reports page
-          "alerts" ? null : null // to add alerts page
+        {
+          currentTab === "overview" ? (
+            <VisualisationComponent patient={selectedBed?.patient} />
+          ) : currentTab === "analytics" ? (
+            <PatientChart patient={selectedBed?.patient} />
+          ) : currentTab === "reports" ? null : currentTab === // to add reports page
+            "alerts" ? null : null // to add alerts page
         }
       </Box>
     </div>
