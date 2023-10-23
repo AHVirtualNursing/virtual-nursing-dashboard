@@ -45,7 +45,7 @@ function RuleConfigs() {
           </div>
         </div>
 
-        <div className="w-3/4 p-2" onDragOver={handleDropOver} onDrop={handleDrop}>
+        <div className="w-3/4 p-2 overflow-y-scroll scrollbar" onDragOver={handleDropOver} onDrop={handleDrop}>
           <Conditions conditionsList={allConditions}/>
         </div>
       </div>
