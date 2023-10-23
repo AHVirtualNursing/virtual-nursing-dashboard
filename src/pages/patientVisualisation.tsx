@@ -1,7 +1,4 @@
-import DashboardSideBar from "@/components/DashboardSideBar";
-import Header from "@/components/Header";
-import { Box, Button } from "@mui/material";
-import { Inter } from "next/font/google";
+import { Box, Button, Tab, Tabs } from "@mui/material";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import profilePic from "../../public/profilepic.jpg";
@@ -20,16 +17,14 @@ const patientVisualisationPage = () => {
   const { bedId } = router.query;
   const [selectedBed, setSelectedBed] = useState<SmartBed>();
   const [showPatientChartView, setShowPatientChartView] = useState(false);
+  const [currentTab, setCurrentTab] = useState("overview");
 
   useEffect(() => {
     fetchBedByBedId(bedId).then((res) => setSelectedBed(res));
   }, [bedId]);
 
-  const handleSideBarTabClick = (key: string) => {
-    router.push(
-      { pathname: "/dashboard", query: { state: key } },
-      "/dashboard"
-    );
+  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
+    setCurrentTab(newValue);
   };
 
   function updateSelectedPatient() {
@@ -91,11 +86,25 @@ const patientVisualisationPage = () => {
             </Box>
           </Box>
         </Box>
-        {showPatientChartView ? (
-          <PatientChart patient={selectedBed?.patient} />
-        ) : (
+        <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
+          <Tabs
+            value={currentTab}
+            onChange={handleTabChange}
+            centered
+            sx={{ marginBottom: 3 }}>
+            <Tab value="overview" label="Overview" />
+            <Tab value="analytics" label="Analytics" />
+            <Tab value="alerts" label="Alerts" />
+            <Tab value="reports" label="Reports" />
+          </Tabs>
+        </Box>
+
+        {currentTab === "overview" ? (
           <VisualisationComponent patient={selectedBed?.patient} />
-        )}
+        ) : currentTab === "analytics" ? (
+          <PatientChart patient={selectedBed?.patient} />
+        ) : currentTab === "reports" ? null : currentTab ===
+          "alerts" ? null : null}
       </Box>
     </div>
   );
