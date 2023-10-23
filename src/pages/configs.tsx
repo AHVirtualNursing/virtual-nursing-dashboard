@@ -1,25 +1,25 @@
 import PendingFollowUps from "@/components/PendingFollowUps";
 import RuleConfigs from "@/components/RuleConfigs";
 import VitalConfigs from "@/components/VitalConfigs";
-import React, { useState } from "react";
+import React, {useState} from "react";
 
 function Configs() {
-  const tabPages = [{ title: "Vitals" }, { title: "Rules" }];
+  const tabPages = [{title: "Vitals"}, {title: "Rules"}];
   const vitalSelections = [
-    { name: "Blood Pressure" },
-    { name: "Heart Rate" },
-    { name: "Saturation" },
-    { name: "Temp" },
+    {name: "Blood Pressure"},
+    {name: "Heart Rate"},
+    {name: "Saturation"},
+    {name: "Temp"},
   ];
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedVital, setSelectedVital] = useState(0);
 
   return (
-    <div className="flex flex-col p-8 gap-8 bg-blue-100 w-full shadow-lg">
+    <div className="flex flex-col p-8 gap-8 bg-slate-100 w-full shadow-lg">
       <div className="flex flex-start gap-8">
         <div
           id="pageTabs"
-          className="bg-blue-400 p-2 rounded-xl flex justify-between items-center gap-x-5"
+          className="bg-blue-900 p-2 rounded-xl flex justify-between items-center gap-x-5"
         >
           {tabPages.map((tab, index) => (
             <button
@@ -54,8 +54,8 @@ function Configs() {
           </div>
         )}
         <div className={`${selectedTab === 0 ? "w-11/12" : "w-full"}`}>
-          {selectedTab === 0 && <VitalConfigs />}
-          {selectedTab === 1 && <RuleConfigs />}
+          {selectedTab === 0 && <VitalConfigs/>}
+          {selectedTab === 1 && <RuleConfigs/>}
         </div>
       </div>
     </div>
