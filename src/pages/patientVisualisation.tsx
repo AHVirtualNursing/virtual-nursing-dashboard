@@ -1,9 +1,5 @@
-import DashboardSideBar from "@/components/DashboardSideBar";
-import Header from "@/components/Header";
-import { Box, Button } from "@mui/material";
-import { Inter } from "next/font/google";
+import { Box, Button, Tab, Tabs } from "@mui/material";
 import { useRouter } from "next/router";
-import styles from "@/styles/Dashboard.module.css";
 import Image from "next/image";
 import profilePic from "../../public/profilepic.jpg";
 import { useEffect, useState } from "react";
@@ -16,20 +12,17 @@ const inter = Inter({ subsets: ["latin"] });
 
 const patientVisualisationPage = () => {
   const router = useRouter();
-  const { patientId, bedId } = router.query;
-
-  const handleSideBarTabClick = (key: string) => {
-    router.push(
-      { pathname: "/dashboard", query: { state: key } },
-      "/dashboard"
-    );
-  };
-
+  const { bedId } = router.query;
   const [selectedBed, setSelectedBed] = useState<SmartBed>();
+  const [currentTab, setCurrentTab] = useState("overview");
 
   useEffect(() => {
     fetchBedByBedId(bedId).then((res) => setSelectedBed(res));
   }, [bedId]);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
+    setCurrentTab(newValue);
+  };
 
   function updateSelectedPatient() {
     router.push("/updatePatient?patientId=" + selectedBed?.patient?._id);
@@ -74,7 +67,25 @@ const patientVisualisationPage = () => {
             </Box>
           </Box>
         </div>
-        <VisualisationComponent patient={selectedBed?.patient} />
+        <Tabs
+          value={currentTab}
+          onChange={handleTabChange}
+          centered
+          sx={{ marginBottom: 3, backgroundColor: undefined }}
+        >
+          <Tab value="overview" label="Overview" />
+          <Tab value="analytics" label="Analytics" />
+          <Tab value="alerts" label="Alerts" />
+          <Tab value="reports" label="Reports" />
+        </Tabs>
+        {
+          currentTab === "overview" ? (
+            <VisualisationComponent patient={selectedBed?.patient} />
+          ) : currentTab === "analytics" ? (
+            <PatientChart patient={selectedBed?.patient} />
+          ) : currentTab === "reports" ? null : currentTab === // to add reports page
+            "alerts" ? null : null // to add alerts page
+        }
       </Box>
     </div>
   );
