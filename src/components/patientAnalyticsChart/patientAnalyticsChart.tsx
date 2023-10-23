@@ -327,7 +327,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
                 onChange={handleSelectedIndicatorsChange}
               />
             }
-            label="Normal Range"
+            label="Thresholds"
           />
         </FormGroup>
       </Grid>
