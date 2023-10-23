@@ -47,7 +47,12 @@ export default function LineChartComponent({
         data={data}
         margin={{ top: 0, right: 20, bottom: 30, left: 0 }}
       >
-        <Line type="monotone" dataKey="reading" stroke={lineColour} />
+        <Line
+          type="monotone"
+          dataKey="reading"
+          stroke={lineColour}
+          strokeWidth={3}
+        />
         <CartesianGrid stroke="#ccc" strokeDasharray="1" />
         <XAxis dataKey="datetime">
           <Label value={axisName} offset={-20} position="insideBottom" />

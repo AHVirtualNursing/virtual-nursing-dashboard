@@ -13,6 +13,8 @@ import { io } from "socket.io-client";
 import { useRouter } from "next/router";
 import { Vital } from "@/models/vital";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
+import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
+import { Alert } from "@/models/alert";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -73,17 +75,20 @@ export default function VisualisationComponent(prop: ComponentProp) {
 
   function getAlerts(status: string) {
     const listOfAlerts: GridRowModel[] = [];
-    if (prop.patient?.alerts !== undefined) {
-      for (let i = 0; i < prop.patient.alerts.length; i++) {
-        if (prop.patient.alerts[i].status == status) {
+    console.log(patientAlerts);
+    if (patientAlerts !== undefined) {
+      for (let i = 0; i < patientAlerts.length; i++) {
+        console.log(patientAlerts[i]);
+        if (patientAlerts[i].status == status) {
           listOfAlerts.push({
-            status: prop.patient.alerts[i].status,
-            description: prop.patient.alerts[i].description,
-            notes: prop.patient.alerts[i].notes,
+            status: patientAlerts[i].status,
+            description: patientAlerts[i].description,
+            notes: patientAlerts[i].notes,
           });
         }
       }
     }
+    console.log(listOfAlerts);
     return listOfAlerts.map((alert, index) => ({
       id: index + 1,
       ...alert,
@@ -158,12 +163,16 @@ export default function VisualisationComponent(prop: ComponentProp) {
   }, [prop.patient?.layout]);
 
   const [patientVitals, setPatientVitals] = useState<Vital>();
+  const [patientAlerts, setPatientAlerts] = useState<Alert[]>();
 
   useEffect(() => {
     fetchVitalByVitalId(prop?.patient?.vital).then((res) =>
       setPatientVitals(res)
     );
-  }, [prop?.patient?.vital]);
+    fetchAlertsByPatientId(prop?.patient?._id).then((res) =>
+      setPatientAlerts(res)
+    );
+  }, [prop?.patient?.vital, prop?.patient?._id]);
 
   useEffect(() => {
     if (patientVitals) {

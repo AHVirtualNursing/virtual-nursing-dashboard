@@ -51,10 +51,13 @@ export default function Patients() {
   const fetchPatientVitals = async () => {
     let patientVitalsArr: any[] = [];
     for (const bedData of data) {
+      console.log(bedData);
       let patientVitals = bedData.patient?.vital;
+      console.log(patientVitals);
       if (patientVitals) {
         const res = await fetchVitalByVitalId(patientVitals);
         patientVitalsArr.push(res);
+        console.log(patientVitalsArr);
       }
     }
     setVitals(patientVitalsArr);
