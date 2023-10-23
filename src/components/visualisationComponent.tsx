@@ -8,13 +8,13 @@ import { Patient } from "@/models/patient";
 import { updatePatientLayoutByPatientId } from "@/pages/api/patients_api";
 import { Layouts } from "react-grid-layout";
 import { Layout } from "react-grid-layout";
-import LineChartComponent from "./lineChart";
 import { io } from "socket.io-client";
 import { useRouter } from "next/router";
 import { Vital } from "@/models/vital";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
 import { Alert } from "@/models/alert";
+import LineChartComponent from "@/components/LineChart";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 

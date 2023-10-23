@@ -9,8 +9,8 @@ import profilePic from "../../public/profilepic.jpg";
 import { useEffect, useState } from "react";
 import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
-import VisualisationComponent from "@/components/visualisationComponent";
 import { Patient } from "@/models/patient";
+import VisualisationComponent from "@/components/VisualisationComponent";
 
 const inter = Inter({ subsets: ["latin"] });
 
