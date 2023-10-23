@@ -101,8 +101,9 @@ const patientVisualisationPage = () => {
           <VisualisationComponent patient={selectedBed?.patient} />
         ) : currentTab === "analytics" ? (
           <PatientChart patient={selectedBed?.patient} />
-        ) : currentTab === "reports" ? null : currentTab ===
-          "alerts" ? null : null}
+        ) : currentTab === "reports" ? null : currentTab === // to add reports page
+          "alerts" ? null : null // to add alerts page
+        }
       </Box>
     </div>
   );
