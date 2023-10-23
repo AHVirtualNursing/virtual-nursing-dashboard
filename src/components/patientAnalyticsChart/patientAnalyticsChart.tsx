@@ -15,13 +15,7 @@ import annotationPlugin from "chartjs-plugin-annotation";
 import { Patient } from "@/models/patient";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import FormGroup from "@mui/material/FormGroup";
-import {
-  Checkbox,
-  colors,
-  FormControlLabel,
-  FormLabel,
-  Grid,
-} from "@mui/material";
+import { Checkbox, FormControlLabel, FormLabel, Grid } from "@mui/material";
 import { showNormalRangeAnnotations } from "./patientAnalyticsChartOptions";
 
 interface PatientChartProps {
@@ -327,7 +321,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
                 onChange={handleSelectedIndicatorsChange}
               />
             }
-            label="Thresholds"
+            label="Normal Range"
           />
         </FormGroup>
       </Grid>

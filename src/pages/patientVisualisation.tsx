@@ -3,21 +3,21 @@ import Header from "@/components/Header";
 import { Box, Button } from "@mui/material";
 import { Inter } from "next/font/google";
 import { useRouter } from "next/router";
-import styles from "@/styles/Dashboard.module.css";
 import Image from "next/image";
 import profilePic from "../../public/profilepic.jpg";
 import { useEffect, useState } from "react";
 import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
 import VisualisationComponent from "@/components/visualisationComponent";
-import { Patient } from "@/models/patient";
-import PatientChart from "@/components/patientAnalyticsChart/patientAnalyticsChart";
-
-const inter = Inter({ subsets: ["latin"] });
+import dynamic from "next/dynamic";
+const PatientChart = dynamic(
+  () => import("@/components/patientAnalyticsChart/patientAnalyticsChart"),
+  { ssr: false }
+);
 
 const patientVisualisationPage = () => {
   const router = useRouter();
-  const { patientId, bedId } = router.query;
+  const { bedId } = router.query;
   const [selectedBed, setSelectedBed] = useState<SmartBed>();
   const [showPatientChartView, setShowPatientChartView] = useState(false);
 
