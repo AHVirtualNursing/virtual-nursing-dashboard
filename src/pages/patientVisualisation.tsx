@@ -86,18 +86,16 @@ const patientVisualisationPage = () => {
             </Box>
           </Box>
         </Box>
-        <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
-          <Tabs
-            value={currentTab}
-            onChange={handleTabChange}
-            centered
-            sx={{ marginBottom: 3 }}>
-            <Tab value="overview" label="Overview" />
-            <Tab value="analytics" label="Analytics" />
-            <Tab value="alerts" label="Alerts" />
-            <Tab value="reports" label="Reports" />
-          </Tabs>
-        </Box>
+        <Tabs
+          value={currentTab}
+          onChange={handleTabChange}
+          centered
+          sx={{ marginBottom: 3, backgroundColor: undefined }}>
+          <Tab value="overview" label="Overview" />
+          <Tab value="analytics" label="Analytics" />
+          <Tab value="alerts" label="Alerts" />
+          <Tab value="reports" label="Reports" />
+        </Tabs>
 
         {currentTab === "overview" ? (
           <VisualisationComponent patient={selectedBed?.patient} />
