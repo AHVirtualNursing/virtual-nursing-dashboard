@@ -15,6 +15,12 @@
         background-color: lightgray; /* or add it to the track */
     }
 
+    .scrollbar::-webkit-scrollbar:horizontal {
+        height: 0;
+        width: 0;
+        display: none; /* or add it to the track */
+    }
+
     .scrollbar::-webkit-scrollbar-thumb {
         background: slategray;
     }
