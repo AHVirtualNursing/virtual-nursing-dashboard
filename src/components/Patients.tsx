@@ -14,7 +14,7 @@ export default function Patients() {
   const [searchPatient, setSearchPatient] = useState<string>("");
   const [searchCondition, setSearchCondition] = useState<string>("");
   const [vitals, setVitals] = useState<any[]>([]);
-  // const [loadingState, setLoadingState] = useState(true);
+  const [loadingState, setLoadingState] = useState(true);
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
@@ -120,6 +120,13 @@ export default function Patients() {
     });
   }, []);
 
+  // fetching vitals immediately after beds are populated
+  useEffect(() => {
+    if (data.length > 0) {
+      fetchPatientVitals();
+    }
+  }, [data]);
+
   useEffect(() => {
     console.log("fetch vitals interval use effect");
     if (data.length > 0) {
@@ -130,14 +137,10 @@ export default function Patients() {
         clearInterval(interval);
       };
     }
-    // setLoadingState(false);
   }, [vitals, data]);
 
   return (
     <>
-      {/* {loadingState ? (
-        <p>Loading...</p>
-      ) : ( */}
       <table className="table-auto w-full border-collapse">
         <thead className="text-sm text-left">
           {/* ------ column headers ------ */}
@@ -325,7 +328,6 @@ export default function Patients() {
             ))}
         </tbody>
       </table>
-      {/* )} */}
     </>
   );
 }
