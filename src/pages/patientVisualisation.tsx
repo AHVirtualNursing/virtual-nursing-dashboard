@@ -5,9 +5,9 @@ import profilePic from "../../public/profilepic.jpg";
 import { useEffect, useState } from "react";
 import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
-import { Patient } from "@/models/patient";
 import VisualisationComponent from "@/components/VisualisationComponent";
 import dynamic from "next/dynamic";
+import AlertTabComponent from "@/components/AlertTabComponent";
 const PatientChart = dynamic(
   () => import("@/components/patientAnalyticsChart/patientAnalyticsChart"),
   { ssr: false }
@@ -87,7 +87,11 @@ const patientVisualisationPage = () => {
           ) : currentTab === "analytics" ? (
             <PatientChart patient={selectedBed?.patient} />
           ) : currentTab === "reports" ? null : currentTab === // to add reports page
-            "alerts" ? null : null // to add alerts page
+            "alerts" ? (
+            <AlertTabComponent
+              patient={selectedBed?.patient}
+            ></AlertTabComponent>
+          ) : null // to add alerts page
         }
       </Box>
     </div>
