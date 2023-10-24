@@ -3,6 +3,31 @@
 @tailwind utilities;
 
 * {
-  padding: 0;
-  margin: 0;
+    padding: 0;
+    margin: 0;
+}
+
+@layer utilities {
+    /* Chrome, Safari and Opera */
+    .scrollbar::-webkit-scrollbar {
+        width: 5px;
+        height: 8px;
+        background-color: lightgray; /* or add it to the track */
+    }
+
+    .scrollbar::-webkit-scrollbar:horizontal {
+        height: 0;
+        width: 0;
+        display: none; /* or add it to the track */
+    }
+
+    .scrollbar::-webkit-scrollbar-thumb {
+        background: slategray;
+    }
+
+    .scrollbar {
+        /*-ms-overflow-style: none; !* IE and Edge *!*/
+        /*scrollbar-width: none; !* Firefox *!*/
+        scrollbar-width: thin;
+    }
 }
