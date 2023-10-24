@@ -7,8 +7,11 @@ import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
 import { Patient } from "@/models/patient";
 import VisualisationComponent from "@/components/VisualisationComponent";
-
-const inter = Inter({ subsets: ["latin"] });
+import dynamic from "next/dynamic";
+const PatientChart = dynamic(
+  () => import("@/components/patientAnalyticsChart/patientAnalyticsChart"),
+  { ssr: false }
+);
 
 const patientVisualisationPage = () => {
   const router = useRouter();
