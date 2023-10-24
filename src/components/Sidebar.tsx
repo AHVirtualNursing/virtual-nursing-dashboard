@@ -8,7 +8,7 @@ import Link from "next/link";
 
 export default function Sidebar() {
   return (
-    <div className="left-0 flex flex-col h-[calc(100vh-110px)] sticky top-1 p-3 gap-4 bg-blue-900">
+    <div className="left-0 flex flex-col h-screen sticky top-0 p-3 gap-4 bg-blue-900">
       <SidebarTab
         name={"Patients"}
         icon={<GroupIcon style={{ color: "white" }} />}
