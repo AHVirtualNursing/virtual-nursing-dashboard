@@ -16,21 +16,12 @@ export default function Patients() {
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
-    // const filteredList = data.filter((bed) =>
-    //   bed.patient?.name.toLowerCase().includes(event.target.value)
-    // );
-    // console.log(filteredList);
-    // setData(filteredList);
   };
 
   const handleConditionSearch = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setSearchCondition(event.target.value);
-    // const filteredList = data.filter((bed) =>
-    //   bed.patient?.condition.toLowerCase().includes(event.target.value)
-    // );
-    // setData(filteredList);
   };
 
   const viewPatientVisualisation = (
@@ -43,11 +34,6 @@ export default function Patients() {
       );
     }
   };
-
-  /* this function iterates all patients, extracts the vital id of each patient, and fetches the vital object by vital id.
-   Vital object is then pushed into a vitals array and set in the state (vitals variable in component state)
-   This function is invoked every 10 seconds. */
-
   const fetchPatientVitals = async () => {
     let patientVitalsArr: any[] = [];
     for (const bedData of data) {
@@ -60,10 +46,8 @@ export default function Patients() {
     setVitals(patientVitalsArr);
   };
 
-  /* this useEffect calls the above method fetchPatientVitals() at 10 second intervals, and re-renders the vitals dynamically in the frontend */
   useEffect(() => {
     fetchAllSmartBeds().then((res) => {
-      console.log(res.data);
       setData(
         res.data.filter(
           (smartbed: SmartBed) => smartbed.ward && smartbed.patient
@@ -127,15 +111,7 @@ export default function Patients() {
           <TableSubHeader subheaderText="Updated"/>
         </tr>
 
-        {/* ------ data rows ------
-            The vitals are displayed based on the latest vitals data/numbers updated into the db. For blood pressure (both DIA and SYS) and Heart Rate, the number displayed is the latest value (value at the last index) of the bloodPressureDia, bloodPressureSys and heartRate arrays.
-
-            For eg, to display the heart rate reading,
-
-            {Math.round(vitals[index]?.heartRate[vitals[index]?.heartRate. length - 1].reading)}
-
-            This code extracts the vitals object matching the patient index, to ensure the correct vitals object of the patient. Then the last element of the heartRate array (latest value) is extracted and rounded to nearest whole number to display the heart rate value (This changes every 10 seconds since we update the latest value of the heartRate array)
-          */}
+        {/* ------ data rows ------*/}
         {data
           .filter((bed) =>
             bed.patient?.name
