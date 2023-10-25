@@ -38,6 +38,8 @@ interface VitalData {
   spO2: VitalReading[];
   bloodPressureSys: VitalReading[];
   bloodPressureDia: VitalReading[];
+  temperature: VitalReading[];
+  respRate: VitalReading[];
 }
 
 export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
@@ -58,12 +60,16 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     spO2: [],
     bloodPressureSys: [],
     bloodPressureDia: [],
+    temperature: [],
+    respRate: [],
   });
 
   const [selectedVitals, setSelectedVitals] = useState({
     bloodPressure: true,
     heartRate: true,
     spO2: true,
+    temperature: true,
+    respRate: true,
   });
 
   const [selectedIndicators, setSelectedIndicators] = useState({
@@ -100,11 +106,27 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
       normal: "rgb(159, 226, 191)",
       high: "rgb(255, 117, 24)",
     },
+    temperature: {
+      low: "rgb(255, 117, 24)",
+      normal: "rgb(159, 226, 191)",
+      high: "rgb(255, 117, 24)",
+    },
+    respRate: {
+      low: "rgb(210, 4, 45)",
+      normal: "rgb(0, 163, 108)",
+      high: "rgb(210, 4, 45)",
+    },
   };
 
   const updateColorByThreshold = (
     reading: any,
-    vitalType: "heartRate" | "spO2" | "bloodPressureSys" | "bloodPressureDia"
+    vitalType:
+      | "heartRate"
+      | "spO2"
+      | "bloodPressureSys"
+      | "bloodPressureDia"
+      | "temperature"
+      | "respRate"
   ) => {
     const thresholds = {
       heartRate: {
@@ -122,6 +144,14 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
       bloodPressureDia: {
         min: 60,
         max: 80,
+      },
+      temperature: {
+        min: 36.2,
+        max: 37.2,
+      },
+      respRate: {
+        min: 12,
+        max: 18,
       },
     };
 
@@ -147,6 +177,18 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
         return colors.bloodPressureDia.low;
       } else if (p1 > thresholds.bloodPressureDia.max) {
         return colors.bloodPressureDia.high;
+      }
+    } else if (vitalType === "temperature") {
+      if (p1 < thresholds.temperature.min) {
+        return colors.temperature.low;
+      } else if (p1 > thresholds.temperature.max) {
+        return colors.temperature.high;
+      }
+    } else if (vitalType === "respRate") {
+      if (p1 < thresholds.respRate.min) {
+        return colors.temperature.low;
+      } else if (p1 > thresholds.respRate.max) {
+        return colors.respRate.high;
       }
     }
   };
@@ -205,6 +247,30 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
         segment: {
           borderColor: (segment: any) =>
             updateColorByThreshold(segment, "bloodPressureDia"),
+        },
+      } as Dataset);
+    }
+
+    if (selectedVitals.temperature) {
+      data.datasets.push({
+        label: "Temperature (°C)",
+        data: vitals.temperature.map((vitalReading) => vitalReading.reading),
+        borderColor: colors.temperature.normal,
+        segment: {
+          borderColor: (segment: any) =>
+            updateColorByThreshold(segment, "temperature"),
+        },
+      } as Dataset);
+    }
+
+    if (selectedVitals.respRate) {
+      data.datasets.push({
+        label: "Respiratory Rate (bpm)",
+        data: vitals.respRate.map((vitalReading) => vitalReading.reading),
+        borderColor: colors.respRate.normal,
+        segment: {
+          borderColor: (segment: any) =>
+            updateColorByThreshold(segment, "respRate"),
         },
       } as Dataset);
     }
@@ -302,6 +368,26 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
               />
             }
             label="Blood Pressure"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="temperature"
+                checked={selectedVitals.temperature}
+                onChange={handleSelectedVitalsChange}
+              />
+            }
+            label="Temperature"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="respRate"
+                checked={selectedVitals.respRate}
+                onChange={handleSelectedVitalsChange}
+              />
+            }
+            label="Respiratory Rate"
           />
         </FormGroup>
       </Grid>

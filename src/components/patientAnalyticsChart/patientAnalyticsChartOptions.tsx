@@ -2,6 +2,8 @@ export const showNormalRangeAnnotations = (selectedVitals: {
   bloodPressure: boolean;
   heartRate: boolean;
   spO2: boolean;
+  temperature: boolean;
+  respRate: boolean;
 }) => {
   const normalRangeAnnotations: {
     [key: string]: any;
@@ -109,6 +111,66 @@ export const showNormalRangeAnnotations = (selectedVitals: {
       yValue: 81,
       content: ["Max Diastolic Blood Pressure (mm Hg)"],
       color: "rgb(255, 117, 24)",
+      font: {
+        size: 12,
+      },
+    };
+  }
+
+  if (selectedVitals.temperature) {
+    normalRangeAnnotations.temperature = {
+      type: "box",
+      yMin: 36.2,
+      yMax: 37.2,
+      backgroundColor: "rgb(64, 224, 208, 0.25)",
+      borderWidth: 0,
+    };
+
+    normalRangeAnnotations.temperatureMinLabel = {
+      type: "label",
+      yValue: 36.1,
+      color: "rgb(64, 200, 224)",
+      content: ["Min Temperature (°C)"],
+      font: {
+        size: 12,
+      },
+    };
+
+    normalRangeAnnotations.temperatureMaxLabel = {
+      type: "label",
+      yValue: 37.3,
+      color: "rgb(64, 200, 224)",
+      content: ["Max Temperature (°C)"],
+      font: {
+        size: 12,
+      },
+    };
+  }
+
+  if (selectedVitals.respRate) {
+    normalRangeAnnotations.respRate = {
+      type: "box",
+      yMin: 12,
+      yMax: 18,
+      backgroundColor: "rgb(47,79,79, 0.25)",
+      borderWidth: 0,
+    };
+
+    normalRangeAnnotations.respRateMinLabel = {
+      type: "label",
+      yValue: 11,
+      color: "rgb(47,79,79)",
+      content: ["Min Respiratory Rate (breaths per minute)"],
+      font: {
+        size: 12,
+      },
+    };
+
+    normalRangeAnnotations.respRateMaxLabel = {
+      type: "label",
+      yValue: 19,
+      color: "rgb(47,79,79)",
+      content: ["Max Respiratory Rate (breaths per minute)"],
       font: {
         size: 12,
       },
