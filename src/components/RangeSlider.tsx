@@ -7,6 +7,7 @@ type RangeSliderProps = {
   lowerBound: number;
   upperBound: number;
   label: string;
+  handleThresholds: Function;
 };
 
 const RangeSlider = ({
@@ -15,6 +16,7 @@ const RangeSlider = ({
   lowerBound,
   upperBound,
   label,
+  handleThresholds,
 }: RangeSliderProps) => {
   const [value, setValue] = useState<number[]>([lowerBound, upperBound]);
   const marks = [
@@ -40,22 +42,9 @@ const RangeSlider = ({
     },
   ];
 
-  const debounce = (func: Function, ms = 500) => {
-    let timer: ReturnType<typeof setTimeout> | null;
-    return function (this: any, ...args: any[]) {
-      const context = this;
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(() => {
-        timer = null;
-        func.apply(context, args);
-      }, ms);
-    };
-  };
-
   const handleChange = (event: Event, newValue: number | number[]) => {
-    const updated = newValue as number[];
-    debounce(() => setValue(updated as number[]), 500);
-    console.log(value);
+    setValue(newValue as number[]);
+    handleThresholds(value);
   };
   const [start, end] = value;
 

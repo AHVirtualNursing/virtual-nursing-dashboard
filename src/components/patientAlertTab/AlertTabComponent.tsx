@@ -36,7 +36,7 @@ const AlertTabComponent = ({ patient }: PropType) => {
       </div>
       <div>
         {selectedTab === 0 && <PatientAlerts />}
-        {selectedTab === 1 && <PatientConfigs />}
+        {selectedTab === 1 && <PatientConfigs patient={patient} />}
       </div>
     </div>
   );
