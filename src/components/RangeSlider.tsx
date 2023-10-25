@@ -4,51 +4,76 @@ import React, { useState } from "react";
 type RangeSliderProps = {
   min: number;
   max: number;
+  lowerBound: number;
+  upperBound: number;
   label: string;
 };
 
-function RangeSlider({ min, max, label }: RangeSliderProps) {
-  const [value, setValue] = useState<number[]>([20, 40, 60, 80]);
+const RangeSlider = ({
+  min,
+  max,
+  lowerBound,
+  upperBound,
+  label,
+}: RangeSliderProps) => {
+  const [value, setValue] = useState<number[]>([lowerBound, upperBound]);
   const marks = [
     {
       value: 0,
       label: "0",
     },
     {
-      value: 20,
-      label: "20",
-    },
-    {
-      value: 60,
-      label: "60",
-    },
-    {
-      value: 80,
-      label: "80",
+      value: 50,
+      label: "50",
     },
     {
       value: 100,
       label: "100",
     },
+    {
+      value: 150,
+      label: "150",
+    },
+    {
+      value: 200,
+      label: "200",
+    },
   ];
-  const handleChange = (event: Event, newValue: number | number[]) => {
-    setValue(newValue as number[]);
+
+  const debounce = (func: Function, ms = 500) => {
+    let timer: ReturnType<typeof setTimeout> | null;
+    return function (this: any, ...args: any[]) {
+      const context = this;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        timer = null;
+        func.apply(context, args);
+      }, ms);
+    };
   };
-  const [start, innerStart, innerEnd, end] = value;
+
+  const handleChange = (event: Event, newValue: number | number[]) => {
+    const updated = newValue as number[];
+    debounce(() => setValue(updated as number[]), 500);
+    console.log(value);
+  };
+  const [start, end] = value;
 
   return (
     <div className="flex gap-6 p-2">
       <span className="w-1/12">{label}</span>
       <Slider
         value={value}
-        min={0}
-        max={100}
+        min={min}
+        max={max}
         onChange={handleChange}
+        valueLabelDisplay="auto"
         marks={marks}
+        disableSwap
         sx={{
           "& .MuiSlider-track": {
-            background: "transparent",
-            borderColor: "transparent",
+            background: "green",
+            borderColor: "green",
           },
           "& .MuiSlider-thumb": {
             background: "white",
@@ -58,7 +83,8 @@ function RangeSlider({ min, max, label }: RangeSliderProps) {
           },
           "& .MuiSlider-rail": {
             opacity: 1,
-            background: `linear-gradient(to right, red 0 ${start}%, orange ${start}% ${innerStart}%, green ${innerStart}% ${innerEnd}%, orange ${innerEnd}% ${end}%, red ${end}% )`,
+            // background: `linear-gradient(to right, red 0 ${start}%, orange ${start}% ${innerStart}%, green ${innerStart}% ${innerEnd}%, orange ${innerEnd}% ${end}%, red ${end}% 100% )`,
+            background: `linear-gradient(to right, red ${start}%, red ${end}%)`,
           },
           "& .MuiSlider-mark": {
             background: "none",
@@ -67,6 +93,6 @@ function RangeSlider({ min, max, label }: RangeSliderProps) {
       />
     </div>
   );
-}
+};
 
 export default RangeSlider;
