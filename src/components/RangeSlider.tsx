@@ -15,20 +15,20 @@ function RangeSlider({ min, max, label }: RangeSliderProps) {
       label: "0",
     },
     {
-      value: 50,
-      label: "50",
+      value: 20,
+      label: "20",
+    },
+    {
+      value: 60,
+      label: "60",
+    },
+    {
+      value: 80,
+      label: "80",
     },
     {
       value: 100,
       label: "100",
-    },
-    {
-      value: 150,
-      label: "150",
-    },
-    {
-      value: 200,
-      label: "200",
     },
   ];
   const handleChange = (event: Event, newValue: number | number[]) => {
@@ -38,12 +38,13 @@ function RangeSlider({ min, max, label }: RangeSliderProps) {
 
   return (
     <div className="flex gap-6 p-2">
-      <span>{label}</span>
+      <span className="w-1/12">{label}</span>
       <Slider
         value={value}
         min={0}
         max={100}
         onChange={handleChange}
+        marks={marks}
         sx={{
           "& .MuiSlider-track": {
             background: "transparent",
