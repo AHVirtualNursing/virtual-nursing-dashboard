@@ -8,7 +8,11 @@ import { useRouter } from "next/navigation";
 import TableSubHeader from "./TableSubHeader";
 import autoAnimate from "@formkit/auto-animate";
 
-export default function Patients() {
+type PatientsListProps = {
+  selectedOption: string;
+};
+
+export default function Patients({ selectedOption }: PatientsListProps) {
   const router = useRouter();
   const [data, setData] = useState<SmartBed[]>([]);
   const [searchPatient, setSearchPatient] = useState<string>("");
@@ -111,6 +115,7 @@ export default function Patients() {
 
   useEffect(() => {
     console.log("fetch beds use effect");
+    console.log(selectedOption);
     fetchAllSmartBeds().then((res) => {
       setData(
         res.data.filter(
@@ -125,7 +130,7 @@ export default function Patients() {
     if (data.length > 0) {
       const interval = setInterval(() => {
         fetchPatientVitals();
-      }, 10000);
+      }, 60000);
       return () => {
         clearInterval(interval);
       };

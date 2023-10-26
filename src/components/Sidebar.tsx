@@ -39,10 +39,10 @@ type SidebarTabProps = {
   dest: string;
 };
 
-const SidebarTab = ({ name, icon, dest }: SidebarTabProps) => {
+const SidebarTab = ({ icon, dest }: SidebarTabProps) => {
   return (
     <Link href={dest} className="no-underline text-black">
-      <div className="flex group gap-3 hover:bg-slate-500 cursor-pointer p-4 rounded-md">
+      <div className="flex group gap-3 hover:bg-blue-400 cursor-pointer p-4 rounded-md">
         {icon}
       </div>
     </Link>
