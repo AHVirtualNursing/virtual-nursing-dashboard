@@ -2,6 +2,7 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart,
+  ChartData,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -15,8 +16,14 @@ import annotationPlugin from "chartjs-plugin-annotation";
 import { Patient } from "@/models/patient";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import FormGroup from "@mui/material/FormGroup";
-import { Checkbox, FormControlLabel, FormLabel, Grid } from "@mui/material";
-import { showNormalRangeAnnotations } from "./patientAnalyticsChartOptions";
+import {
+  Box,
+  Checkbox,
+  FormControlLabel,
+  FormLabel,
+  Grid,
+} from "@mui/material";
+import { colors, updateChartOptions, updateColorByThreshold } from "./utils";
 
 interface PatientChartProps {
   patient?: Patient;
@@ -85,116 +92,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     setVitals(res);
   };
 
-  const colors = {
-    heartRate: {
-      low: "rgb(255, 191, 0)",
-      normal: "rgb(147, 197, 114)",
-      high: "rgb(255, 191, 0)",
-    },
-    spO2: {
-      low: "rgb(64, 224, 208)",
-      normal: "rgb(100, 149, 237)",
-      high: "rgb(255, 0, 255)",
-    },
-    bloodPressureSys: {
-      low: "rgb(210, 4, 45)",
-      normal: "rgb(0, 163, 108)",
-      high: "rgb(210, 4, 45)",
-    },
-    bloodPressureDia: {
-      low: "rgb(255, 117, 24)",
-      normal: "rgb(159, 226, 191)",
-      high: "rgb(255, 117, 24)",
-    },
-    temperature: {
-      low: "rgb(255, 117, 24)",
-      normal: "rgb(159, 226, 191)",
-      high: "rgb(255, 117, 24)",
-    },
-    respRate: {
-      low: "rgb(210, 4, 45)",
-      normal: "rgb(0, 163, 108)",
-      high: "rgb(210, 4, 45)",
-    },
-  };
-
-  const updateColorByThreshold = (
-    reading: any,
-    vitalType:
-      | "heartRate"
-      | "spO2"
-      | "bloodPressureSys"
-      | "bloodPressureDia"
-      | "temperature"
-      | "respRate"
-  ) => {
-    const thresholds = {
-      heartRate: {
-        min: 60,
-        max: 100,
-      },
-      spO2: {
-        min: 95,
-        max: 100,
-      },
-      bloodPressureSys: {
-        min: 90,
-        max: 120,
-      },
-      bloodPressureDia: {
-        min: 60,
-        max: 80,
-      },
-      temperature: {
-        min: 36.2,
-        max: 37.2,
-      },
-      respRate: {
-        min: 12,
-        max: 18,
-      },
-    };
-
-    const p1 = reading.p1.raw;
-    if (vitalType === "heartRate") {
-      if (p1 < thresholds.heartRate.min) {
-        return colors.heartRate.low;
-      } else if (p1 > thresholds.heartRate.max) {
-        return colors.heartRate.high;
-      }
-    } else if (vitalType === "spO2") {
-      if (p1 < thresholds.spO2.min) {
-        return colors.spO2.low;
-      }
-    } else if (vitalType === "bloodPressureSys") {
-      if (p1 < thresholds.bloodPressureSys.min) {
-        return colors.bloodPressureSys.low;
-      } else if (p1 > thresholds.bloodPressureSys.max) {
-        return colors.bloodPressureSys.high;
-      }
-    } else if (vitalType === "bloodPressureDia") {
-      if (p1 < thresholds.bloodPressureDia.min) {
-        return colors.bloodPressureDia.low;
-      } else if (p1 > thresholds.bloodPressureDia.max) {
-        return colors.bloodPressureDia.high;
-      }
-    } else if (vitalType === "temperature") {
-      if (p1 < thresholds.temperature.min) {
-        return colors.temperature.low;
-      } else if (p1 > thresholds.temperature.max) {
-        return colors.temperature.high;
-      }
-    } else if (vitalType === "respRate") {
-      if (p1 < thresholds.respRate.min) {
-        return colors.temperature.low;
-      } else if (p1 > thresholds.respRate.max) {
-        return colors.respRate.high;
-      }
-    }
-  };
-
   const updateChartData = () => {
-    const data = {
+    const data: ChartData<"line"> = {
       labels: vitals.heartRate.map(
         (vitalReading) => vitalReading.datetime.split(" ")[1]
       ),
@@ -210,7 +109,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           borderColor: (segment: any) =>
             updateColorByThreshold(segment, "heartRate"),
         },
-        spanGaps: true,
+        yAxisID: "yLeft1",
       } as Dataset);
     }
 
@@ -223,6 +122,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           borderColor: (segment: any) =>
             updateColorByThreshold(segment, "spO2"),
         },
+        yAxisID: "yLeft1",
       } as Dataset);
     }
 
@@ -237,6 +137,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           borderColor: (segment: any) =>
             updateColorByThreshold(segment, "bloodPressureSys"),
         },
+        yAxisID: "yLeft1",
       } as Dataset);
       data.datasets.push({
         label: "Blood Pressure Diastolic (mm Hg)",
@@ -248,6 +149,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           borderColor: (segment: any) =>
             updateColorByThreshold(segment, "bloodPressureDia"),
         },
+        yAxisID: "yLeft1",
       } as Dataset);
     }
 
@@ -260,6 +162,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           borderColor: (segment: any) =>
             updateColorByThreshold(segment, "temperature"),
         },
+        yAxisID: "yLeft2",
       } as Dataset);
     }
 
@@ -272,44 +175,11 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           borderColor: (segment: any) =>
             updateColorByThreshold(segment, "respRate"),
         },
+        yAxisID: "yRight",
       } as Dataset);
     }
 
     return data;
-  };
-
-  const updateChartOptions = () => {
-    const options = {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: {},
-        title: {
-          display: true,
-          text: "Patient Vitals Chart",
-        },
-        zoom: {
-          zoom: {
-            wheel: {
-              enabled: true,
-            },
-          },
-          pan: {
-            enabled: true,
-          },
-        },
-        annotation: {
-          annotations: {},
-        },
-      },
-    };
-
-    if (selectedIndicators.normalRange) {
-      options.plugins.annotation.annotations =
-        showNormalRangeAnnotations(selectedVitals);
-    }
-
-    return options;
   };
 
   const handleSelectedVitalsChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -391,7 +261,6 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           />
         </FormGroup>
       </Grid>
-
       <Grid item xs={6}>
         <FormGroup id="indicators" sx={{ flexDirection: "row" }}>
           <FormLabel
@@ -411,7 +280,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           />
         </FormGroup>
       </Grid>
-      <Line data={updateChartData()} options={updateChartOptions()} />
+      <Line data={updateChartData()} options={updateChartOptions(selectedVitals, selectedIndicators)} />
     </>
   );
 }
