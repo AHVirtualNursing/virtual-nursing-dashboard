@@ -9,6 +9,9 @@ export class SmartBed {
   name: string;
   nurses: [];
   patient?: Patient;
+  bedPosition: string;
+  isBrakeSet: boolean;
+  bedAlarmTriggered: boolean;
   railStatus: boolean;
   updatedAt: string;
   ward: Ward;
@@ -26,6 +29,9 @@ export class SmartBed {
     ward: Ward,
     roomNum: string,
     bedNum: string,
+    bedPosition: string,
+    isBrakeSet: boolean,
+    bedAlarmTriggered: boolean,
     patient?: Patient
   ) {
     this._id = _id;
@@ -38,6 +44,9 @@ export class SmartBed {
     this.updatedAt = updatedAt;
     this.ward = ward;
     this.roomNum = roomNum;
+    this.bedPosition = bedPosition;
+    this.isBrakeSet = isBrakeSet;
+    this.bedAlarmTriggered = bedAlarmTriggered;
     this.bedNum = bedNum;
   }
 }

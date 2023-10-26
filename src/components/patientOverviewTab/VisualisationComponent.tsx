@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -10,10 +10,9 @@ import { io } from "socket.io-client";
 import { useRouter } from "next/router";
 import { Vital } from "@/models/vital";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
-import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
-import { Alert } from "@/models/alert";
-import LineChartComponent from "@/components/LineChart";
+import LineChartComponent from "@/components/patientOverviewTab/LineChart";
 import LastUpdatedVital from "./LastUpdatedVital";
+import OverviewSelection from "./OverviewSelection";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -194,39 +193,42 @@ export default function VisualisationComponent(prop: ComponentProp) {
   }, []);
 
   return (
-    <ResponsiveGridLayout
-      className="layout"
-      layouts={retrieveLayout}
-      onLayoutChange={onLayoutChange}
-      breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-      cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-      rowHeight={60}
-    >
-      {/* graphs cannot render when divs are added in the ResponsiveContainer in LineChartComponent */}
-      <div key="rr" className="flex items-center justify-between">
-        <LastUpdatedVital data={rrData!} vital="rr" />
-        <LineChartComponent data={rrData!} vital="rr" />
-      </div>
-      <div key="hr" className="flex items-center justify-between">
-        <LastUpdatedVital data={hrData!} vital="hr" />
-        <LineChartComponent data={hrData!} vital="hr" />
-      </div>
-      <div key="o2" className="flex items-center justify-between">
-        <LastUpdatedVital data={spO2Data!} vital="o2" />
-        <LineChartComponent data={spO2Data!} vital="o2" />
-      </div>
-      <div key="bpDia" className="flex items-center justify-between">
-        <LastUpdatedVital data={bpDiaData!} vital="bpDia" />
-        <LineChartComponent data={bpDiaData!} vital="bpDia" />
-      </div>
-      <div key="bpSys" className="flex items-center justify-between">
-        <LastUpdatedVital data={bpSysData!} vital="bpSys" />
-        <LineChartComponent data={bpSysData!} vital="bpSys" />
-      </div>
-      <div key="tp" className="flex">
-        <LastUpdatedVital data={tempData!} vital="tp" />
-        <LineChartComponent data={tempData!} vital="tp" />
-      </div>
-    </ResponsiveGridLayout>
+    <div style={{ position: "relative" }}>
+      <OverviewSelection />
+      <ResponsiveGridLayout
+        className="layout"
+        layouts={retrieveLayout}
+        onLayoutChange={onLayoutChange}
+        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+        rowHeight={60}
+      >
+        {/* graphs cannot render when divs are added in the ResponsiveContainer in LineChartComponent */}
+        <div key="rr" className="flex items-center justify-between">
+          <LastUpdatedVital data={rrData!} vital="rr" />
+          <LineChartComponent data={rrData!} vital="rr" />
+        </div>
+        <div key="hr" className="flex items-center justify-between">
+          <LastUpdatedVital data={hrData!} vital="hr" />
+          <LineChartComponent data={hrData!} vital="hr" />
+        </div>
+        <div key="o2" className="flex items-center justify-between">
+          <LastUpdatedVital data={spO2Data!} vital="o2" />
+          <LineChartComponent data={spO2Data!} vital="o2" />
+        </div>
+        <div key="bpDia" className="flex items-center justify-between">
+          <LastUpdatedVital data={bpDiaData!} vital="bpDia" />
+          <LineChartComponent data={bpDiaData!} vital="bpDia" />
+        </div>
+        <div key="bpSys" className="flex items-center justify-between">
+          <LastUpdatedVital data={bpSysData!} vital="bpSys" />
+          <LineChartComponent data={bpSysData!} vital="bpSys" />
+        </div>
+        <div key="tp" className="flex">
+          <LastUpdatedVital data={tempData!} vital="tp" />
+          <LineChartComponent data={tempData!} vital="tp" />
+        </div>
+      </ResponsiveGridLayout>
+    </div>
   );
 }

@@ -5,9 +5,10 @@ import profilePic from "../../public/profilepic.jpg";
 import { useEffect, useState } from "react";
 import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
-import VisualisationComponent from "@/components/VisualisationComponent";
+import VisualisationComponent from "@/components/patientOverviewTab/VisualisationComponent";
 import dynamic from "next/dynamic";
 import AlertTabComponent from "@/components/patientAlertTab/AlertTabComponent";
+import BedStatusComponent from "@/components/bedStatusTab/BedStatusComponent";
 const PatientChart = dynamic(
   () => import("@/components/patientAnalyticsChart/patientAnalyticsChart"),
   { ssr: false }
@@ -81,16 +82,17 @@ const patientVisualisationPage = () => {
             <Tab value="analytics" label="Analytics" />
             <Tab value="alerts" label="Alerts" />
             <Tab value="reports" label="Reports" />
+            <Tab value="bedstatus" label="Bed Status" />
           </Tabs>
-          {
-            currentTab === "overview" ? (
-              <VisualisationComponent patient={selectedBed?.patient} />
-            ) : currentTab === "analytics" ? (
-              <PatientChart patient={selectedBed?.patient} />
-            ) : currentTab === "reports" ? null : currentTab === "alerts" ? (
-              <AlertTabComponent patient={selectedBed?.patient} />
-            ) : null // to add alerts page
-          }
+          {currentTab === "overview" ? (
+            <VisualisationComponent patient={selectedBed?.patient} />
+          ) : currentTab === "analytics" ? (
+            <PatientChart patient={selectedBed?.patient} />
+          ) : currentTab === "reports" ? null : currentTab === "alerts" ? (
+            <AlertTabComponent patient={selectedBed?.patient} />
+          ) : currentTab === "bedstatus" ? (
+            <BedStatusComponent bed={selectedBed} />
+          ) : null}
         </div>
       </Box>
     </div>
