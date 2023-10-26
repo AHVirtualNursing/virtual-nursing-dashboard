@@ -2,22 +2,21 @@ import React, { useEffect, useRef, useState } from "react";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import { patientData } from "@/mockData";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
-import { fetchAllSmartBeds } from "@/pages/api/smartbed_api";
+import { fetchAllSmartBeds, fetchBedByBedId } from "@/pages/api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
 import { useRouter } from "next/navigation";
 import TableSubHeader from "./TableSubHeader";
 import autoAnimate from "@formkit/auto-animate";
+import { useSession } from "next-auth/react";
+import { fetchWardsByVirtualNurse } from "@/pages/api/nurse_api";
 
-type PatientsListProps = {
-  selectedOption: string;
-};
-
-export default function Patients({ selectedOption }: PatientsListProps) {
+export default function Patients() {
   const router = useRouter();
   const [data, setData] = useState<SmartBed[]>([]);
   const [searchPatient, setSearchPatient] = useState<string>("");
   const [searchCondition, setSearchCondition] = useState<string>("");
   const [vitals, setVitals] = useState<any[]>([]);
+  const { data: sessionData } = useSession();
   // const [loadingState, setLoadingState] = useState(true);
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,13 +114,25 @@ export default function Patients({ selectedOption }: PatientsListProps) {
 
   useEffect(() => {
     console.log("fetch beds use effect");
-    console.log(selectedOption);
-    fetchAllSmartBeds().then((res) => {
-      setData(
-        res.data.filter(
-          (smartbed: SmartBed) => smartbed.ward && smartbed.patient
-        )
-      );
+    // fetchAllSmartBeds().then((res) => {
+    //   setData(
+    //     res.data.filter(
+    //       (smartbed: SmartBed) => smartbed.ward && smartbed.patient
+    //     )
+    //   );
+    // });
+    fetchWardsByVirtualNurse(sessionData?.user.id).then((wards) => {
+      let promises: Promise<SmartBed>[] = [];
+      let smartBedIds = [];
+      for (const ward of wards) {
+        const bedArray = ward.smartBeds;
+        smartBedIds.push(...bedArray);
+      }
+      smartBedIds.map((id) => promises.push(fetchBedByBedId(id)));
+      Promise.all(promises).then((res) => {
+        console.log("Smart Beds assigned to VN", res);
+        setData(res.filter((sb) => sb.ward && sb.patient));
+      });
     });
   }, []);
 
