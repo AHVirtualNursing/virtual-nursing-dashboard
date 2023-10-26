@@ -6,7 +6,6 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Label,
 } from "recharts";
 
 interface dataInterface {
@@ -23,15 +22,6 @@ const colours: { [key: string]: string } = {
   o2: "rgb(255, 102, 178)",
 };
 
-const vitals: { [key: string]: string } = {
-  rr: "Respiratory Rate",
-  hr: "Heart Rate",
-  bpSys: "Blood Pressure Systolic",
-  bpDia: "Blood Pressure Diastolic",
-  tp: "Temperature",
-  o2: "SpO2",
-};
-
 export default function LineChartComponent({
   data,
   vital,
@@ -40,7 +30,6 @@ export default function LineChartComponent({
   vital: string;
 }) {
   const lineColour = colours[vital];
-  const axisName = vitals[vital];
   return (
     <ResponsiveContainer key={data.length}>
       <LineChart
@@ -54,9 +43,7 @@ export default function LineChartComponent({
           strokeWidth={3}
         />
         <CartesianGrid stroke="#ccc" strokeDasharray="1" />
-        <XAxis dataKey="datetime">
-          <Label value={axisName} offset={-20} position="insideBottom" />
-        </XAxis>
+        <XAxis dataKey="datetime"></XAxis>
         <YAxis />
         <Tooltip />
       </LineChart>

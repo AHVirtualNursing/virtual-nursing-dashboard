@@ -13,6 +13,7 @@ import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
 import { Alert } from "@/models/alert";
 import LineChartComponent from "@/components/LineChart";
+import LastUpdatedVital from "./LastUpdatedVital";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -201,22 +202,29 @@ export default function VisualisationComponent(prop: ComponentProp) {
       cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
       rowHeight={60}
     >
-      <div key="rr">
+      {/* graphs cannot render when divs are added in the ResponsiveContainer in LineChartComponent */}
+      <div key="rr" className="flex items-center justify-between">
+        <LastUpdatedVital data={rrData!} vital="rr" />
         <LineChartComponent data={rrData!} vital="rr" />
       </div>
-      <div key="hr">
+      <div key="hr" className="flex items-center justify-between">
+        <LastUpdatedVital data={hrData!} vital="hr" />
         <LineChartComponent data={hrData!} vital="hr" />
       </div>
-      <div key="o2">
+      <div key="o2" className="flex items-center justify-between">
+        <LastUpdatedVital data={spO2Data!} vital="o2" />
         <LineChartComponent data={spO2Data!} vital="o2" />
       </div>
-      <div key="bpDia">
+      <div key="bpDia" className="flex items-center justify-between">
+        <LastUpdatedVital data={bpDiaData!} vital="bpDia" />
         <LineChartComponent data={bpDiaData!} vital="bpDia" />
       </div>
-      <div key="bpSys">
+      <div key="bpSys" className="flex items-center justify-between">
+        <LastUpdatedVital data={bpSysData!} vital="bpSys" />
         <LineChartComponent data={bpSysData!} vital="bpSys" />
       </div>
-      <div key="tp">
+      <div key="tp" className="flex">
+        <LastUpdatedVital data={tempData!} vital="tp" />
         <LineChartComponent data={tempData!} vital="tp" />
       </div>
     </ResponsiveGridLayout>
