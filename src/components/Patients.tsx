@@ -2,11 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import { patientData } from "@/mockData";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
-import { fetchAllSmartBeds } from "@/pages/api/smartbed_api";
+import { fetchAllSmartBeds, fetchBedByBedId } from "@/pages/api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
 import { useRouter } from "next/navigation";
 import TableSubHeader from "./TableSubHeader";
 import autoAnimate from "@formkit/auto-animate";
+import { useSession } from "next-auth/react";
+import { fetchWardsByVirtualNurse } from "@/pages/api/nurse_api";
+import TableDataRow from "./TableDataRow";
 
 export default function Patients() {
   const router = useRouter();
@@ -14,7 +17,7 @@ export default function Patients() {
   const [searchPatient, setSearchPatient] = useState<string>("");
   const [searchCondition, setSearchCondition] = useState<string>("");
   const [vitals, setVitals] = useState<any[]>([]);
-  const [loadingState, setLoadingState] = useState(true);
+  const { data: sessionData } = useSession();
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
@@ -111,12 +114,25 @@ export default function Patients() {
 
   useEffect(() => {
     console.log("fetch beds use effect");
-    fetchAllSmartBeds().then((res) => {
-      setData(
-        res.data.filter(
-          (smartbed: SmartBed) => smartbed.ward && smartbed.patient
-        )
-      );
+    // fetchAllSmartBeds().then((res) => {
+    //   setData(
+    //     res.data.filter(
+    //       (smartbed: SmartBed) => smartbed.ward && smartbed.patient
+    //     )
+    //   );
+    // });
+    fetchWardsByVirtualNurse(sessionData?.user.id).then((wards) => {
+      let promises: Promise<SmartBed>[] = [];
+      let smartBedIds = [];
+      for (const ward of wards) {
+        const bedArray = ward.smartBeds;
+        smartBedIds.push(...bedArray);
+      }
+      smartBedIds.map((id) => promises.push(fetchBedByBedId(id)));
+      Promise.all(promises).then((res) => {
+        console.log("Smart Beds assigned to VN", res);
+        setData(res.filter((sb) => sb.ward && sb.patient));
+      });
     });
   }, []);
 
@@ -132,7 +148,7 @@ export default function Patients() {
     if (data.length > 0) {
       const interval = setInterval(() => {
         fetchPatientVitals();
-      }, 10000);
+      }, 60000);
       return () => {
         clearInterval(interval);
       };
@@ -140,7 +156,7 @@ export default function Patients() {
   }, [vitals, data]);
 
   return (
-    <>
+    <div className="h-full overflow-auto scrollbar">
       <table className="table-auto w-full border-collapse">
         <thead className="text-sm text-left">
           {/* ------ column headers ------ */}
@@ -150,9 +166,9 @@ export default function Patients() {
             <th>Condition</th>
             <th>Bed</th>
             <th>Ward</th>
-            <th colSpan={2}>Blood Pressure</th>
-            <th colSpan={2}>Heart Rate</th>
-            <th colSpan={2}>Saturation</th>
+            <th>Blood Pressure</th>
+            <th>Heart Rate</th>
+            <th>Saturation</th>
           </tr>
         </thead>
         <tbody ref={parent}>
@@ -182,22 +198,11 @@ export default function Patients() {
             <TableSubHeader subheaderText="Bed No." />
             <TableSubHeader subheaderText="Ward No." />
             <TableSubHeader subheaderText="Result" />
-            <TableSubHeader subheaderText="Updated" />
             <TableSubHeader subheaderText="Reading" />
-            <TableSubHeader subheaderText="Updated" />
             <TableSubHeader subheaderText="Reading" />
-            <TableSubHeader subheaderText="Updated" />
           </tr>
 
-          {/* ------ data rows ------
-            The vitals are displayed based on the latest vitals data/numbers updated into the db. For blood pressure (both DIA and SYS) and Heart Rate, the number displayed is the latest value (value at the last index) of the bloodPressureDia, bloodPressureSys and heartRate arrays.
-
-            For eg, to display the heart rate reading,
-
-            {Math.round(vitals[index]?.heartRate[vitals[index]?.heartRate. length - 1].reading)}
-
-            This code extracts the vitals object matching the patient index, to ensure the correct vitals object of the patient. Then the last element of the heartRate array (latest value) is extracted and rounded to nearest whole number to display the heart rate value (This changes every 10 seconds since we update the latest value of the heartRate array)
-          */}
+          {/* ------ data rows ------*/}
           {data
             .filter((bed) =>
               bed.patient?.name
@@ -211,123 +216,58 @@ export default function Patients() {
                 </td>
                 <td
                   id="patientName"
-                  className="text-sm p-2 w-1/8 border-solid border-0 border-l border-slate-400 hover:cursor-pointer"
+                  className="text-sm p-2 w-1/8 border-solid border-0 border-l border-slate-400 hover:cursor-pointer hover:bg-blue-100 hover:rounded-lg"
                   onClick={() =>
                     viewPatientVisualisation(pd.patient?._id, pd._id)
                   }
                 >
                   {pd.patient?.name}
                 </td>
-                <td
+                <TableDataRow
                   id="patientCondition"
-                  className="text-sm p-2 w-1/8 border-solid border-0 border-l border-slate-400"
-                >
-                  {pd.patient?.condition}
-                </td>
-                <td
-                  id="bedNum"
-                  className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400"
-                >
-                  {pd.bedNum}
-                </td>
-                <td
+                  width="1/8"
+                  data={pd.patient?.condition}
+                />
+                <TableDataRow id="bedNum" width="1/12" data={pd.bedNum} />
+                <TableDataRow
                   id="wardNum"
-                  className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400"
-                >
-                  {pd.ward.wardNum}
-                </td>
-                <td
-                  id="bpReading"
-                  className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400"
-                >
-                  {vitals[index] === undefined
-                    ? "-"
-                    : vitals[index].bloodPressureSys === undefined ||
-                      vitals[index].bloodPressureSys.length == 0
-                    ? "-"
-                    : vitals[index]?.bloodPressureSys[
-                        vitals[index]?.bloodPressureSys.length - 1
-                      ]?.reading}
-                  /
-                  {vitals[index] === undefined
-                    ? "-"
-                    : vitals[index].bloodPressureDia === undefined ||
-                      vitals[index].bloodPressureDia.length == 0
-                    ? "-"
-                    : vitals[index]?.bloodPressureDia[
-                        vitals[index]?.bloodPressureDia.length - 1
-                      ]?.reading}
-                </td>
-                <td
-                  id="bpDateTime"
-                  className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400"
-                >
-                  {vitals[index] === undefined
-                    ? "-"
-                    : vitals[index].bloodPressureDia === undefined ||
-                      vitals[index].bloodPressureDia.length == 0
-                    ? "-"
-                    : vitals[index]?.bloodPressureDia[
-                        vitals[index]?.bloodPressureDia.length - 1
-                      ]?.datetime.split(" ")[1]}
-                </td>
-                <td
-                  id="hrReading"
-                  className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400"
-                >
-                  {vitals[index] === undefined
-                    ? "-"
-                    : vitals[index].heartRate === undefined ||
-                      vitals[index].heartRate.length == 0
-                    ? "-"
-                    : Math.round(
-                        vitals[index]?.heartRate[
-                          vitals[index]?.heartRate.length - 1
-                        ]?.reading
-                      )}
-                </td>
-                <td
-                  id="hrDateTime"
-                  className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400"
-                >
-                  {vitals[index] === undefined
-                    ? "-"
-                    : vitals[index].heartRate === undefined ||
-                      vitals[index].heartRate.length == 0
-                    ? "-"
-                    : vitals[index]?.heartRate[
-                        vitals[index]?.heartRate.length - 1
-                      ]?.datetime.split(" ")[1]}
-                </td>
-                <td
-                  id="spo2"
-                  className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400"
-                >
-                  {vitals[index] === undefined
-                    ? "-"
-                    : vitals[index].spO2 === undefined ||
-                      vitals[index].spO2.length == 0
-                    ? "-"
-                    : vitals[index]?.spO2[vitals[index]?.spO2.length - 1]
-                        ?.reading}
-                </td>
-                <td
-                  id="spo2Datetime"
-                  className="text-sm p-2 w-1/12 border-solid border-0 border-l border-slate-400"
-                >
-                  {vitals[index] === undefined
-                    ? "-"
-                    : vitals[index].spO2 === undefined ||
-                      vitals[index].spO2.length == 0
-                    ? "-"
-                    : vitals[index]?.spO2[
-                        vitals[index]?.spO2.length - 1
-                      ]?.datetime.split(" ")[1]}
-                </td>
+                  width="1/12"
+                  data={pd.ward.wardNum}
+                />
+                <TableDataRow
+                  id="bp-reading"
+                  width="1/12"
+                  data={[
+                    vitals[index]?.bloodPressureSys[
+                      vitals[index]?.bloodPressureSys.length - 1
+                    ]?.reading,
+                    vitals[index]?.bloodPressureDia[
+                      vitals[index]?.bloodPressureDia.length - 1
+                    ]?.reading,
+                  ]}
+                />
+
+                <TableDataRow
+                  id="hr-reading"
+                  width="1/12"
+                  data={Math.round(
+                    vitals[index]?.heartRate[
+                      vitals[index]?.heartRate.length - 1
+                    ]?.reading
+                  )}
+                />
+
+                <TableDataRow
+                  id="spo2-reading"
+                  width="1/12"
+                  data={
+                    vitals[index]?.spO2[vitals[index]?.spO2.length - 1]?.reading
+                  }
+                />
               </tr>
             ))}
         </tbody>
       </table>
-    </>
+    </div>
   );
 }

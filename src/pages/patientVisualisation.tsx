@@ -7,7 +7,7 @@ import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
 import VisualisationComponent from "@/components/VisualisationComponent";
 import dynamic from "next/dynamic";
-import AlertTabComponent from "@/components/AlertTabComponent";
+import AlertTabComponent from "@/components/patientAlertTab/AlertTabComponent";
 const PatientChart = dynamic(
   () => import("@/components/patientAnalyticsChart/patientAnalyticsChart"),
   { ssr: false }
@@ -70,29 +70,28 @@ const patientVisualisationPage = () => {
             </Box>
           </Box>
         </div>
-        <Tabs
-          value={currentTab}
-          onChange={handleTabChange}
-          centered
-          sx={{ marginBottom: 3, backgroundColor: undefined }}
-        >
-          <Tab value="overview" label="Overview" />
-          <Tab value="analytics" label="Analytics" />
-          <Tab value="alerts" label="Alerts" />
-          <Tab value="reports" label="Reports" />
-        </Tabs>
-        {
-          currentTab === "overview" ? (
-            <VisualisationComponent patient={selectedBed?.patient} />
-          ) : currentTab === "analytics" ? (
-            <PatientChart patient={selectedBed?.patient} />
-          ) : currentTab === "reports" ? null : currentTab === // to add reports page
-            "alerts" ? (
-            <AlertTabComponent
-              patient={selectedBed?.patient}
-            ></AlertTabComponent>
-          ) : null // to add alerts page
-        }
+        <div className="bg-white rounded-2xl shadow-lg">
+          <Tabs
+            value={currentTab}
+            onChange={handleTabChange}
+            centered
+            sx={{ marginBottom: 3, backgroundColor: undefined }}
+          >
+            <Tab value="overview" label="Overview" />
+            <Tab value="analytics" label="Analytics" />
+            <Tab value="alerts" label="Alerts" />
+            <Tab value="reports" label="Reports" />
+          </Tabs>
+          {
+            currentTab === "overview" ? (
+              <VisualisationComponent patient={selectedBed?.patient} />
+            ) : currentTab === "analytics" ? (
+              <PatientChart patient={selectedBed?.patient} />
+            ) : currentTab === "reports" ? null : currentTab === "alerts" ? (
+              <AlertTabComponent patient={selectedBed?.patient} />
+            ) : null // to add alerts page
+          }
+        </div>
       </Box>
     </div>
   );
