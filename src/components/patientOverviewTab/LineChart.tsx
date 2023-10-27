@@ -31,22 +31,24 @@ export default function LineChartComponent({
 }) {
   const lineColour = colours[vital];
   return (
-    <ResponsiveContainer key={data.length}>
-      <LineChart
-        data={data}
-        margin={{ top: 0, right: 20, bottom: 30, left: 0 }}
-      >
-        <Line
-          type="monotone"
-          dataKey="reading"
-          stroke={lineColour}
-          strokeWidth={3}
-        />
-        <CartesianGrid stroke="#ccc" strokeDasharray="1" />
-        <XAxis dataKey="datetime"></XAxis>
-        <YAxis />
-        <Tooltip />
-      </LineChart>
-    </ResponsiveContainer>
+    <div className="grid w-full">
+      <ResponsiveContainer width="99%" key={data.length} aspect={10}>
+        <LineChart
+          data={data}
+          margin={{ top: 0, right: 20, bottom: 30, left: 0 }}
+        >
+          <Line
+            type="monotone"
+            dataKey="reading"
+            stroke={lineColour}
+            strokeWidth={3}
+          />
+          <CartesianGrid stroke="#ccc" strokeDasharray="1" />
+          <XAxis dataKey="datetime"></XAxis>
+          <YAxis />
+          <Tooltip />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 }

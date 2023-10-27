@@ -21,6 +21,9 @@ export default function layout({ children }: { children: React.ReactNode }) {
     socket.on("alertIncoming", (data: any) => {
       console.log(data);
     });
+    return () => {
+      socket.close();
+    };
   }, []);
 
   return (
