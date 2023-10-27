@@ -97,8 +97,18 @@ export default function Patients() {
     });
     const sortedBeds = combined.map((x) => x.bed);
     const sortedVitals = combined.map((x) => x.vital);
-    setData(sortedBeds);
-    setVitals(sortedVitals);
+    if (
+      sortedBeds.length !== data.length ||
+      !sortedBeds.every((element, index) => element === data[index])
+    ) {
+      setData(sortedBeds);
+    }
+    if (
+      sortedVitals.length !== vitals.length ||
+      !sortedVitals.every((element, index) => element === vitals[index])
+    ) {
+      setVitals(sortedVitals);
+    }
   };
 
   useEffect(() => {
@@ -126,6 +136,7 @@ export default function Patients() {
 
   // fetching vitals immediately after beds are populated
   useEffect(() => {
+    console.log("first");
     if (data.length > 0) {
       fetchPatientVitals();
     }
