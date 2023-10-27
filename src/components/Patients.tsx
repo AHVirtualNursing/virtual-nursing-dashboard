@@ -46,13 +46,10 @@ export default function Patients() {
   const fetchPatientVitals = async () => {
     let patientVitalsArr: any[] = [];
     for (const bedData of data) {
-      console.log(bedData);
       let patientVitals = bedData.patient?.vital;
-      console.log(patientVitals);
       if (patientVitals) {
         const res = await fetchVitalByVitalId(patientVitals);
         patientVitalsArr.push(res);
-        console.log(patientVitalsArr);
       } else {
         patientVitalsArr.push(undefined);
       }
@@ -61,7 +58,6 @@ export default function Patients() {
       bed: bedData,
       vital: patientVitalsArr[index],
     }));
-    console.log(combined);
     combined.sort((vital1, vital2) => {
       if (vital1.vital === undefined && vital2.vital === undefined) {
         return 0;
@@ -88,10 +84,6 @@ export default function Patients() {
         ) {
           return -1;
         } else {
-          console.log(vital1);
-          console.log(vital1.vital);
-          console.log(vital1.vital.heartRate);
-          console.log(vital1.vital.heartRate[1].reading);
           return (
             Math.round(
               vital2.vital.heartRate[vital2.vital.heartRate.length - 1].reading
@@ -103,17 +95,13 @@ export default function Patients() {
         }
       }
     });
-    console.log(combined);
     const sortedBeds = combined.map((x) => x.bed);
     const sortedVitals = combined.map((x) => x.vital);
-    console.log(sortedBeds);
-    console.log(sortedVitals);
     setData(sortedBeds);
     setVitals(sortedVitals);
   };
 
   useEffect(() => {
-    console.log("fetch beds use effect");
     // fetchAllSmartBeds().then((res) => {
     //   setData(
     //     res.data.filter(

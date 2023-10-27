@@ -1,13 +1,28 @@
 import Head from "next/head";
-import React from "react";
+import React, { useEffect } from "react";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Dashboard.module.css";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
+import { io } from "socket.io-client";
+import { useSession } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function layout({ children }: { children: React.ReactNode }) {
+  const { data: sessionData } = useSession();
+
+  useEffect(() => {
+    console.log("SOCKET USEEFFECT");
+    const socket = io("http://localhost:3001");
+    const nurseId = sessionData?.user.id;
+    console.log(nurseId);
+    socket.emit("alertConnections", nurseId);
+    socket.on("alertIncoming", (data: any) => {
+      console.log(data);
+    });
+  }, []);
+
   return (
     <div>
       <Head>
