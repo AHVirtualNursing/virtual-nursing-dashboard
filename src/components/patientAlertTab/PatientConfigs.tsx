@@ -18,6 +18,8 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
   const [systolic, setSystolic] = useState<number[]>([]);
   const [diastolic, setDiastolic] = useState<number[]>([]);
   const [spo2, setSpo2] = useState<number[]>([]);
+  const [saved, setSaved] = useState<boolean>(false);
+  const [confirmMessage, setConfirmMessage] = useState<string>("");
 
   useEffect(() => {
     fetchAlertConfigByPatientId(patient?._id).then((res) => {
@@ -33,6 +35,15 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
     });
   }, []);
 
+  useEffect(() => {
+    if (saved) {
+      setTimeout(() => {
+        setConfirmMessage("");
+        setSaved(false);
+      }, 5000);
+    }
+  }, [saved]);
+
   function handleSaveConfigs() {
     const alertConfig = {
       _id: patient?._id,
@@ -44,8 +55,9 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
     };
     console.log(alertConfig);
     updateAlertConfig(defaultConfigId, alertConfig).then((res) =>
-      console.log(res.data)
+      console.log(res)
     );
+    setSaved(true);
   }
 
   return (
@@ -93,13 +105,16 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
         />
       )}
 
-      <div>
+      <div className="space-y-2">
         <button
-          className=" float-right bg-blue-900 text-white rounded-lg border-none p-3 font-bold text-md active:bg-blue-400"
+          className="float-right bg-blue-900 text-white rounded-lg border-none p-3 font-bold text-md active:bg-blue-400"
           onClick={handleSaveConfigs}
         >
           Save Changes
         </button>
+        <div className="text-green-800 float-right clear-right">
+          {saved ? "Changes saved" : confirmMessage}
+        </div>
       </div>
     </div>
   );

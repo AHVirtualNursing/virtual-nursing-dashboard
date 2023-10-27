@@ -42,7 +42,7 @@ export default function Dashboard() {
         <Summary />
       </div>
       <div className="bg-white rounded-2xl h-4/6 p-3 shadow-lg">
-        <Patients selectedOption={selectedOption} />
+        <Patients />
       </div>
     </div>
   );
