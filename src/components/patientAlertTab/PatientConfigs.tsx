@@ -2,14 +2,17 @@ import React, { useEffect, useState } from "react";
 import RangeSlider from "../RangeSlider";
 import { AlertConfig } from "@/models/alertConfig";
 import { Patient } from "@/models/patient";
-import { fetchAlertConfigByPatientId } from "@/pages/api/alertConfigs_api";
+import {
+  fetchAlertConfigByPatientId,
+  updateAlertConfig,
+} from "@/pages/api/alertConfigs_api";
 
 type PatientConfigProps = {
   patient: Patient | undefined;
 };
 
 const PatientConfigs = ({ patient }: PatientConfigProps) => {
-  const [defaultConfig, setDefaultConfig] = useState<AlertConfig>();
+  const [defaultConfigId, setDefaultConfigId] = useState<string>("");
   const [rr, setRr] = useState<number[]>([]);
   const [heartRate, setHeartRate] = useState<number[]>([]);
   const [systolic, setSystolic] = useState<number[]>([]);
@@ -19,6 +22,7 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
   useEffect(() => {
     fetchAlertConfigByPatientId(patient?._id).then((res) => {
       console.log(res?.data);
+      setDefaultConfigId(res?.data._id);
       const { hrConfig, rrConfig, spO2Config, bpDiaConfig, bpSysConfig } =
         res?.data;
       setHeartRate(hrConfig);
@@ -39,6 +43,9 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
       spO2Config: spo2,
     };
     console.log(alertConfig);
+    updateAlertConfig(defaultConfigId, alertConfig).then((res) =>
+      console.log(res.data)
+    );
   }
 
   return (
