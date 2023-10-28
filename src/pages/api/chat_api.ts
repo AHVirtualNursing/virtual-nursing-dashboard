@@ -1,4 +1,5 @@
 import { BedSideNurse } from "@/models/bedsideNurse";
+import { Message } from "@/models/message";
 import axios from "axios";
 
 export const fetchChatsForVirtualNurse = async (virtualNurseId: string) => {
@@ -26,6 +27,30 @@ export const addNewMessageToChat = async (
         chatId: chatId,
         content: content,
         createdBy: createdBy,
+      });
+
+      const data = await res.data;
+
+      return data.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const addNewPatientMessageToChat = async (
+  chatId: string,
+  message: Message,
+  createdBy: string
+) => {
+  try {
+    const url = process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + "/chat/message";
+    if (url) {
+      const res = await axios.post(url, {
+        chatId: chatId,
+        patient: message.patient?._id,
+        createdBy: createdBy,
+        content: "Virtual Nurse shared a Patient vitals with you."
       });
 
       const data = await res.data;
@@ -123,3 +148,23 @@ export const updateMessageContent = async (
   
     return null;
   };
+
+  export const deleteChat = async (chatId: string) => {
+    try {
+      const url = process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + "/chat/";
+      const response = await fetch(url + chatId, {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+      const json = await response.json();
+      console.log("DELETED", json);
+      return json;
+    } catch (error) {
+      console.error(error);
+    }
+  
+    return null;
+  }

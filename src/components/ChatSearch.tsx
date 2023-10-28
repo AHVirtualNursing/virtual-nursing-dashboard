@@ -8,9 +8,10 @@ type SearchProps = {
   selectedChat: Chat | undefined;
   setSelectedChat: Dispatch<SetStateAction<Chat | undefined>>;
   chats: Chat[] | undefined;
+  handleDeleteChat: (chat: Chat) => void
 };
 
-const Search = ({ selectedChat, setSelectedChat, chats }: SearchProps) => {
+const Search = ({ selectedChat, setSelectedChat, chats, handleDeleteChat }: SearchProps) => {
   const [searchNurse, setSearchNurse] = useState("");
 
   return (
@@ -57,13 +58,12 @@ const Search = ({ selectedChat, setSelectedChat, chats }: SearchProps) => {
               if (chatA.messages.length === 0) return 1;
               if (chatB.messages.length === 0) return -1;
               // Get the latest message in each chat
-              const latestMessageA = chatA.messages[chatA.messages.length - 1];
-              const latestMessageB = chatB.messages[chatB.messages.length - 1];
+              const latestMessageA = chatA.messages[0];
+              const latestMessageB = chatB.messages[0];
 
               // Compare the createdAt property of the latest messages
               return (
-                new Date(latestMessageB.createdAt).getTime() -
-                new Date(latestMessageA.createdAt).getTime()
+                new Date(latestMessageB.createdAt).getTime()- new Date(latestMessageA.createdAt).getTime()
               );
             })
             .filter((chat) => {
@@ -84,6 +84,9 @@ const Search = ({ selectedChat, setSelectedChat, chats }: SearchProps) => {
                   onClickChatPreview={() => {
                     setSelectedChat(chat);
                     setSearchNurse("");
+                  }}
+                  handleDeleteChat={() => {
+                    handleDeleteChat(chat);
                   }}
                 />
               );

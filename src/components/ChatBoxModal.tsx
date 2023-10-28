@@ -17,6 +17,7 @@ import {
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import CloseIcon from "@mui/icons-material/Close";
 import { useEffect, useRef, useState } from "react";
 import { VirtualNurse } from "@/models/virtualNurse";
@@ -25,7 +26,9 @@ import { useSession } from "next-auth/react";
 import { FormControl, MenuItem } from "@mui/material";
 import {
   addNewMessageToChat,
+  addNewPatientMessageToChat,
   createChat,
+  deleteChat,
   deleteMessageFromChat,
   fetchBedsideNursesByBedId,
   fetchChatsForVirtualNurse,
@@ -65,6 +68,37 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [messageInEditMode, setMessageInEditMode] = useState<Message>();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isAddingPatientToChat, setIsAddingPatientToChat] = useState(false);
+  const handleOpenSharingPatientToChat = () => {
+    const totalAssignedBeds = selectedChat?.bedsideNurse.smartBeds as any[];
+    const assignedBeds = bedsWithPatientsData!.filter((bed) => {
+      const idx = totalAssignedBeds?.indexOf(bed._id);
+      return idx >= 0;
+    });
+    setAssignedBedsToSelectedChatBedsideNurse(assignedBeds);
+    setIsAddingPatientToChat(true);
+  };
+  const handleCloseSharingPatientToChat = () => {
+    setShareToSelectedChatBedWithPatientId("");
+    setPatientPreviewMessage(undefined);
+    setAssignedBedsToSelectedChatBedsideNurse([]);
+    setIsAddingPatientToChat(false);
+  };
+
+  //This is to get the assigned patients that intersects bedside nurse and virtual nurse
+  const [
+    assignedBedsToSelectedChatBedsideNurse,
+    setAssignedBedsToSelectedChatBedsideNurse,
+  ] = useState<SmartBed[]>([]);
+
+  //This is to select the patient that we want to share to the bedside nurse
+  const [
+    shareToSelectedChatBedWithPatientId,
+    setShareToSelectedChatBedWithPatientId,
+  ] = useState("");
+
+  //This is to show patient preview message
+  const [patientPreviewMessage, setPatientPreviewMessage] = useState<Message>();
 
   useEffect(() => {
     fetchVirtualNurseByNurseId(sessionData?.user.id).then((res) => {
@@ -79,6 +113,11 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       getChatsForVirtualNurse(virtualNurse);
     }, 5000);
 
+    // Cleanup the interval when the component is unmounted or when the effect is re-run
+    return () => clearInterval(refreshChats);
+  }, [sessionData?.user.id]);
+
+  useEffect(() => {
     if (textMessage) {
       const textarea = textareaRef.current;
       if (textarea) {
@@ -86,10 +125,13 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
         textarea.style.height = `${textarea.scrollHeight}px`; // Set new height
       }
     }
+  }, [textMessage]);
 
-    // Cleanup the interval when the component is unmounted or when the effect is re-run
-    return () => clearInterval(refreshChats);
-  }, [sessionData?.user.id, textMessage]);
+  useEffect(() => {
+    if (shareToSelectedChatBedWithPatientId !== "") {
+      setPatientPreviewMessage(createPatientPreviewMessage());
+    }
+  }, [shareToSelectedChatBedWithPatientId]);
 
   const getChatsForVirtualNurse = async (nurse: VirtualNurse | undefined) => {
     if (nurse === undefined) return;
@@ -116,29 +158,56 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       }
     });
   };
+
+  const handleSharePatientToSelectedChat = () => {
+    handleSendPatientMessage();
+    handleCloseSharingPatientToChat();
+  };
+
+  const handleSendPatientMessage = () => {
+    if (patientPreviewMessage === undefined || selectedChat === undefined) return;
+
+    addNewPatientMessageToChat(
+      selectedChat._id,
+      patientPreviewMessage,
+      virtualNurse!._id
+    ).then((updatedChat) => {
+      console.log("UPDATED CHAT", updatedChat)
+      if (updatedChat === undefined) return;
+      //capture selected Chat
+      setSelectedChat(updatedChat);
+
+      //update chats
+      const updatedChats = chats.filter((chat) => chat._id !== updatedChat._id);
+      setChats([...updatedChats, updatedChat]);
+
+      //Send to websocket
+    });
+  };
+
   const handleSendMessage = () => {
     if (textMessage === "") return;
     if (selectedChat === undefined) return;
     //capture textMessage
+    const trimmedTextMessage = textMessage.trim();
+    addNewMessageToChat(
+      selectedChat._id,
+      trimmedTextMessage,
+      virtualNurse!._id
+    ).then((updatedChat) => {
+      if (updatedChat === undefined) return;
+      //capture selected Chat
+      setSelectedChat(updatedChat);
 
-    addNewMessageToChat(selectedChat._id, textMessage, virtualNurse!._id).then(
-      (updatedChat) => {
-        if (updatedChat === undefined) return;
-        //capture selected Chat
-        setSelectedChat(updatedChat);
+      //update chats
+      const updatedChats = chats.filter((chat) => chat._id !== updatedChat._id);
+      setChats([...updatedChats, updatedChat]);
 
-        //update chats
-        const updatedChats = chats.filter(
-          (chat) => chat._id !== updatedChat._id
-        );
-        setChats([...updatedChats, updatedChat]);
+      //Send to websocket
 
-        //Send to websocket
-
-        //reset
-        setTextMessage("");
-      }
-    );
+      //reset
+      setTextMessage("");
+    });
   };
 
   const handleUpdateMessage = () => {
@@ -148,11 +217,11 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       handleCloseEditButton();
       return;
     }
-
+    const trimmedTextMessage = textMessage.trim();
     updateMessageContent(
       selectedChat!._id,
       messageInEditMode._id,
-      textMessage
+      trimmedTextMessage
     ).then((updatedChat) => {
       if (updatedChat === undefined) return;
 
@@ -174,6 +243,19 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
     if (textarea) {
       textarea.focus();
     }
+  };
+
+  const handleDeleteChat = (chat: Chat) => {
+    if (chat === undefined) return;
+
+    deleteChat(chat._id).then((deletedChat) => {
+      if (deletedChat === null) return;
+
+      setSelectedChat(undefined);
+      //update chats
+      const updatedChats = chats.filter((chat) => chat._id !== deletedChat._id);
+      setChats([...updatedChats]);
+    });
   };
 
   const handleDeleteMessage = (message: Message) => {
@@ -245,6 +327,40 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
     setTextMessage(event.target.value);
   };
 
+  const createPatientPreviewMessage = (): Message => {
+    if (bedsWithPatientsData === undefined || virtualNurse === undefined) {
+      const newMsg: Message = {
+        _id: "123",
+        content: "",
+        createdAt: new Date(Date.now()),
+        createdBy: "123",
+      };
+      return newMsg;
+    }
+
+    const chosenBeds = bedsWithPatientsData.filter(
+      (bed) => bed._id === shareToSelectedChatBedWithPatientId
+    );
+    if (chosenBeds.length === 0) {
+      const newMsg: Message = {
+        _id: "123",
+        content: "",
+        createdAt: new Date(Date.now()),
+        createdBy: "123",
+      };
+      return newMsg;
+    }
+
+    const newMsg: Message = {
+      _id: "123",
+      patient: chosenBeds[0]!.patient,
+      content: "",
+      createdAt: new Date(Date.now()),
+      createdBy: virtualNurse!._id,
+    };
+    return newMsg;
+  };
+
   return (
     <>
       <Modal
@@ -309,6 +425,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
               selectedChat={selectedChat}
               setSelectedChat={setSelectedChat}
               chats={chats}
+              handleDeleteChat={handleDeleteChat}
             />
           </Box>
           <Box sx={{ flex: 2, padding: "20px" }}>
@@ -474,11 +591,18 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                       <DoneIcon sx={{ color: midIndigo, fontSize: 30 }} />
                     </IconButton>
                   ) : (
-                    <IconButton onClick={handleSendMessage}>
-                      <ArrowCircleUpIcon
-                        sx={{ color: midIndigo, fontSize: 30 }}
-                      />
-                    </IconButton>
+                    <>
+                      <IconButton onClick={handleOpenSharingPatientToChat}>
+                        <PersonOutlineIcon
+                          sx={{ color: midIndigo, fontSize: 30 }}
+                        />
+                      </IconButton>
+                      <IconButton onClick={handleSendMessage}>
+                        <ArrowCircleUpIcon
+                          sx={{ color: midIndigo, fontSize: 30 }}
+                        />
+                      </IconButton>
+                    </>
                   )}
                 </Box>
               </Box>
@@ -605,6 +729,134 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
             onClick={handleCreateChat}
           >
             Create
+          </Button>
+        </Box>
+      </Modal>
+      <Modal
+        open={isAddingPatientToChat}
+        onClose={handleCloseSharingPatientToChat}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            marginLeft: "auto",
+            marginRight: "auto",
+            marginTop: "10%",
+            width: "40%",
+            height: "50%",
+            bgcolor: lightIndigo,
+            borderRadius: 5,
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
+            border: "none",
+            outline: "none",
+            padding: "20px",
+            overflowY: "scroll",
+            msOverflowStyle: "none",
+            scrollbarWidth: "none",
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: "18px",
+              fontWeight: "bold",
+              color: darkIndigo,
+            }}
+          >
+            Share Patient to Bedside Nurse
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: "14px",
+              marginBottom: "20px",
+            }}
+          >
+            Patients below are assigned to {selectedChat?.bedsideNurse.name},
+            select one to share vitals.
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: "12px",
+              fontWeight: "bold",
+              color: darkIndigo,
+            }}
+          >
+            Patient
+          </Typography>
+
+          <FormControl fullWidth sx={{ marginBottom: "20px" }}>
+            <Select
+              value={shareToSelectedChatBedWithPatientId}
+              onChange={(event) => {
+                setShareToSelectedChatBedWithPatientId(event.target.value);
+              }}
+            >
+              {assignedBedsToSelectedChatBedsideNurse?.map((bedWithPatient) => {
+                return (
+                  <MenuItem key={bedWithPatient._id} value={bedWithPatient._id}>
+                    {bedWithPatient?.patient?.name}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              sx={{
+                fontSize: "12px",
+                fontWeight: "bold",
+                color: darkIndigo,
+              }}
+            >
+              Preview
+            </Typography>
+            <Box
+              sx={{
+                height: "20vh",
+                backgroundColor: lighterIndigo,
+                borderRadius: "10px",
+                display: "flex",
+                flexDirection: "column-reverse",
+                paddingTop: "10px",
+                paddingRight: "20px",
+                overflowY: "scroll",
+                msOverflowStyle: "none",
+                scrollbarWidth: "none",
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                },
+              }}
+            >
+              {patientPreviewMessage && (
+                <ChatBubble
+                  message={patientPreviewMessage}
+                  virtualNurse={virtualNurse}
+                  handleDeleteMessage={() => {}}
+                  handleEditMessage={() => {}}
+                  enableActionsUponRightClick={false}
+                />
+              )}
+            </Box>
+          </Box>
+          <Button
+            variant="contained"
+            sx={{
+              marginTop: "20px",
+              borderRadius: "20px",
+              backgroundColor: darkIndigo,
+              alignSelf: "flex-end",
+              "&:hover": {
+                backgroundColor: darkerIndigo,
+              },
+            }}
+            onClick={handleSharePatientToSelectedChat}
+          >
+            Share
           </Button>
         </Box>
       </Modal>
