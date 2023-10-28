@@ -12,7 +12,11 @@ import { Vital } from "@/models/vital";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import LineChartComponent from "@/components/patientOverviewTab/LineChart";
 import LastUpdatedVital from "./LastUpdatedVital";
-import OverviewSelection from "./OverviewSelection";
+import { Divider, Drawer, IconButton, List, Toolbar } from "@mui/material";
+import { styled, useTheme } from "@mui/material/styles";
+import MenuIcon from "@mui/icons-material/Menu";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -192,43 +196,141 @@ export default function VisualisationComponent(prop: ComponentProp) {
     };
   }, []);
 
+  const [open, setOpen] = React.useState(false);
+
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
+
+  const drawerWidth = 240;
+  const theme = useTheme();
+
+  const ChartsContainer = styled("main", {
+    shouldForwardProp: (prop) => prop !== "open",
+  })<{
+    open?: boolean;
+  }>(({ theme, open }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    ...(open && {
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginRight: `${drawerWidth}px`,
+    }),
+  }));
+
+  interface AppBarProps extends MuiAppBarProps {
+    open?: boolean;
+  }
+
+  const AppBar = styled(MuiAppBar, {
+    shouldForwardProp: (prop) => prop !== "open",
+  })<AppBarProps>(({ theme, open }) => ({
+    transition: theme.transitions.create(["margin", "width"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    ...(open && {
+      width: `calc(100% - ${drawerWidth}px)`,
+      marginRight: `${drawerWidth}px`,
+      transition: theme.transitions.create(["margin", "width"], {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    }),
+  }));
+
   return (
     <div style={{ position: "relative" }}>
-      <OverviewSelection />
-      <ResponsiveGridLayout
-        className="layout"
-        layouts={retrieveLayout}
-        onLayoutChange={onLayoutChange}
-        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-        rowHeight={60}
+      <AppBar position="static" color="inherit" elevation={0} open={open}>
+        <Toolbar className="flex justify-end">
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            onClick={handleDrawerOpen}
+            sx={{ mr: 2, ...(open && { display: "none" }) }}
+          >
+            <MenuIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          "& .MuiDrawer-paper": {
+            width: drawerWidth,
+            boxSizing: "border-box",
+            position: "absolute",
+          },
+        }}
+        variant="persistent"
+        anchor="right"
+        open={open}
       >
-        {/* graphs cannot render when divs are added in the ResponsiveContainer in LineChartComponent */}
-        <div key="rr" className="flex items-center justify-between">
-          <LastUpdatedVital data={rrData!} vital="rr" />
-          <LineChartComponent data={rrData!} vital="rr" />
+        <div className="flex items-center">
+          <IconButton onClick={handleDrawerClose}>
+            <ChevronRightIcon />
+          </IconButton>
+          <p>Graphs</p>
         </div>
-        <div key="hr" className="flex items-center justify-between">
-          <LastUpdatedVital data={hrData!} vital="hr" />
-          <LineChartComponent data={hrData!} vital="hr" />
-        </div>
-        <div key="o2" className="flex items-center justify-between">
-          <LastUpdatedVital data={spO2Data!} vital="o2" />
-          <LineChartComponent data={spO2Data!} vital="o2" />
-        </div>
-        <div key="bpDia" className="flex items-center justify-between">
-          <LastUpdatedVital data={bpDiaData!} vital="bpDia" />
-          <LineChartComponent data={bpDiaData!} vital="bpDia" />
-        </div>
-        <div key="bpSys" className="flex items-center justify-between">
-          <LastUpdatedVital data={bpSysData!} vital="bpSys" />
-          <LineChartComponent data={bpSysData!} vital="bpSys" />
-        </div>
-        <div key="tp" className="flex">
-          <LastUpdatedVital data={tempData!} vital="tp" />
-          <LineChartComponent data={tempData!} vital="tp" />
-        </div>
-      </ResponsiveGridLayout>
+        <Divider />
+        <List>
+          <p>Graph 1</p>
+        </List>
+        <Divider />
+        <List>
+          <p>Graph 2</p>
+        </List>
+        <Divider />
+      </Drawer>
+      <ChartsContainer open={open}>
+        <ResponsiveGridLayout
+          className="layout"
+          layouts={retrieveLayout}
+          onLayoutChange={onLayoutChange}
+          breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+          cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+          rowHeight={60}
+        >
+          {/* graphs cannot render when divs are added in the ResponsiveContainer in LineChartComponent */}
+          <div key="rr" className="flex items-center justify-between">
+            <LastUpdatedVital data={rrData!} vital="rr" />
+            <LineChartComponent data={rrData!} vital="rr" />
+          </div>
+          <div key="hr" className="flex items-center justify-between">
+            <LastUpdatedVital data={hrData!} vital="hr" />
+            <LineChartComponent data={hrData!} vital="hr" />
+          </div>
+          <div key="o2" className="flex items-center justify-between">
+            <LastUpdatedVital data={spO2Data!} vital="o2" />
+            <LineChartComponent data={spO2Data!} vital="o2" />
+          </div>
+          <div key="bpDia" className="flex items-center justify-between">
+            <LastUpdatedVital data={bpDiaData!} vital="bpDia" />
+            <LineChartComponent data={bpDiaData!} vital="bpDia" />
+          </div>
+          <div key="bpSys" className="flex items-center justify-between">
+            <LastUpdatedVital data={bpSysData!} vital="bpSys" />
+            <LineChartComponent data={bpSysData!} vital="bpSys" />
+          </div>
+          <div key="tp" className="flex">
+            <LastUpdatedVital data={tempData!} vital="tp" />
+            <LineChartComponent data={tempData!} vital="tp" />
+          </div>
+        </ResponsiveGridLayout>
+      </ChartsContainer>
     </div>
   );
 }
