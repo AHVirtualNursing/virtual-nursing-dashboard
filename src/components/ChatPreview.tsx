@@ -1,18 +1,29 @@
 import { Chat } from "@/models/chat";
-import { darkerIndigo, lightIndigo, indigo } from "@/styles/colorTheme";
-import { Box, Typography } from "@mui/material";
+import {
+  darkerIndigo,
+  lightIndigo,
+  indigo,
+  darkIndigo,
+  lighterIndigo,
+} from "@/styles/colorTheme";
+import { Box, IconButton, Typography } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useState } from "react";
 
 type ChatPreviewProps = {
   chat: Chat;
   onClickChatPreview: () => void;
   isSelected: boolean;
+  handleDeleteChat: () => void
 };
 
 const ChatPreview = ({
   chat,
   onClickChatPreview,
   isSelected,
+  handleDeleteChat
 }: ChatPreviewProps) => {
+  const [rightClickEvent, setRightClickedEvent] = useState(false);
   return (
     <Box
       key={chat.bedsideNurse.name}
@@ -28,9 +39,34 @@ const ChatPreview = ({
         "&:hover": {
           backgroundColor: darkerIndigo,
         },
+        position: "relative",
       }}
       onClick={onClickChatPreview}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        setRightClickedEvent((prevState) => !prevState);
+      }}
     >
+      {rightClickEvent && (
+        <>
+          <IconButton
+            sx={{
+              position: "absolute",
+              right: "20px",
+              backgroundColor: lightIndigo,
+              width: "50px",
+              height: "50px",
+              "&:hover": {
+                backgroundColor: lighterIndigo,
+              },
+              zIndex: "100"
+            }}
+            onClick={handleDeleteChat}
+          >
+            <DeleteIcon sx={{ fontSize: "20", color: darkIndigo }} />
+          </IconButton>
+        </>
+      )}
       <Box
         sx={{
           width: 50,
