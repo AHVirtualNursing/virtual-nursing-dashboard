@@ -8,6 +8,7 @@ import { SmartBed } from "@/models/smartBed";
 import { Patient } from "@/models/patient";
 import VisualisationComponent from "@/components/VisualisationComponent";
 import dynamic from "next/dynamic";
+import PatientReport from "@/components/patientReport/patientReport";
 const PatientChart = dynamic(
   () => import("@/components/patientAnalyticsChart/patientAnalyticsChart"),
   { ssr: false }
@@ -63,8 +64,7 @@ const patientVisualisationPage = () => {
             <Box textAlign={"right"} marginRight={2}>
               <button
                 className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full border-none"
-                onClick={updateSelectedPatient}
-              >
+                onClick={updateSelectedPatient}>
                 Update Details
               </button>
             </Box>
@@ -74,8 +74,7 @@ const patientVisualisationPage = () => {
           value={currentTab}
           onChange={handleTabChange}
           centered
-          sx={{ marginBottom: 3, backgroundColor: undefined }}
-        >
+          sx={{ marginBottom: 3, backgroundColor: undefined }}>
           <Tab value="overview" label="Overview" />
           <Tab value="analytics" label="Analytics" />
           <Tab value="alerts" label="Alerts" />
@@ -86,8 +85,9 @@ const patientVisualisationPage = () => {
             <VisualisationComponent patient={selectedBed?.patient} />
           ) : currentTab === "analytics" ? (
             <PatientChart patient={selectedBed?.patient} />
-          ) : currentTab === "reports" ? null : currentTab === // to add reports page
-            "alerts" ? null : null // to add alerts page
+          ) : currentTab === "reports" ? (
+            <PatientReport patient={selectedBed?.patient} />
+          ) : currentTab === "alerts" ? null : null // to add alerts page
         }
       </Box>
     </div>
