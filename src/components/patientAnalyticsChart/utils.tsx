@@ -1,35 +1,41 @@
 import { ChartOptions } from "chart.js";
 
-export const colors = {
+export const vitalChartAttributes = {
   heartRate: {
-    low: "rgb(255, 191, 0)",
+    low: "rgb(210, 4, 45)",
     normal: "rgb(147, 197, 114)",
-    high: "rgb(255, 191, 0)",
+    high: "rgb(210, 4, 45)",
+    yAxisID: "yLeftChart1",
   },
   spO2: {
-    low: "rgb(64, 224, 208)",
+    low: "rgb(210, 4, 45)",
     normal: "rgb(100, 149, 237)",
-    high: "rgb(255, 0, 255)",
+    high: "rgb(210, 4, 45)",
+    yAxisID: "yRightChart1",
   },
   bloodPressureSys: {
     low: "rgb(210, 4, 45)",
     normal: "rgb(0, 163, 108)",
     high: "rgb(210, 4, 45)",
+    yAxisID: "yLeftChart1",
   },
   bloodPressureDia: {
-    low: "rgb(255, 117, 24)",
+    low: "rgb(210, 4, 45)",
     normal: "rgb(159, 226, 191)",
-    high: "rgb(255, 117, 24)",
+    high: "rgb(210, 4, 45)",
+    yAxisID: "yLeftChart1",
   },
   temperature: {
-    low: "rgb(255, 117, 24)",
+    low: "rgb(210, 4, 45)",
     normal: "rgb(159, 226, 191)",
-    high: "rgb(255, 117, 24)",
+    high: "rgb(210, 4, 45)",
+    yAxisID: "yLeftChart2",
   },
   respRate: {
     low: "rgb(210, 4, 45)",
     normal: "rgb(0, 163, 108)",
     high: "rgb(210, 4, 45)",
+    yAxisID: "yRightChart2",
   },
 };
 
@@ -43,7 +49,8 @@ export const updateChartOptions = (
   },
   selectedIndicators: {
     normalRange: boolean;
-  }
+  },
+  chartId: string
 ) => {
   const options: ChartOptions<"line"> = {
     responsive: true,
@@ -71,26 +78,31 @@ export const updateChartOptions = (
     scales: {
       y: {
         display:
-          !selectedVitals.heartRate &&
-          !selectedVitals.bloodPressure &&
-          !selectedVitals.spO2 &&
-          !selectedVitals.respRate &&
-          !selectedVitals.temperature,
+          (!selectedVitals.heartRate &&
+            !selectedVitals.bloodPressure &&
+            !selectedVitals.spO2 &&
+            chartId === "chart1") ||
+          (!selectedVitals.respRate &&
+            !selectedVitals.temperature &&
+            chartId === "chart2"),
       },
-      yLeft1: {
+      yLeftChart1: {
         display:
-          selectedVitals.heartRate ||
-          selectedVitals.bloodPressure ||
-          selectedVitals.spO2,
+          chartId === "chart1" &&
+          (selectedVitals.heartRate || selectedVitals.bloodPressure),
         position: "left",
       },
-      yRight: {
-        display: selectedVitals.respRate,
+      yRightChart1: {
+        display: selectedVitals.spO2 && chartId === "chart1",
         position: "right",
       },
-      yLeft2: {
-        display: selectedVitals.temperature,
+      yLeftChart2: {
+        display: selectedVitals.temperature && chartId === "chart2",
         position: "left",
+      },
+      yRightChart2: {
+        display: selectedVitals.respRate && chartId === "chart2",
+        position: "right",
       },
     },
   };
@@ -100,32 +112,37 @@ export const updateChartOptions = (
     options.plugins &&
     options.plugins.annotation
   ) {
-    options.plugins.annotation.annotations =
-      showNormalRangeAnnotations(selectedVitals);
+    options.plugins.annotation.annotations = showNormalRangeAnnotations(
+      selectedVitals,
+      chartId
+    );
   }
 
   return options;
 };
 
-const showNormalRangeAnnotations = (selectedVitals: {
-  bloodPressure: boolean;
-  heartRate: boolean;
-  spO2: boolean;
-  temperature: boolean;
-  respRate: boolean;
-}) => {
+const showNormalRangeAnnotations = (
+  selectedVitals: {
+    bloodPressure: boolean;
+    heartRate: boolean;
+    spO2: boolean;
+    temperature: boolean;
+    respRate: boolean;
+  },
+  chartId: string
+) => {
   const normalRangeAnnotations: {
     [key: string]: any;
   } = {};
 
-  if (selectedVitals.heartRate) {
+  if (selectedVitals.heartRate && chartId === "chart1") {
     normalRangeAnnotations.heartRateNormal = {
       type: "box",
       yMin: 60,
       yMax: 100,
       backgroundColor: "rgb(255, 191, 0, 0.25)",
       borderWidth: 0,
-      yScaleID: "yLeft1",
+      yScaleID: "yLeftChart1",
     };
 
     normalRangeAnnotations.heartRateMinLabel = {
@@ -136,7 +153,7 @@ const showNormalRangeAnnotations = (selectedVitals: {
       font: {
         size: 12,
       },
-      yScaleID: "yLeft1",
+      yScaleID: "yLeftChart1",
     };
 
     normalRangeAnnotations.heartRateMaxLabel = {
@@ -147,18 +164,18 @@ const showNormalRangeAnnotations = (selectedVitals: {
       font: {
         size: 12,
       },
-      yScaleID: "yLeft1",
+      yScaleID: "yLeftChart1",
     };
   }
 
-  if (selectedVitals.spO2) {
+  if (selectedVitals.spO2 && chartId === "chart1") {
     normalRangeAnnotations.spO2Normal = {
       type: "box",
       yMin: 95,
       yMax: 100,
       backgroundColor: "rgb(64, 224, 208, 0.25)",
       borderWidth: 0,
-      yScaleID: "yLeft1",
+      yScaleID: "yRightChart1",
     };
 
     normalRangeAnnotations.spO2MinLabel = {
@@ -169,18 +186,18 @@ const showNormalRangeAnnotations = (selectedVitals: {
       font: {
         size: 12,
       },
-      yScaleID: "yLeft1",
+      yScaleID: "yRightChart1",
     };
   }
 
-  if (selectedVitals.bloodPressure) {
+  if (selectedVitals.bloodPressure && chartId === "chart1") {
     normalRangeAnnotations.bloodPressureSysNormal = {
       type: "box",
       yMin: 90,
       yMax: 120,
       backgroundColor: "rgb(210, 4, 45, 0.25)",
       borderWidth: 0,
-      yScaleID: "yLeft1",
+      yScaleID: "yLeftChart1",
     };
 
     normalRangeAnnotations.bloodPressureSysMinLabel = {
@@ -191,7 +208,7 @@ const showNormalRangeAnnotations = (selectedVitals: {
       font: {
         size: 12,
       },
-      yScaleID: "yLeft1",
+      yScaleID: "yLeftChart1",
     };
 
     normalRangeAnnotations.bloodPressureSysMaxLabel = {
@@ -202,7 +219,7 @@ const showNormalRangeAnnotations = (selectedVitals: {
       font: {
         size: 12,
       },
-      yScaleID: "yLeft1",
+      yScaleID: "yLeftChart1",
     };
 
     normalRangeAnnotations.bloodPressureDiaNormal = {
@@ -211,7 +228,7 @@ const showNormalRangeAnnotations = (selectedVitals: {
       yMax: 80,
       backgroundColor: "rgb(255, 117, 24, 0.25)",
       borderWidth: 0,
-      yScaleID: "yLeft1",
+      yScaleID: "yLeftChart1",
     };
 
     normalRangeAnnotations.bloodPressureDiaMinLabel = {
@@ -222,7 +239,7 @@ const showNormalRangeAnnotations = (selectedVitals: {
       font: {
         size: 12,
       },
-      yScaleID: "yLeft1",
+      yScaleID: "yLeftChart1",
     };
 
     normalRangeAnnotations.bloodPressureDiaMaxLabel = {
@@ -233,18 +250,18 @@ const showNormalRangeAnnotations = (selectedVitals: {
       font: {
         size: 12,
       },
-      yScaleID: "yLeft1",
+      yScaleID: "yLeftChart1",
     };
   }
 
-  if (selectedVitals.temperature) {
+  if (selectedVitals.temperature && chartId === "chart2") {
     normalRangeAnnotations.temperatureNormal = {
       type: "box",
       yMin: 36.2,
       yMax: 37.2,
       backgroundColor: "rgb(64, 224, 208, 0.25)",
       borderWidth: 0,
-      yScaleID: "yLeft2",
+      yScaleID: "yLeftChart2",
     };
 
     normalRangeAnnotations.temperatureMinLabel = {
@@ -255,7 +272,7 @@ const showNormalRangeAnnotations = (selectedVitals: {
       font: {
         size: 12,
       },
-      yScaleID: "yLeft2",
+      yScaleID: "yLeftChart2",
     };
 
     normalRangeAnnotations.temperatureMaxLabel = {
@@ -266,18 +283,18 @@ const showNormalRangeAnnotations = (selectedVitals: {
       font: {
         size: 12,
       },
-      yScaleID: "yLeft2",
+      yScaleID: "yLeftChart2",
     };
   }
 
-  if (selectedVitals.respRate) {
+  if (selectedVitals.respRate && chartId === "chart2") {
     normalRangeAnnotations.respRateNormal = {
       type: "box",
       yMin: 12,
       yMax: 18,
       backgroundColor: "rgb(47,79,79, 0.25)",
       borderWidth: 0,
-      yScaleID: "yRight",
+      yScaleID: "yRightChart2",
     };
 
     normalRangeAnnotations.respRateMinLabel = {
@@ -288,7 +305,7 @@ const showNormalRangeAnnotations = (selectedVitals: {
       font: {
         size: 12,
       },
-      yScaleID: "yRight",
+      yScaleID: "yRightChart2",
     };
 
     normalRangeAnnotations.respRateMaxLabel = {
@@ -299,12 +316,38 @@ const showNormalRangeAnnotations = (selectedVitals: {
       font: {
         size: 12,
       },
-      yScaleID: "yRight",
+      yScaleID: "yRightChart2",
     };
   }
 
-  console.log(normalRangeAnnotations);
   return normalRangeAnnotations;
+};
+
+const thresholds = {
+  heartRate: {
+    min: 60,
+    max: 100,
+  },
+  spO2: {
+    min: 95,
+    max: 100,
+  },
+  bloodPressureSys: {
+    min: 90,
+    max: 120,
+  },
+  bloodPressureDia: {
+    min: 60,
+    max: 80,
+  },
+  temperature: {
+    min: 36.2,
+    max: 37.2,
+  },
+  respRate: {
+    min: 12,
+    max: 18,
+  },
 };
 
 export const updateColorByThreshold = (
@@ -317,67 +360,91 @@ export const updateColorByThreshold = (
     | "temperature"
     | "respRate"
 ) => {
-  const thresholds = {
-    heartRate: {
-      min: 60,
-      max: 100,
-    },
-    spO2: {
-      min: 95,
-      max: 100,
-    },
-    bloodPressureSys: {
-      min: 90,
-      max: 120,
-    },
-    bloodPressureDia: {
-      min: 60,
-      max: 80,
-    },
-    temperature: {
-      min: 36.2,
-      max: 37.2,
-    },
-    respRate: {
-      min: 12,
-      max: 18,
-    },
-  };
-
   const p1 = reading.p1.raw;
+
   if (vitalType === "heartRate") {
     if (p1 < thresholds.heartRate.min) {
-      return colors.heartRate.low;
+      return vitalChartAttributes.heartRate.low;
     } else if (p1 > thresholds.heartRate.max) {
-      return colors.heartRate.high;
+      return vitalChartAttributes.heartRate.high;
     }
   } else if (vitalType === "spO2") {
     if (p1 < thresholds.spO2.min) {
-      return colors.spO2.low;
+      return vitalChartAttributes.spO2.low;
     }
   } else if (vitalType === "bloodPressureSys") {
     if (p1 < thresholds.bloodPressureSys.min) {
-      return colors.bloodPressureSys.low;
+      return vitalChartAttributes.bloodPressureSys.low;
     } else if (p1 > thresholds.bloodPressureSys.max) {
-      return colors.bloodPressureSys.high;
+      return vitalChartAttributes.bloodPressureSys.high;
     }
   } else if (vitalType === "bloodPressureDia") {
     if (p1 < thresholds.bloodPressureDia.min) {
-      return colors.bloodPressureDia.low;
+      return vitalChartAttributes.bloodPressureDia.low;
     } else if (p1 > thresholds.bloodPressureDia.max) {
-      return colors.bloodPressureDia.high;
+      return vitalChartAttributes.bloodPressureDia.high;
     }
   } else if (vitalType === "temperature") {
     if (p1 < thresholds.temperature.min) {
-      return colors.temperature.low;
+      return vitalChartAttributes.temperature.low;
     } else if (p1 > thresholds.temperature.max) {
-      return colors.temperature.high;
+      return vitalChartAttributes.temperature.high;
     }
   } else if (vitalType === "respRate") {
     if (p1 < thresholds.respRate.min) {
-      return colors.temperature.low;
+      return vitalChartAttributes.temperature.low;
     } else if (p1 > thresholds.respRate.max) {
-      return colors.respRate.high;
+      return vitalChartAttributes.respRate.high;
     }
   }
+};
+
+export const updateBorderDash = (reading: any) => {
+  const p0 = reading.p0.raw;
+  const p1 = reading.p1.raw;
+
+  if (p1 > p0) {
+    return [5, 5];
+  }
+};
+
+export const getGradient = (
+  context: any,
+  vitalType:
+    | "heartRate"
+    | "spO2"
+    | "bloodPressureSys"
+    | "bloodPressureDia"
+    | "temperature"
+    | "respRate"
+) => {
+  const chart = context.chart;
+  const { ctx, chartArea } = chart;
+
+  const yAxisScale = chart.scales[vitalChartAttributes[vitalType].yAxisID];
+
+  if (!chartArea) {
+    return;
+  }
+
+  const height = chart.height;
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, chart.height);
+  let yThresholdMax = yAxisScale.getPixelForValue(thresholds[vitalType].max);
+  let yThresholdMin = yAxisScale.getPixelForValue(thresholds[vitalType].min);
+
+  if (yThresholdMax !== -32768) {
+    let offsetMax = yThresholdMax / height;
+    let offsetMin = yThresholdMin / height;
+
+    if (0 < offsetMax && offsetMax < 1 && 0 < offsetMin && offsetMin < 1) {
+      gradient.addColorStop(0, "red");
+      gradient.addColorStop(offsetMin, "green");
+      gradient.addColorStop(offsetMin, "red");
+      gradient.addColorStop(offsetMax, "red");
+      gradient.addColorStop(offsetMax, "green");
+      gradient.addColorStop(1, "red");
+    }
+  }
+  return gradient;
 };

@@ -23,7 +23,13 @@ import {
   FormLabel,
   Grid,
 } from "@mui/material";
-import { colors, updateChartOptions, updateColorByThreshold } from "./utils";
+import {
+  vitalChartAttributes,
+  getGradient,
+  updateBorderDash,
+  updateChartOptions,
+  updateColorByThreshold,
+} from "./utils";
 
 interface PatientChartProps {
   patient?: Patient;
@@ -72,11 +78,11 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
   });
 
   const [selectedVitals, setSelectedVitals] = useState({
-    bloodPressure: true,
     heartRate: true,
-    spO2: true,
-    temperature: true,
-    respRate: true,
+    bloodPressure: false,
+    spO2: false,
+    temperature: false,
+    respRate: false,
   });
 
   const [selectedIndicators, setSelectedIndicators] = useState({
@@ -92,7 +98,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     setVitals(res);
   };
 
-  const updateChartData = () => {
+  const updateChartData = (chartId: string) => {
     const data: ChartData<"line"> = {
       labels: vitals.heartRate.map(
         (vitalReading) => vitalReading.datetime.split(" ")[1]
@@ -100,85 +106,92 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
       datasets: [] as Dataset[],
     };
 
-    if (selectedVitals.heartRate) {
-      data.datasets.push({
-        label: "Heart Rate (bpm)",
-        data: vitals.heartRate.map((vitalReading) => vitalReading.reading),
-        borderColor: colors.heartRate.normal,
-        segment: {
-          borderColor: (segment: any) =>
-            updateColorByThreshold(segment, "heartRate"),
-        },
-        yAxisID: "yLeft1",
-      } as Dataset);
-    }
+    if (chartId == "chart1") {
+      if (selectedVitals.heartRate) {
+        data.datasets.push({
+          label: "Heart Rate (bpm)",
+          data: vitals.heartRate.map((vitalReading) => vitalReading.reading),
+          borderColor: (context: any) => {
+            return getGradient(context, "heartRate");
+          },
+          segment: {
+            borderDash: (segment: any) => updateBorderDash(segment),
+          },
+          yAxisID: "yLeftChart1",
+        } as unknown as Dataset);
+      }
 
-    if (selectedVitals.spO2) {
-      data.datasets.push({
-        label: "Blood Oxygen (%)",
-        data: vitals.spO2.map((vitalReading) => vitalReading.reading),
-        borderColor: colors.spO2.normal,
-        segment: {
-          borderColor: (segment: any) =>
-            updateColorByThreshold(segment, "spO2"),
-        },
-        yAxisID: "yLeft1",
-      } as Dataset);
-    }
+      if (selectedVitals.spO2) {
+        data.datasets.push({
+          label: "Blood Oxygen (%)",
+          data: vitals.spO2.map((vitalReading) => vitalReading.reading),
+          borderColor: (context: any) => {
+            return getGradient(context, "spO2");
+          },
+          segment: {
+            borderDash: (segment: any) => updateBorderDash(segment),
+          },
+          yAxisID: "yRightChart1",
+        } as unknown as Dataset);
+      }
 
-    if (selectedVitals.bloodPressure) {
-      data.datasets.push({
-        label: "Blood Pressure Systolic (mm Hg)",
-        data: vitals.bloodPressureSys.map(
-          (vitalReading) => vitalReading.reading
-        ),
-        borderColor: colors.bloodPressureSys.normal,
-        segment: {
-          borderColor: (segment: any) =>
-            updateColorByThreshold(segment, "bloodPressureSys"),
-        },
-        yAxisID: "yLeft1",
-      } as Dataset);
-      data.datasets.push({
-        label: "Blood Pressure Diastolic (mm Hg)",
-        data: vitals.bloodPressureDia.map(
-          (vitalReading) => vitalReading.reading
-        ),
-        borderColor: colors.bloodPressureDia.normal,
-        segment: {
-          borderColor: (segment: any) =>
-            updateColorByThreshold(segment, "bloodPressureDia"),
-        },
-        yAxisID: "yLeft1",
-      } as Dataset);
-    }
+      if (selectedVitals.bloodPressure) {
+        data.datasets.push({
+          label: "Blood Pressure Systolic (mm Hg)",
+          data: vitals.bloodPressureSys.map(
+            (vitalReading) => vitalReading.reading
+          ),
+          borderColor: (context: any) => {
+            return getGradient(context, "bloodPressureSys");
+          },
+          segment: {
+            borderDash: (segment: any) => updateBorderDash(segment),
+          },
+          yAxisID: "yLeftChart1",
+        } as unknown as Dataset);
+        data.datasets.push({
+          label: "Blood Pressure Diastolic (mm Hg)",
+          data: vitals.bloodPressureDia.map(
+            (vitalReading) => vitalReading.reading
+          ),
+          borderColor: (context: any) => {
+            return getGradient(context, "bloodPressureDia");
+          },
+          segment: {
+            borderDash: (segment: any) => updateBorderDash(segment),
+          },
+          yAxisID: "yLeftChart1",
+        } as unknown as Dataset);
+      }
+    } else if (chartId == "chart2") {
+      if (selectedVitals.temperature) {
+        data.datasets.push({
+          label: "Temperature (°C)",
+          data: vitals.temperature.map((vitalReading) => vitalReading.reading),
+          borderColor: (context: any) => {
+            return getGradient(context, "temperature");
+          },
+          segment: {
+            borderDash: (segment: any) => updateBorderDash(segment),
+          },
+          yAxisID: "yLeftChart2",
+        } as unknown as Dataset);
+      }
 
-    if (selectedVitals.temperature) {
-      data.datasets.push({
-        label: "Temperature (°C)",
-        data: vitals.temperature.map((vitalReading) => vitalReading.reading),
-        borderColor: colors.temperature.normal,
-        segment: {
-          borderColor: (segment: any) =>
-            updateColorByThreshold(segment, "temperature"),
-        },
-        yAxisID: "yLeft2",
-      } as Dataset);
+      if (selectedVitals.respRate) {
+        data.datasets.push({
+          label: "Respiratory Rate (bpm)",
+          data: vitals.respRate.map((vitalReading) => vitalReading.reading),
+          borderColor: vitalChartAttributes.respRate.normal,
+          segment: {
+            borderColor: (segment: any) =>
+              updateColorByThreshold(segment, "respRate"),
+            borderDash: (segment: any) => updateBorderDash(segment),
+          },
+          yAxisID: "yRightChart2",
+        } as Dataset);
+      }
     }
-
-    if (selectedVitals.respRate) {
-      data.datasets.push({
-        label: "Respiratory Rate (bpm)",
-        data: vitals.respRate.map((vitalReading) => vitalReading.reading),
-        borderColor: colors.respRate.normal,
-        segment: {
-          borderColor: (segment: any) =>
-            updateColorByThreshold(segment, "respRate"),
-        },
-        yAxisID: "yRight",
-      } as Dataset);
-    }
-
     return data;
   };
 
@@ -280,7 +293,26 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           />
         </FormGroup>
       </Grid>
-      <Line data={updateChartData()} options={updateChartOptions(selectedVitals, selectedIndicators)} />
+      <Box sx={{ height: 400 }} id="chart1">
+        <Line
+          data={updateChartData("chart1")}
+          options={updateChartOptions(
+            selectedVitals,
+            selectedIndicators,
+            "chart1"
+          )}
+        />
+      </Box>
+      <Box sx={{ height: 400 }} id="chart2">
+        <Line
+          data={updateChartData("chart2")}
+          options={updateChartOptions(
+            selectedVitals,
+            selectedIndicators,
+            "chart2"
+          )}
+        />
+      </Box>
     </>
   );
 }
