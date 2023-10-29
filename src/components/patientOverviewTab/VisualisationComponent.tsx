@@ -29,9 +29,6 @@ import ClearIcon from "@mui/icons-material/Clear";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AddIcon from "@mui/icons-material/Add";
-import autoAnimate from "@formkit/auto-animate";
-
-const ResponsiveGridLayout = WidthProvider(Responsive);
 
 interface ComponentProp {
   patient: Patient | undefined;
@@ -39,11 +36,8 @@ interface ComponentProp {
 
 export default function VisualisationComponent(prop: ComponentProp) {
   const [retrieveLayout, setLayouts] = useState(prop.patient?.layout);
+  console.log(prop.patient);
   const [order, setOrder] = useState(["bpSys", "bpDia", "hr", "rr", "temp"]);
-  const parent = useRef(null);
-  useEffect(() => {
-    parent.current && autoAnimate(parent.current);
-  }, [parent]);
   const [drawerOrder, setDrawerOrder] = useState(["spo2"]);
   const colours: { [key: string]: string } = {
     rr: "rgb(255, 102, 102)",
@@ -96,24 +90,59 @@ export default function VisualisationComponent(prop: ComponentProp) {
     return (
       <ul>
         {order.map((chartType, index) => (
-          <div ref={parent}>
+          <div>
             <li className="flex items-center justify-start">
               <div className="w-1/5">
-                <LastUpdatedVital data={rrData} vital={chartType} />
+                <LastUpdatedVital
+                  data={
+                    chartType == "rr"
+                      ? rrData
+                      : chartType == "hr"
+                      ? hrData
+                      : chartType == "bpSys"
+                      ? bpSysData
+                      : chartType == "bpDia"
+                      ? bpDiaData
+                      : chartType == "temp"
+                      ? tempData
+                      : chartType == "spo2"
+                      ? spO2Data
+                      : placeholder_data
+                  }
+                  vital={chartType}
+                />
               </div>
-              <div className="w-3/5">
-                <LineChart width={500} height={300} data={rrData}>
-                  <Line
-                    type="monotone"
-                    dataKey="reading"
-                    stroke="#82ca9d"
-                    strokeWidth={3}
-                  />
-                  <CartesianGrid stroke="#ccc" strokeDasharray="1" />
-                  <XAxis dataKey="datetime"></XAxis>
-                  <YAxis />
-                  <Tooltip />
-                </LineChart>
+              <div className="w-4/5">
+                <ResponsiveContainer aspect={7}>
+                  <LineChart
+                    data={
+                      chartType == "rr"
+                        ? rrData
+                        : chartType == "hr"
+                        ? hrData
+                        : chartType == "bpSys"
+                        ? bpSysData
+                        : chartType == "bpDia"
+                        ? bpDiaData
+                        : chartType == "temp"
+                        ? tempData
+                        : chartType == "spo2"
+                        ? spO2Data
+                        : placeholder_data
+                    }
+                  >
+                    <Line
+                      type="monotone"
+                      dataKey="reading"
+                      stroke={colours[chartType]}
+                      strokeWidth={3}
+                    />
+                    <CartesianGrid stroke="#ccc" strokeDasharray="1" />
+                    <XAxis dataKey="datetime"></XAxis>
+                    <YAxis />
+                    <Tooltip />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
               <IconButton
                 size="small"
