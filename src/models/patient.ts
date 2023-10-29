@@ -11,6 +11,7 @@ export class Patient {
   name: string;
   nric: string;
   condition: string;
+  order: string[];
   picture?: string;
   addInfo?: string;
   copd?: boolean;
@@ -34,6 +35,7 @@ export class Patient {
     nric: string,
     condition: string,
     fallRiskScore: number,
+    order: string[],
     picture?: string,
     addInfo?: string,
     copd?: boolean,
@@ -53,6 +55,7 @@ export class Patient {
     this.acuityLevel = acuityLevel;
     this.name = name;
     this.nric = nric;
+    this.order = order;
     this.picture = picture;
     this.condition = condition;
     this.addInfo = addInfo;

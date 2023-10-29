@@ -35,10 +35,17 @@ interface ComponentProp {
 }
 
 export default function VisualisationComponent(prop: ComponentProp) {
-  const [retrieveLayout, setLayouts] = useState(prop.patient?.layout);
-  console.log(prop.patient);
   const [order, setOrder] = useState(["bpSys", "bpDia", "hr", "rr", "temp"]);
   const [drawerOrder, setDrawerOrder] = useState(["spo2"]);
+  // const [order, setOrder] = useState(prop.patient?.order);
+  // const [drawerOrder, setDrawerOrder] = useState(
+  //   ["bpSys", "bpDia", "hr", "rr", "temp", "spo2"].filter(
+  //     (item) => !order?.includes(item)
+  //   )
+  // );
+  // console.log(order);
+  // console.log(drawerOrder);
+
   const colours: { [key: string]: string } = {
     rr: "rgb(255, 102, 102)",
     hr: "rgb(255, 178, 102)",
@@ -177,10 +184,6 @@ export default function VisualisationComponent(prop: ComponentProp) {
   const [bpDiaData, setBpDiaData] = useState(placeholder_data);
   const [tempData, setTempData] = useState(placeholder_data);
   const [spO2Data, setSpO2Data] = useState(placeholder_data);
-
-  useEffect(() => {
-    setLayouts(prop.patient?.layout);
-  }, [prop.patient?.layout]);
 
   const [patientVitals, setPatientVitals] = useState<Vital>();
 
