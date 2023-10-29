@@ -1,4 +1,3 @@
-import { StringLiteral } from "typescript";
 import { Patient } from "./patient";
 import { Ward } from "./ward";
 
@@ -12,7 +11,16 @@ export class SmartBed {
   bedPosition: string;
   isBrakeSet: boolean;
   bedAlarmTriggered: boolean;
-  railStatus: boolean;
+  railStatus: {
+    left: {
+      upper: boolean;
+      lower: boolean;
+    };
+    right: {
+      upper: boolean;
+      lower: boolean;
+    };
+  };
   updatedAt: string;
   ward: Ward;
   roomNum: string;
@@ -24,7 +32,16 @@ export class SmartBed {
     createdAt: string,
     name: string,
     nurses: [],
-    railStatus: boolean,
+    railStatus: {
+      left: {
+        upper: boolean;
+        lower: boolean;
+      };
+      right: {
+        upper: boolean;
+        lower: boolean;
+      };
+    },
     updatedAt: string,
     ward: Ward,
     roomNum: string,
