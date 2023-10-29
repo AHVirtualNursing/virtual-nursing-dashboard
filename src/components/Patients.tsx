@@ -156,13 +156,15 @@ export default function Patients() {
 
   return (
     <div className="h-full overflow-auto scrollbar">
-      <table className="table-auto w-full border-collapse">
+      <table className="table-fixed w-full border-collapse">
         <thead className="text-sm text-left">
           {/* ------ column headers ------ */}
           <tr>
             <th></th>
             <th className="p-2">Patient</th>
             <th>Condition</th>
+            <th>Acuity Level</th>
+            <th>Fall Risk</th>
             <th>Bed</th>
             <th>Ward</th>
             <th>Blood Pressure</th>
@@ -194,7 +196,8 @@ export default function Patients() {
                 onChange={handleConditionSearch}
               />
             </td>
-            <TableSubHeader subheaderText="Bed No." />
+            <TableSubHeader subheaderText="" />
+            <TableSubHeader subheaderText="" />
             <TableSubHeader subheaderText="Ward No." />
             <TableSubHeader subheaderText="Result" />
             <TableSubHeader subheaderText="Reading" />
@@ -226,6 +229,16 @@ export default function Patients() {
                   id="patientCondition"
                   width="1/8"
                   data={pd.patient?.condition}
+                />
+                <TableDataRow
+                  id="acuity"
+                  width="1/12"
+                  data={pd.patient?.acuityLevel}
+                />
+                <TableDataRow
+                  id="fall-risk"
+                  width="1/12"
+                  data={pd.patient?.fallRiskScore}
                 />
                 <TableDataRow id="bedNum" width="1/12" data={pd.bedNum} />
                 <TableDataRow
