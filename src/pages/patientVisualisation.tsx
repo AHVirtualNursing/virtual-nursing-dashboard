@@ -2,7 +2,7 @@ import { Box, Button, Tab, Tabs } from "@mui/material";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import profilePic from "../../public/profilepic.jpg";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
 import VisualisationComponent from "@/components/patientOverviewTab/VisualisationComponent";
@@ -13,12 +13,17 @@ const PatientChart = dynamic(
   () => import("@/components/patientAnalyticsChart/patientAnalyticsChart"),
   { ssr: false }
 );
+import autoAnimate from "@formkit/auto-animate";
 
 const patientVisualisationPage = () => {
   const router = useRouter();
   const { bedId } = router.query;
   const [selectedBed, setSelectedBed] = useState<SmartBed>();
   const [currentTab, setCurrentTab] = useState("overview");
+  const parent = useRef(null);
+  useEffect(() => {
+    parent.current && autoAnimate(parent.current);
+  }, [parent]);
 
   useEffect(() => {
     fetchBedByBedId(bedId).then((res) => setSelectedBed(res));
@@ -71,7 +76,7 @@ const patientVisualisationPage = () => {
             </Box>
           </Box>
         </div>
-        <div className="bg-white rounded-2xl shadow-lg">
+        <div className="bg-white rounded-2xl shadow-lg" ref={parent}>
           <Tabs
             value={currentTab}
             onChange={handleTabChange}
