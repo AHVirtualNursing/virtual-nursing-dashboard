@@ -4,11 +4,21 @@ import React, { useState } from "react";
 type RangeSliderProps = {
   min: number;
   max: number;
+  lowerBound: number;
+  upperBound: number;
   label: string;
+  handleThresholds: Function;
 };
 
-function RangeSlider({ min, max, label }: RangeSliderProps) {
-  const [value, setValue] = useState<number[]>([20, 40, 60, 80]);
+const RangeSlider = ({
+  min,
+  max,
+  lowerBound,
+  upperBound,
+  label,
+  handleThresholds,
+}: RangeSliderProps) => {
+  const [value, setValue] = useState<number[]>([lowerBound, upperBound]);
   const marks = [
     {
       value: 0,
@@ -31,23 +41,28 @@ function RangeSlider({ min, max, label }: RangeSliderProps) {
       label: "200",
     },
   ];
+
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]);
+    handleThresholds(value);
   };
-  const [start, innerStart, innerEnd, end] = value;
+  const [start, end] = value;
 
   return (
     <div className="flex gap-6 p-2">
-      <span>{label}</span>
+      <span className="w-1/12">{label}</span>
       <Slider
         value={value}
-        min={0}
-        max={100}
+        min={min}
+        max={max}
         onChange={handleChange}
+        valueLabelDisplay="auto"
+        marks={marks}
+        disableSwap
         sx={{
           "& .MuiSlider-track": {
-            background: "transparent",
-            borderColor: "transparent",
+            background: "green",
+            borderColor: "green",
           },
           "& .MuiSlider-thumb": {
             background: "white",
@@ -57,7 +72,8 @@ function RangeSlider({ min, max, label }: RangeSliderProps) {
           },
           "& .MuiSlider-rail": {
             opacity: 1,
-            background: `linear-gradient(to right, red 0 ${start}%, orange ${start}% ${innerStart}%, green ${innerStart}% ${innerEnd}%, orange ${innerEnd}% ${end}%, red ${end}% )`,
+            // background: `linear-gradient(to right, red 0 ${start}%, orange ${start}% ${innerStart}%, green ${innerStart}% ${innerEnd}%, orange ${innerEnd}% ${end}%, red ${end}% 100% )`,
+            background: `linear-gradient(to right, red ${start}%, red ${end}%)`,
           },
           "& .MuiSlider-mark": {
             background: "none",
@@ -66,6 +82,6 @@ function RangeSlider({ min, max, label }: RangeSliderProps) {
       />
     </div>
   );
-}
+};
 
 export default RangeSlider;

@@ -1,4 +1,4 @@
-import { Box, Button, Tab, Tabs } from "@mui/material";
+import { Box, Tab, Tabs } from "@mui/material";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import profilePic from "../../public/profilepic.jpg";
@@ -9,6 +9,7 @@ import { Patient } from "@/models/patient";
 import VisualisationComponent from "@/components/VisualisationComponent";
 import dynamic from "next/dynamic";
 import PatientReport from "@/components/patientReport/patientReport";
+import AlertTabComponent from "@/components/patientAlertTab/AlertTabComponent";
 const PatientChart = dynamic(
   () => import("@/components/patientAnalyticsChart/patientAnalyticsChart"),
   { ssr: false }
@@ -80,15 +81,15 @@ const patientVisualisationPage = () => {
           <Tab value="alerts" label="Alerts" />
           <Tab value="reports" label="Reports" />
         </Tabs>
-        {
-          currentTab === "overview" ? (
-            <VisualisationComponent patient={selectedBed?.patient} />
-          ) : currentTab === "analytics" ? (
-            <PatientChart patient={selectedBed?.patient} />
-          ) : currentTab === "reports" ? (
-            <PatientReport patient={selectedBed?.patient} />
-          ) : currentTab === "alerts" ? null : null // to add alerts page
-        }
+        {currentTab === "overview" ? (
+          <VisualisationComponent patient={selectedBed?.patient} />
+        ) : currentTab === "analytics" ? (
+          <PatientChart patient={selectedBed?.patient} />
+        ) : currentTab === "reports" ? (
+          <PatientReport patient={selectedBed?.patient} />
+        ) : currentTab === "alerts" ? (
+          <AlertTabComponent patient={selectedBed?.patient} />
+        ) : null}
       </Box>
     </div>
   );
