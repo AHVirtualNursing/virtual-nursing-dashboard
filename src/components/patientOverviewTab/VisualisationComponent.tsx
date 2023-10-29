@@ -251,7 +251,7 @@ export default function VisualisationComponent(prop: ComponentProp) {
   }));
 
   return (
-    <div style={{ position: "relative" }}>
+    <div className="relative overflow-hidden">
       <AppBar position="static" color="inherit" elevation={0} open={open}>
         <Toolbar className="flex justify-end">
           <IconButton
