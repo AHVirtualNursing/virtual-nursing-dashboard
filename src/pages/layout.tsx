@@ -35,8 +35,8 @@ export default function layout({ children }: { children: React.ReactNode }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header />
-      <main className={`${styles.main} ${inter.className}`}>
-        <Sidebar />
+      <Sidebar />
+      <main className={`${inter.className} flex ml-20 h-screen`}>
         {children}
       </main>
     </div>
