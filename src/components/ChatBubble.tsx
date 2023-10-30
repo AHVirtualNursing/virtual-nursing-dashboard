@@ -7,9 +7,11 @@ import {
   lightIndigo,
 } from "@/styles/colorTheme";
 import { Box, IconButton, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { getFileByPresignedURL } from "@/pages/api/chat_api";
+import Image from "next/image";
 
 type ChatBubbleProps = {
   message: Message | undefined;
@@ -28,6 +30,19 @@ const ChatBubble = ({
 }: ChatBubbleProps) => {
   const isMsgFromVirtualNurse = message?.createdBy === virtualNurse?._id;
   const [hoverChatBubble, setHoverChatBubble] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string>();
+  const [imageLoading, setImageLoading] = useState(true);
+
+  useEffect(() => {
+    if (message === undefined) return;
+    if (message.imageUrl) {
+      getFileByPresignedURL(message.imageUrl).then((url) => {
+        if (url === null) return "";
+
+        setPhotoUrl(url);
+      });
+    }
+  }, [message]);
 
   const renderChatMessage = () => {
     let chatMessageRender = () => {
@@ -223,10 +238,14 @@ const ChatBubble = ({
                 Created On
               </Typography>
               <Typography style={{ whiteSpace: "pre-line" }}>
-                {new Date(message?.alert?.createdAt as string).toLocaleDateString()}{" "}
-                {new Date(message?.alert?.createdAt as string).toLocaleTimeString()}
+                {new Date(
+                  message?.alert?.createdAt as string
+                ).toLocaleDateString()}{" "}
+                {new Date(
+                  message?.alert?.createdAt as string
+                ).toLocaleTimeString()}
               </Typography>
-          </Box>
+            </Box>
             <Box
               sx={{
                 display: "flex",
@@ -320,7 +339,83 @@ const ChatBubble = ({
           )}
         </>
       )}
-      {renderChatMessage()}
+      {photoUrl ? (
+        <>
+          <Box
+            sx={{
+              padding: "10px",
+              backgroundColor: isMsgFromVirtualNurse ? indigo : lighterIndigo,
+              borderRadius: isMsgFromVirtualNurse
+                ? "15px 15px 0px 15px"
+                : "15px 15px 15px 0px",
+              maxWidth: "100%",
+              marginBottom: "10px",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Box
+              sx={{
+                display: "inline-block",
+                marginBottom: "10px",
+                alignSelf: isMsgFromVirtualNurse ? "flex-end" : "flex-start",
+              }}
+            >
+              {imageLoading && (
+                <>
+                  <Typography>Loading...</Typography>
+                </>
+              )}
+              <Image
+                onLoadStart={() => setImageLoading(true)}
+                onLoad={() => setImageLoading(false)}
+                src={photoUrl}
+                alt="Image"
+                width={375}
+                height={500}
+                style={{ borderRadius: "10px" }}
+              />
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignSelf: isMsgFromVirtualNurse ? "flex-end" : "flex-start",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: "12px",
+                  alignSelf: isMsgFromVirtualNurse ? "flex-end" : "flex-start",
+                }}
+              >
+                {new Date(message!.createdAt).toDateString()}
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "12px",
+                  alignSelf: isMsgFromVirtualNurse ? "flex-end" : "flex-start",
+                }}
+              >
+                {new Date(message!.createdAt)
+                  .toLocaleTimeString()
+                  .slice(
+                    0,
+                    new Date(message!.createdAt).toLocaleTimeString().length - 6
+                  )}
+                {new Date(message!.createdAt)
+                  .toLocaleTimeString()
+                  .slice(
+                    new Date(message!.createdAt).toLocaleTimeString().length - 2
+                  )
+                  .toLowerCase()}
+              </Typography>
+            </Box>
+          </Box>
+        </>
+      ) : (
+        <>{renderChatMessage()}</>
+      )}
     </Box>
   );
 };
