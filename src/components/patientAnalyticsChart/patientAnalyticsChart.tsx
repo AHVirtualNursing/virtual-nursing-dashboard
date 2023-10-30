@@ -24,11 +24,10 @@ import {
   Grid,
 } from "@mui/material";
 import {
-  vitalChartAttributes,
   getGradient,
   updateBorderDash,
   updateChartOptions,
-  updateColorByThreshold,
+  vitalChartAttributes,
 } from "./utils";
 
 interface PatientChartProps {
@@ -117,7 +116,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           segment: {
             borderDash: (segment: any) => updateBorderDash(segment),
           },
-          yAxisID: "yLeftChart1",
+          yAxisID: vitalChartAttributes.heartRate.yScaleID,
         } as unknown as Dataset);
       }
 
@@ -131,7 +130,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           segment: {
             borderDash: (segment: any) => updateBorderDash(segment),
           },
-          yAxisID: "yRightChart1",
+          yAxisID: vitalChartAttributes.spO2.yScaleID,
         } as unknown as Dataset);
       }
 
@@ -147,7 +146,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           segment: {
             borderDash: (segment: any) => updateBorderDash(segment),
           },
-          yAxisID: "yLeftChart1",
+          yAxisID: vitalChartAttributes.bloodPressure.yScaleID,
         } as unknown as Dataset);
         data.datasets.push({
           label: "Blood Pressure Diastolic (mm Hg)",
@@ -160,7 +159,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           segment: {
             borderDash: (segment: any) => updateBorderDash(segment),
           },
-          yAxisID: "yLeftChart1",
+          yAxisID: vitalChartAttributes.bloodPressure.yScaleID,
         } as unknown as Dataset);
       }
     } else if (chartId == "chart2") {
@@ -174,7 +173,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           segment: {
             borderDash: (segment: any) => updateBorderDash(segment),
           },
-          yAxisID: "yLeftChart2",
+          yAxisID: vitalChartAttributes.temperature.yScaleID,
         } as unknown as Dataset);
       }
 
@@ -182,14 +181,14 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
         data.datasets.push({
           label: "Respiratory Rate (bpm)",
           data: vitals.respRate.map((vitalReading) => vitalReading.reading),
-          borderColor: vitalChartAttributes.respRate.normal,
+          borderColor: (context: any) => {
+            return getGradient(context, "respRate");
+          },
           segment: {
-            borderColor: (segment: any) =>
-              updateColorByThreshold(segment, "respRate"),
             borderDash: (segment: any) => updateBorderDash(segment),
           },
-          yAxisID: "yRightChart2",
-        } as Dataset);
+          yAxisID: vitalChartAttributes.respRate.yScaleID,
+        } as unknown as Dataset);
       }
     }
     return data;
