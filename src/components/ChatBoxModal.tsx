@@ -165,14 +165,15 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
   };
 
   const handleSendPatientMessage = () => {
-    if (patientPreviewMessage === undefined || selectedChat === undefined) return;
+    if (patientPreviewMessage === undefined || selectedChat === undefined)
+      return;
 
     addNewPatientMessageToChat(
       selectedChat._id,
       patientPreviewMessage,
       virtualNurse!._id
     ).then((updatedChat) => {
-      console.log("UPDATED CHAT", updatedChat)
+      console.log("UPDATED CHAT", updatedChat);
       if (updatedChat === undefined) return;
       //capture selected Chat
       setSelectedChat(updatedChat);

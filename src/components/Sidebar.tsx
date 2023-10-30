@@ -8,7 +8,7 @@ import { ChatBox } from "./ChatBox";
 
 export default function Sidebar() {
   return (
-    <div className="left-0 flex flex-col fixed h-screen p-3 gap-4 w-14 bg-blue-900">
+    <div className="left-0 flex flex-col h-screen fixed p-3 gap-4 w-14 bg-blue-900">
       <SidebarTab
         name={"Patients"}
         icon={<GroupIcon style={{ color: "white" }} />}
