@@ -6,18 +6,21 @@ export class Alert {
   description: string;
   patient: Patient;
   notes?: string;
+  createdAt?: string;
 
   constructor(
     _id: string,
     status: string,
     description: string,
     patient: Patient,
-    notes?: string
+    notes?: string,
+    createdAt?: string
   ) {
     this._id = _id;
     this.status = status;
     this.description = description;
     this.patient = patient;
     this.notes = notes;
+    this.createdAt = createdAt;
   }
 }

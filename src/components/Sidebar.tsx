@@ -4,6 +4,7 @@ import BedIcon from "@mui/icons-material/Bed";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
 import Link from "next/link";
+import { ChatBox } from "./ChatBox";
 
 export default function Sidebar() {
   return (
@@ -28,6 +29,7 @@ export default function Sidebar() {
         icon={<SettingsSuggestIcon style={{ color: "white" }} />}
         dest={"configs"}
       />
+      <ChatBox />
     </div>
   );
 }
