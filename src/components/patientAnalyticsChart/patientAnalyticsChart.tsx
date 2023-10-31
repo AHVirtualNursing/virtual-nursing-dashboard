@@ -85,7 +85,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
   });
 
   const [selectedIndicators, setSelectedIndicators] = useState({
-    normalRange: false,
+    threshold: false,
+    exceedance: false,
     increasingTrend: false,
   });
 
@@ -112,7 +113,9 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           label: "Heart Rate (bpm)",
           data: vitals.heartRate.map((vitalReading) => vitalReading.reading),
           borderColor: (context: any) => {
-            return getGradient(context, "heartRate");
+            return selectedIndicators.exceedance
+              ? getGradient(context, "heartRate")
+              : vitalChartAttributes.heartRate.normal;
           },
           segment: {
             borderDash: (segment: any) =>
@@ -129,7 +132,9 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           label: "Blood Oxygen (%)",
           data: vitals.spO2.map((vitalReading) => vitalReading.reading),
           borderColor: (context: any) => {
-            return getGradient(context, "spO2");
+            return selectedIndicators.exceedance
+              ? getGradient(context, "spO2")
+              : vitalChartAttributes.spO2.normal;
           },
           segment: {
             borderDash: (segment: any) =>
@@ -148,7 +153,9 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
             (vitalReading) => vitalReading.reading
           ),
           borderColor: (context: any) => {
-            return getGradient(context, "bloodPressureSys");
+            return selectedIndicators.exceedance
+              ? getGradient(context, "bloodPressureSys")
+              : vitalChartAttributes.bloodPressure.normal;
           },
           segment: {
             borderDash: (segment: any) =>
@@ -164,7 +171,9 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
             (vitalReading) => vitalReading.reading
           ),
           borderColor: (context: any) => {
-            return getGradient(context, "bloodPressureDia");
+            return selectedIndicators.exceedance
+              ? getGradient(context, "bloodPressureDia")
+              : vitalChartAttributes.bloodPressure.normal;
           },
           segment: {
             borderDash: (segment: any) =>
@@ -181,7 +190,9 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           label: "Temperature (°C)",
           data: vitals.temperature.map((vitalReading) => vitalReading.reading),
           borderColor: (context: any) => {
-            return getGradient(context, "temperature");
+            return selectedIndicators.exceedance
+              ? getGradient(context, "temperature")
+              : vitalChartAttributes.temperature.normal;
           },
           segment: {
             borderDash: (segment: any) =>
@@ -198,7 +209,9 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           label: "Respiratory Rate (bpm)",
           data: vitals.respRate.map((vitalReading) => vitalReading.reading),
           borderColor: (context: any) => {
-            return getGradient(context, "respRate");
+            return selectedIndicators.exceedance
+              ? getGradient(context, "respRate")
+              : vitalChartAttributes.respRate.normal;
           },
           segment: {
             borderDash: (segment: any) =>
@@ -302,12 +315,22 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           <FormControlLabel
             control={
               <Checkbox
-                name="normalRange"
-                checked={selectedIndicators.normalRange}
+                name="threshold"
+                checked={selectedIndicators.threshold}
                 onChange={handleSelectedIndicatorsChange}
               />
             }
-            label="Normal Range"
+            label="Threshold"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="exceedance"
+                checked={selectedIndicators.exceedance}
+                onChange={handleSelectedIndicatorsChange}
+              />
+            }
+            label="Exceedance"
           />
           <FormControlLabel
             control={

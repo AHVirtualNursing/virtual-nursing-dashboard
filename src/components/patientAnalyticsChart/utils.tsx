@@ -2,25 +2,22 @@ import { ChartOptions } from "chart.js";
 
 export const vitalChartAttributes = {
   heartRate: {
-    low: "rgb(210, 4, 45)",
-    normal: "rgb(147, 197, 114)",
-    high: "rgb(210, 4, 45)",
+    normal: "green",
+    abnormal: "red",
     threshold: { min: 60, max: 100 },
     chartID: "chart1",
     yScaleID: "yLeftChart1",
   },
   spO2: {
-    low: "rgb(210, 4, 45)",
-    normal: "rgb(100, 149, 237)",
-    high: "rgb(210, 4, 45)",
+    normal: "rgb(100, 149, 23)",
+    abnormal: "red",
     threshold: { min: 95, max: 100 },
     chartID: "chart1",
     yScaleID: "yRightChart1",
   },
   bloodPressure: {
-    low: "rgb(210, 4, 45)",
-    normal: "rgb(0, 163, 108)",
-    high: "rgb(210, 4, 45)",
+    normal: "rgb(100, 149, 237)",
+    abnormal: "rgb(210, 4, 45)",
     threshold: {
       bloodPressureSys: {
         min: 90,
@@ -35,17 +32,15 @@ export const vitalChartAttributes = {
     yScaleID: "yLeftChart1",
   },
   temperature: {
-    low: "rgb(210, 4, 45)",
-    normal: "rgb(159, 226, 191)",
-    high: "rgb(210, 4, 45)",
+    normal: "green",
+    abnormal: "red",
     threshold: { min: 36.2, max: 37.2 },
     chartID: "chart2",
     yScaleID: "yLeftChart2",
   },
   respRate: {
-    low: "rgb(210, 4, 45)",
-    normal: "rgb(0, 163, 108)",
-    high: "rgb(210, 4, 45)",
+    normal: "rgb(100, 149, 237)",
+    abnormal: "rgb(210, 4, 45)",
     threshold: { min: 12, max: 18 },
     chartID: "chart2",
     yScaleID: "yRightChart2",
@@ -61,7 +56,7 @@ export const updateChartOptions = (
     respRate: boolean;
   },
   selectedIndicators: {
-    normalRange: boolean;
+    threshold: boolean;
   },
   chartId: string
 ) => {
@@ -127,7 +122,7 @@ export const updateChartOptions = (
   };
 
   if (
-    selectedIndicators.normalRange &&
+    selectedIndicators.threshold &&
     options.plugins &&
     options.plugins.annotation
   ) {
@@ -408,20 +403,52 @@ export const getGradient = (
     let offsetMin = yThresholdMin / height;
 
     if (0 < offsetMax && offsetMax < 1 && 0 < offsetMin && offsetMin < 1) {
-      gradient.addColorStop(0, "red");
-      gradient.addColorStop(offsetMin, "green");
-      gradient.addColorStop(offsetMin, "red");
-      gradient.addColorStop(offsetMax, "red");
-      gradient.addColorStop(offsetMax, "green");
-      gradient.addColorStop(1, "red");
+      if (
+        vitalType == "bloodPressureSys" ||
+        vitalType == "bloodPressureDia" ||
+        vitalType == "respRate"
+      ) {
+        gradient.addColorStop(0, vitalChartAttributes.bloodPressure.abnormal);
+        gradient.addColorStop(
+          offsetMin,
+          vitalChartAttributes.bloodPressure.normal
+        );
+        gradient.addColorStop(
+          offsetMin,
+          vitalChartAttributes.bloodPressure.abnormal
+        );
+        gradient.addColorStop(
+          offsetMax,
+          vitalChartAttributes.bloodPressure.abnormal
+        );
+        gradient.addColorStop(
+          offsetMax,
+          vitalChartAttributes.bloodPressure.normal
+        );
+        gradient.addColorStop(1, vitalChartAttributes.bloodPressure.abnormal);
+      } else if (vitalType == "heartRate" || vitalType == "temperature") {
+        gradient.addColorStop(0, vitalChartAttributes.heartRate.abnormal);
+        gradient.addColorStop(offsetMin, vitalChartAttributes.heartRate.normal);
+        gradient.addColorStop(
+          offsetMin,
+          vitalChartAttributes.heartRate.abnormal
+        );
+        gradient.addColorStop(
+          offsetMax,
+          vitalChartAttributes.heartRate.abnormal
+        );
+        gradient.addColorStop(offsetMax, vitalChartAttributes.heartRate.normal);
+        gradient.addColorStop(1, vitalChartAttributes.heartRate.abnormal);
+      }
+      // spO2
     } else if (offsetMax < 0 && offsetMax > -1) {
-      gradient.addColorStop(0, "green");
-      gradient.addColorStop(offsetMin, "green");
-      gradient.addColorStop(offsetMin, "red");
+      gradient.addColorStop(0, vitalChartAttributes.spO2.normal);
+      gradient.addColorStop(offsetMin, vitalChartAttributes.spO2.normal);
+      gradient.addColorStop(offsetMin, vitalChartAttributes.spO2.abnormal);
     } else if (offsetMin < 0 && offsetMax > -1) {
-      gradient.addColorStop(offsetMax, "red");
-      gradient.addColorStop(offsetMax, "green");
-      gradient.addColorStop(1, "green");
+      gradient.addColorStop(offsetMax, vitalChartAttributes.spO2.abnormal);
+      gradient.addColorStop(offsetMax, vitalChartAttributes.spO2.normal);
+      gradient.addColorStop(1, vitalChartAttributes.spO2.normal);
     }
   }
   return gradient;
