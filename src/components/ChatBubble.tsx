@@ -160,10 +160,6 @@ const ChatBubble = ({
                       sx={{
                         width: 80,
                         height: 80,
-                        marginLeft: "auto",
-                        marginRight: "auto",
-                        alignItems: "center",
-                        justifyContent: "center",
                         backgroundColor: lightIndigo,
                         borderRadius: "100%",
                         display: !patientImageLoading ? "none" : undefined,
@@ -180,8 +176,6 @@ const ChatBubble = ({
                       style={{
                         borderRadius: "50%",
                         objectFit: "cover",
-                        marginLeft: "auto",
-                        marginRight: "auto",
                         display: patientImageLoading ? "none" : undefined,
                       }}
                     />
