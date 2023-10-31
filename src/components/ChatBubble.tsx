@@ -19,6 +19,7 @@ type ChatBubbleProps = {
   handleDeleteMessage: (message: Message) => void;
   handleEditMessage: (message: Message) => void;
   enableActionsUponRightClick?: boolean;
+  showImageFullScreenModal: (imageUrl: string) => void;
 };
 
 const ChatBubble = ({
@@ -27,11 +28,23 @@ const ChatBubble = ({
   handleDeleteMessage,
   handleEditMessage,
   enableActionsUponRightClick,
+  showImageFullScreenModal,
 }: ChatBubbleProps) => {
   const isMsgFromVirtualNurse = message?.createdBy === virtualNurse?._id;
   const [hoverChatBubble, setHoverChatBubble] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string>();
   const [imageLoading, setImageLoading] = useState(true);
+  const [imageUri, setImageUri] = useState<string>();
+  const [patientImageLoading, setPatientImageLoading] = useState(false);
+
+  useEffect(() => {
+    if (message?.patient && message.patient.picture && imageUri === undefined) {
+      getFileByPresignedURL(message.patient.picture).then((url) => {
+        if (url === null) return "";
+        setImageUri(url);
+      });
+    }
+  }, [message, imageUri]);
 
   useEffect(() => {
     if (message === undefined) return;
@@ -141,14 +154,48 @@ const ChatBubble = ({
                   marginBottom: "10px",
                 }}
               >
-                <Box
-                  sx={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: "100%",
-                    backgroundColor: lightIndigo,
-                  }}
-                ></Box>
+                {imageUri ? (
+                  <>
+                    <Box
+                      sx={{
+                        width: 80,
+                        height: 80,
+                        marginLeft: "auto",
+                        marginRight: "auto",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: lightIndigo,
+                        borderRadius: "100%",
+                        display: !patientImageLoading ? "none" : undefined,
+                      }}
+                    ></Box>
+
+                    <Image
+                      onLoadStart={() => setPatientImageLoading(true)}
+                      onLoad={() => setPatientImageLoading(false)}
+                      src={imageUri}
+                      alt="Picture"
+                      width={80}
+                      height={80}
+                      style={{
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                        marginLeft: "auto",
+                        marginRight: "auto",
+                        display: patientImageLoading ? "none" : undefined,
+                      }}
+                    />
+                  </>
+                ) : (
+                  <Box
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: "100%",
+                      backgroundColor: lightIndigo,
+                    }}
+                  ></Box>
+                )}
                 <Box>
                   <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
                     Patient
@@ -292,7 +339,7 @@ const ChatBubble = ({
     <Box
       sx={{
         alignSelf: isMsgFromVirtualNurse ? "flex-end" : "flex-start",
-        maxWidth: "60%",
+        maxWidth: photoUrl ? "100%" : "60%",
         position: "relative",
       }}
       onContextMenu={(event) => {
@@ -361,7 +408,11 @@ const ChatBubble = ({
                 display: "inline-block",
                 marginBottom: "10px",
                 alignSelf: isMsgFromVirtualNurse ? "flex-end" : "flex-start",
+                "&:hover": {
+                  cursor: "pointer",
+                },
               }}
+              onClick={() => showImageFullScreenModal(photoUrl)}
             >
               {imageLoading && (
                 <>
