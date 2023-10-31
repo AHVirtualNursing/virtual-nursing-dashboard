@@ -87,10 +87,6 @@ const ChatPreview = ({
             sx={{
               width: 50,
               height: 50,
-              marginLeft: "auto",
-              marginRight: "auto",
-              alignItems: "center",
-              justifyContent: "center",
               backgroundColor: lightIndigo,
               borderRadius: "100%",
               display: !imageLoading ? "none" : undefined,
@@ -109,8 +105,6 @@ const ChatPreview = ({
             style={{
               borderRadius: "50%",
               objectFit: 'cover',
-              marginLeft: "auto",
-              marginRight: "auto",
               display: imageLoading ? "none" : undefined,
             }}
           />
