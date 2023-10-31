@@ -144,7 +144,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
   const getPatients = async (virtualNurse: any) => {
     let beds: SmartBed[] = await fetchBedsByWardId(virtualNurse.wards);
 
-    beds = beds.filter(
+    beds = beds?.filter(
       (bed) => bed.patient !== undefined && bed.patient !== null
     );
 
