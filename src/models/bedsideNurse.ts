@@ -15,6 +15,7 @@ export type BedSideNurse = {
   password: string;
   mobilePushNotificationToken: string;
   passwordReset: boolean;
+  picture?: string;
 };
 
 export enum NurseStatusEnum {

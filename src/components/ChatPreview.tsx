@@ -8,22 +8,36 @@ import {
 } from "@/styles/colorTheme";
 import { Box, IconButton, Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { getFileByPresignedURL } from "@/pages/api/chat_api";
 
 type ChatPreviewProps = {
   chat: Chat;
   onClickChatPreview: () => void;
   isSelected: boolean;
-  handleDeleteChat: () => void
+  handleDeleteChat: () => void;
 };
 
 const ChatPreview = ({
   chat,
   onClickChatPreview,
   isSelected,
-  handleDeleteChat
+  handleDeleteChat,
 }: ChatPreviewProps) => {
   const [rightClickEvent, setRightClickedEvent] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [imageUri, setImageUri] = useState<string>();
+
+  useEffect(() => {
+    if (chat.bedsideNurse.picture && imageUri === undefined) {
+      getFileByPresignedURL(chat.bedsideNurse.picture).then((url) => {
+        if (url === null) return "";
+
+        setImageUri(url);
+      });
+    }
+  }, [chat, imageUri]);
   return (
     <Box
       key={chat.bedsideNurse.name}
@@ -59,7 +73,7 @@ const ChatPreview = ({
               "&:hover": {
                 backgroundColor: lighterIndigo,
               },
-              zIndex: "100"
+              zIndex: "100",
             }}
             onClick={handleDeleteChat}
           >
@@ -67,14 +81,51 @@ const ChatPreview = ({
           </IconButton>
         </>
       )}
-      <Box
-        sx={{
-          width: 50,
-          height: 50,
-          borderRadius: "100%",
-          backgroundColor: lightIndigo,
-        }}
-      ></Box>
+      {imageUri ? (
+        <>
+          <Box
+            sx={{
+              width: 50,
+              height: 50,
+              marginLeft: "auto",
+              marginRight: "auto",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: lightIndigo,
+              borderRadius: "100%",
+              display: !imageLoading ? "none" : undefined,
+            }}
+          >
+            {imageLoading && <Typography>Loading Image...</Typography>}
+          </Box>
+
+          <Image
+            onLoadStart={() => setImageLoading(true)}
+            onLoad={() => setImageLoading(false)}
+            src={imageUri}
+            alt="Picture"
+            width={50}
+            height={50}
+            style={{
+              borderRadius: "50%",
+              objectFit: 'cover',
+              marginLeft: "auto",
+              marginRight: "auto",
+              display: imageLoading ? "none" : undefined,
+            }}
+          />
+        </>
+      ) : (
+        <Box
+          sx={{
+            width: 50,
+            height: 50,
+            borderRadius: "100%",
+            backgroundColor: lightIndigo,
+          }}
+        ></Box>
+      )}
+
       <Box sx={{ marginLeft: "20px" }}>
         <Typography sx={{ fontWeight: "bold", color: lightIndigo }}>
           {chat.bedsideNurse.name}
