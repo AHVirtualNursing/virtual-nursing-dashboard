@@ -86,6 +86,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
 
   const [selectedIndicators, setSelectedIndicators] = useState({
     normalRange: false,
+    increasingTrend: false,
   });
 
   useEffect(() => {
@@ -114,7 +115,10 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
             return getGradient(context, "heartRate");
           },
           segment: {
-            borderDash: (segment: any) => updateBorderDash(segment),
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
           },
           yAxisID: vitalChartAttributes.heartRate.yScaleID,
         } as unknown as Dataset);
@@ -128,7 +132,10 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
             return getGradient(context, "spO2");
           },
           segment: {
-            borderDash: (segment: any) => updateBorderDash(segment),
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
           },
           yAxisID: vitalChartAttributes.spO2.yScaleID,
         } as unknown as Dataset);
@@ -144,7 +151,10 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
             return getGradient(context, "bloodPressureSys");
           },
           segment: {
-            borderDash: (segment: any) => updateBorderDash(segment),
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
           },
           yAxisID: vitalChartAttributes.bloodPressure.yScaleID,
         } as unknown as Dataset);
@@ -157,7 +167,10 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
             return getGradient(context, "bloodPressureDia");
           },
           segment: {
-            borderDash: (segment: any) => updateBorderDash(segment),
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
           },
           yAxisID: vitalChartAttributes.bloodPressure.yScaleID,
         } as unknown as Dataset);
@@ -171,7 +184,10 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
             return getGradient(context, "temperature");
           },
           segment: {
-            borderDash: (segment: any) => updateBorderDash(segment),
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
           },
           yAxisID: vitalChartAttributes.temperature.yScaleID,
         } as unknown as Dataset);
@@ -185,7 +201,10 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
             return getGradient(context, "respRate");
           },
           segment: {
-            borderDash: (segment: any) => updateBorderDash(segment),
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
           },
           yAxisID: vitalChartAttributes.respRate.yScaleID,
         } as unknown as Dataset);
@@ -289,6 +308,16 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
               />
             }
             label="Normal Range"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="increasingTrend"
+                checked={selectedIndicators.increasingTrend}
+                onChange={handleSelectedIndicatorsChange}
+              />
+            }
+            label="Increasing Trend"
           />
         </FormGroup>
       </Grid>
