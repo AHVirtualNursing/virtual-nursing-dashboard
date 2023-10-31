@@ -50,11 +50,11 @@ export const updatePatientConditionByPatientId = async (
 
 export const updatePatientLayoutByPatientId = async (
   patientId: string | string[] | undefined,
-  layout: Layouts
+  order: string[]
 ) => {
   try {
     const res = await axios.put(`http://localhost:3001/patient/${patientId}`, {
-      layout: layout,
+      order: order,
     });
     return res;
   } catch (error) {

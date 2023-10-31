@@ -1,17 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Responsive, WidthProvider } from "react-grid-layout";
+import React, { useEffect, useState } from "react";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { Patient } from "@/models/patient";
 import { updatePatientLayoutByPatientId } from "@/pages/api/patients_api";
-import { Layouts } from "react-grid-layout";
-import { Layout } from "react-grid-layout";
 import { io } from "socket.io-client";
 import { useRouter } from "next/router";
 import { Vital } from "@/models/vital";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import LastUpdatedVital from "./LastUpdatedVital";
-import { Divider, Drawer, IconButton, List, Toolbar } from "@mui/material";
+import {
+  Button,
+  Divider,
+  Drawer,
+  IconButton,
+  List,
+  Toolbar,
+} from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -34,17 +38,26 @@ interface ComponentProp {
   patient: Patient | undefined;
 }
 
-export default function VisualisationComponent(prop: ComponentProp) {
-  const [order, setOrder] = useState(["bpSys", "bpDia", "hr", "rr", "temp"]);
-  const [drawerOrder, setDrawerOrder] = useState(["spo2"]);
-  // const [order, setOrder] = useState(prop.patient?.order);
-  // const [drawerOrder, setDrawerOrder] = useState(
-  //   ["bpSys", "bpDia", "hr", "rr", "temp", "spo2"].filter(
-  //     (item) => !order?.includes(item)
-  //   )
-  // );
-  // console.log(order);
-  // console.log(drawerOrder);
+export default function VisualisationComponent({ patient }: ComponentProp) {
+  // const [order, setOrder] = useState([]);
+  // const [drawerOrder, setDrawerOrder] = useState([]);
+  const [order, setOrder] = useState<string[]>([]);
+  const [drawerOrder, setDrawerOrder] = useState<string[]>([]);
+  const [changesMade, setChangeMade] = useState(false);
+  console.log(order);
+  console.log(drawerOrder);
+
+  useEffect(() => {
+    if (patient !== undefined) {
+      setOrder(patient.order!);
+      console.log(order);
+      const l = ["bpSys", "bpDia", "hr", "rr", "temp", "spo2"].filter(
+        (item) => !patient.order?.includes(item)
+      );
+      console.log(l);
+      setDrawerOrder(l);
+    }
+  }, [patient]);
 
   const colours: { [key: string]: string } = {
     rr: "rgb(255, 102, 102)",
@@ -68,11 +81,13 @@ export default function VisualisationComponent(prop: ComponentProp) {
   const addChartType = (chartType: string) => {
     setDrawerOrder(drawerOrder.filter((type) => type !== chartType));
     setOrder([chartType, ...order]);
+    setChangeMade(true);
   };
 
   const removeChartType = (chartType: string) => {
     setOrder(order.filter((type) => type !== chartType));
     setDrawerOrder([...drawerOrder, chartType]);
+    setChangeMade(true);
   };
 
   const moveChartUp = (chartType: string) => {
@@ -82,6 +97,7 @@ export default function VisualisationComponent(prop: ComponentProp) {
     updatedOrder[currentIndex] = updatedOrder[currentIndex - 1];
     updatedOrder[currentIndex - 1] = temp;
     setOrder(updatedOrder);
+    setChangeMade(true);
   };
 
   const moveChartDown = (chartType: string) => {
@@ -91,7 +107,15 @@ export default function VisualisationComponent(prop: ComponentProp) {
     updatedOrder[currentIndex] = updatedOrder[currentIndex + 1];
     updatedOrder[currentIndex + 1] = temp;
     setOrder(updatedOrder);
+    setChangeMade(true);
   };
+
+  function saveLayout() {
+    updatePatientLayoutByPatientId(patient?._id, order).then((res) =>
+      console.log(res)
+    );
+    setChangeMade(false);
+  }
 
   function Charts({ order }: { order: string[] }) {
     return (
@@ -188,30 +212,30 @@ export default function VisualisationComponent(prop: ComponentProp) {
   const [patientVitals, setPatientVitals] = useState<Vital>();
 
   useEffect(() => {
-    fetchVitalByVitalId(prop?.patient?.vital).then((res) =>
-      setPatientVitals(res)
-    );
-  }, [prop?.patient?.vital]);
+    if (patient !== undefined) {
+      fetchVitalByVitalId(patient.vital).then((res) => setPatientVitals(res));
+    }
+  }, [patient?.vital]);
 
   useEffect(() => {
     if (patientVitals) {
       if (patientVitals.spO2.length > 0) {
-        setSpO2Data(patientVitals.spO2);
+        setSpO2Data(patientVitals.spO2.slice(-7));
       }
       if (patientVitals.heartRate.length > 0) {
-        setHRData(patientVitals.heartRate);
+        setHRData(patientVitals.heartRate.slice(-7));
       }
       if (patientVitals.bloodPressureDia.length > 0) {
-        setBpDiaData(patientVitals.bloodPressureDia);
+        setBpDiaData(patientVitals.bloodPressureDia.slice(-7));
       }
       if (patientVitals.bloodPressureSys.length > 0) {
-        setBpSysData(patientVitals.bloodPressureSys);
+        setBpSysData(patientVitals.bloodPressureSys.slice(-7));
       }
       if (patientVitals.temperature.length > 0) {
-        setTempData(patientVitals.temperature);
+        setTempData(patientVitals.temperature.slice(-7));
       }
       if (patientVitals.respRate.length > 0) {
-        setRRData(patientVitals.respRate);
+        setRRData(patientVitals.respRate.slice(-7));
       }
     }
   }, [patientVitals]);
@@ -246,10 +270,7 @@ export default function VisualisationComponent(prop: ComponentProp) {
               datetime: formattedDateTime,
               reading: Math.floor(data.heartRate!),
             },
-          ];
-          if (newData.length > 7) {
-            return newData.slice(newData.length - 7);
-          }
+          ].slice(-7);
           return newData;
         });
       }
@@ -261,10 +282,7 @@ export default function VisualisationComponent(prop: ComponentProp) {
               datetime: formattedDateTime,
               reading: Math.floor(data.bloodPressureDia!),
             },
-          ];
-          if (newData.length > 7) {
-            return newData.slice(newData.length - 7);
-          }
+          ].slice(-7);
           return newData;
         });
       }
@@ -276,10 +294,7 @@ export default function VisualisationComponent(prop: ComponentProp) {
               datetime: formattedDateTime,
               reading: Math.floor(data.bloodPressureSys!),
             },
-          ];
-          if (newData.length > 7) {
-            return newData.slice(newData.length - 7);
-          }
+          ].slice(-7);
           return newData;
         });
       }
@@ -291,10 +306,7 @@ export default function VisualisationComponent(prop: ComponentProp) {
               datetime: formattedDateTime,
               reading: Math.floor(data.spO2!),
             },
-          ];
-          if (newData.length > 7) {
-            return newData.slice(newData.length - 7);
-          }
+          ].slice(-7);
           return newData;
         });
       }
@@ -363,6 +375,9 @@ export default function VisualisationComponent(prop: ComponentProp) {
     <div className="relative overflow-hidden">
       <AppBar position="static" color="inherit" elevation={0} open={open}>
         <Toolbar className="flex justify-end">
+          <Button disabled={!changesMade} onClick={saveLayout}>
+            Save Layout
+          </Button>
           <IconButton
             size="small"
             edge="start"
