@@ -32,6 +32,7 @@ import {
   deleteMessageFromChat,
   fetchBedsideNursesByBedId,
   fetchChatsForVirtualNurse,
+  reopenChat,
   updateMessageContent,
 } from "@/pages/api/chat_api";
 import { BedSideNurse } from "@/models/bedsideNurse";
@@ -52,6 +53,9 @@ type ChatBoxModalProps = {
 const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
   const [selectedChat, setSelectedChat] = useState<Chat>();
   const [chats, setChats] = useState<Chat[]>([]);
+  const [archivedAndUnarchivedChats, setArchivedAndUnarchivedChats] = useState<
+    Chat[]
+  >([]);
   const [hoverCreateButton, setHoverCreateButton] = useState(false);
   const [textMessage, setTextMessage] = useState("");
   const { data: sessionData } = useSession();
@@ -143,7 +147,10 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
     const chatsRes: Chat[] = await fetchChatsForVirtualNurse(nurse!._id);
 
     if (chatsRes === undefined) return;
-    setChats([...chatsRes]);
+
+    const unarchivedChats = chatsRes.filter((chat) => !chat.isArchived);
+    setChats([...unarchivedChats]);
+    setArchivedAndUnarchivedChats([...chatsRes]);
   };
 
   const getPatients = async (virtualNurse: any) => {
@@ -277,13 +284,17 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
 
   const handleCreateChat = () => {
     //check for existing chat
-    chats.forEach((chat) => {
+    archivedAndUnarchivedChats.forEach((chat) => {
       if (chat.bedsideNurse._id === selectedBedsideNurseId) {
-        setSelectedChat(chat);
-        handleCloseCreateChat();
-        setSelectedBedWithPatientId("");
-        setSelectedBedsideNurseId("");
-        return;
+        reopenChat(chat._id).then((reopenedChat) => {
+          if (reopenedChat === null) return;
+          setSelectedChat(chat);
+          setChats([...chats, reopenedChat]);
+          handleCloseCreateChat();
+          setSelectedBedWithPatientId("");
+          setSelectedBedsideNurseId("");
+          return;
+        });
       }
     });
 

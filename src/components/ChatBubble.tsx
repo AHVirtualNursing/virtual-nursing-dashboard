@@ -304,38 +304,40 @@ const ChatBubble = ({
     >
       {hoverChatBubble && (
         <>
-          <IconButton
-            sx={{
-              margin: isMsgFromVirtualNurse
-                ? "0px 20px 0px 0px"
-                : "0px 0px 0px 20px",
-              position: "absolute",
-              bottom: "15px",
-              left: isMsgFromVirtualNurse ? "-55px" : undefined,
-              right: isMsgFromVirtualNurse ? undefined : "-55px",
-            }}
-            onClick={() => handleDeleteMessage(message)}
-          >
-            <DeleteIcon sx={{ fontSize: "20", color: darkIndigo }} />
-          </IconButton>
           {isMsgFromVirtualNurse && (
-            <IconButton
-              sx={{
-                margin: isMsgFromVirtualNurse
-                  ? "0px 20px 0px 0px"
-                  : "0px 0px 0px 20px",
-                position: "absolute",
-                bottom: "15px",
-                left: isMsgFromVirtualNurse ? "-105px" : undefined,
-                right: isMsgFromVirtualNurse ? undefined : "-105px",
-              }}
-              onClick={() => {
-                setHoverChatBubble((prevState) => !prevState);
-                handleEditMessage(message);
-              }}
-            >
-              <EditIcon sx={{ fontSize: "20", color: darkIndigo }} />
-            </IconButton>
+            <>
+              <IconButton
+                sx={{
+                  margin: isMsgFromVirtualNurse
+                    ? "0px 20px 0px 0px"
+                    : "0px 0px 0px 20px",
+                  position: "absolute",
+                  bottom: "15px",
+                  left: isMsgFromVirtualNurse ? "-55px" : undefined,
+                  right: isMsgFromVirtualNurse ? undefined : "-55px",
+                }}
+                onClick={() => handleDeleteMessage(message)}
+              >
+                <DeleteIcon sx={{ fontSize: "20", color: darkIndigo }} />
+              </IconButton>
+              <IconButton
+                sx={{
+                  margin: isMsgFromVirtualNurse
+                    ? "0px 20px 0px 0px"
+                    : "0px 0px 0px 20px",
+                  position: "absolute",
+                  bottom: "15px",
+                  left: isMsgFromVirtualNurse ? "-105px" : undefined,
+                  right: isMsgFromVirtualNurse ? undefined : "-105px",
+                }}
+                onClick={() => {
+                  setHoverChatBubble((prevState) => !prevState);
+                  handleEditMessage(message);
+                }}
+              >
+                <EditIcon sx={{ fontSize: "20", color: darkIndigo }} />
+              </IconButton>
+            </>
           )}
         </>
       )}
