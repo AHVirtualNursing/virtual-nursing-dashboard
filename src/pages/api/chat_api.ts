@@ -100,6 +100,30 @@ export const fetchBedsideNursesByBedId = async (
   return null;
 };
 
+export const reopenChat = async (chatId: string) => {
+  try {
+    const url = process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + "/chat";
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chatId: chatId,
+        isArchived: false,
+      }),
+    });
+    const json = await response.json();
+    console.log("REOPENED", json);
+    return json;
+  } catch (error) {
+    console.error(error);
+  }
+
+  return null;
+}
+
 export const createChat = async (
   virtualNurseId: string,
   bedsideNurseId: string
@@ -160,7 +184,6 @@ export const updateMessageContent = async (
         },
       });
       const json = await response.json();
-      console.log("DELETED", json);
       return json;
     } catch (error) {
       console.error(error);
@@ -168,3 +191,31 @@ export const updateMessageContent = async (
   
     return null;
   }
+
+  export const getFileByPresignedURL = async (
+    imageUrl: string
+  ): Promise<string | null> => {
+    const url = process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + "/s3";
+    const bucket = "ah-virtual-nursing";
+    const presignedURL = imageUrl.split("uploads/")[1];
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          bucket: bucket,
+          key: "uploads/" + presignedURL,
+        }),
+      });
+      const json = await response.json();
+      console.log("retrieved file by presigned url", json.url);
+      return json.url;
+    } catch (error) {
+      console.error(error);
+    }
+  
+    return null;
+  };

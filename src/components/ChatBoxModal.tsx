@@ -32,6 +32,7 @@ import {
   deleteMessageFromChat,
   fetchBedsideNursesByBedId,
   fetchChatsForVirtualNurse,
+  reopenChat,
   updateMessageContent,
 } from "@/pages/api/chat_api";
 import { BedSideNurse } from "@/models/bedsideNurse";
@@ -43,6 +44,8 @@ import { Message } from "@/models/message";
 import ChatBubble from "./ChatBubble";
 import EditIcon from "@mui/icons-material/Edit";
 import Search from "./ChatSearch";
+import Image from "next/image";
+import { io } from "socket.io-client";
 
 type ChatBoxModalProps = {
   open: boolean;
@@ -52,12 +55,20 @@ type ChatBoxModalProps = {
 const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
   const [selectedChat, setSelectedChat] = useState<Chat>();
   const [chats, setChats] = useState<Chat[]>([]);
+  const [archivedAndUnarchivedChats, setArchivedAndUnarchivedChats] = useState<
+    Chat[]
+  >([]);
   const [hoverCreateButton, setHoverCreateButton] = useState(false);
   const [textMessage, setTextMessage] = useState("");
   const { data: sessionData } = useSession();
   const [virtualNurse, setVirtualNurse] = useState<VirtualNurse>();
   const [openCreateChat, setOpenCreateChat] = useState(false);
-  const handleCloseCreateChat = () => setOpenCreateChat(false);
+  const handleCloseCreateChat = () => {
+    setOpenCreateChat(false);
+    setSelectedBedWithPatientId("");
+    setSelectedBedsideNurseId("");
+    setBedsideNursesForSelectedPatient([]);
+  };
   const handleOpenCreateChat = () => setOpenCreateChat(true);
   const [selectedBedWithPatientId, setSelectedBedWithPatientId] = useState("");
   const [selectedBedsideNurseId, setSelectedBedsideNurseId] = useState("");
@@ -84,6 +95,18 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
     setAssignedBedsToSelectedChatBedsideNurse([]);
     setIsAddingPatientToChat(false);
   };
+
+  //This is for image loading and handling for full size
+  const [imageUrl, setImageUrl] = useState<string>();
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageFulLScreenVisible, setImageFullScreenVisible] = useState(false);
+  const showImageFullScreenModal = (imageUrl: string) => {
+    setImageUrl(imageUrl);
+    setImageFullScreenVisible(true);
+  };
+  const hideImageFullScreenModal = () => setImageFullScreenVisible(false);
+  const [imageWidth, setImageWidth] = useState(0);
+  const [imageHeight, setImageHeight] = useState(0);
 
   //This is to get the assigned patients that intersects bedside nurse and virtual nurse
   const [
@@ -133,18 +156,55 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
     }
   }, [shareToSelectedChatBedWithPatientId]);
 
+  useEffect(() => {
+    const calculateDimensions = () => {
+      const screenHeight = window.innerHeight * 0.9;
+      const screenWidth = (screenHeight / 4) * 3;
+      setImageWidth(screenWidth);
+      setImageHeight(screenHeight);
+    };
+
+    calculateDimensions();
+
+    // Add event listener for window resize
+    window.addEventListener("resize", calculateDimensions);
+
+    // Remove event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", calculateDimensions);
+    };
+  }, []);
+
+  useEffect(() => {
+    const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
+    socket.emit("connectVirtualNurseForChatMessaging", sessionData?.user.id);
+    socket.on("updateVirtualNurseChat", (updatedChat: Chat) => {
+      //update chats
+      if (updatedChat._id === selectedChat?._id) {
+        setSelectedChat(updatedChat);
+      }
+      getChatsForVirtualNurse(updatedChat.virtualNurse);
+    });
+    return () => {
+      socket.close();
+    };
+  }, []);
+
   const getChatsForVirtualNurse = async (nurse: VirtualNurse | undefined) => {
     if (nurse === undefined) return;
     const chatsRes: Chat[] = await fetchChatsForVirtualNurse(nurse!._id);
 
     if (chatsRes === undefined) return;
-    setChats([...chatsRes]);
+
+    const unarchivedChats = chatsRes.filter((chat) => !chat.isArchived);
+    setChats([...unarchivedChats]);
+    setArchivedAndUnarchivedChats([...chatsRes]);
   };
 
   const getPatients = async (virtualNurse: any) => {
     let beds: SmartBed[] = await fetchBedsByWardId(virtualNurse.wards);
 
-    beds = beds.filter(
+    beds = beds?.filter(
       (bed) => bed.patient !== undefined && bed.patient !== null
     );
 
@@ -165,14 +225,14 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
   };
 
   const handleSendPatientMessage = () => {
-    if (patientPreviewMessage === undefined || selectedChat === undefined) return;
+    if (patientPreviewMessage === undefined || selectedChat === undefined)
+      return;
 
     addNewPatientMessageToChat(
       selectedChat._id,
       patientPreviewMessage,
       virtualNurse!._id
     ).then((updatedChat) => {
-      console.log("UPDATED CHAT", updatedChat)
       if (updatedChat === undefined) return;
       //capture selected Chat
       setSelectedChat(updatedChat);
@@ -182,6 +242,8 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       setChats([...updatedChats, updatedChat]);
 
       //Send to websocket
+      const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
+      socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
     });
   };
 
@@ -204,6 +266,8 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       setChats([...updatedChats, updatedChat]);
 
       //Send to websocket
+      const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
+      socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
 
       //reset
       setTextMessage("");
@@ -229,6 +293,11 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       const updatedChats = chats.filter((chat) => chat._id !== updatedChat._id);
       setChats([...updatedChats, updatedChat]);
       setSelectedChat(updatedChat);
+
+      //Send to websocket
+      const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
+      socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
+
       handleCloseEditButton();
     });
   };
@@ -267,18 +336,26 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       //update chats
       const updatedChats = chats.filter((chat) => chat._id !== updatedChat._id);
       setChats([...updatedChats, updatedChat]);
+
+      //Send to websocket
+      const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
+      socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
     });
   };
 
   const handleCreateChat = () => {
     //check for existing chat
-    chats.forEach((chat) => {
+    archivedAndUnarchivedChats.forEach((chat) => {
       if (chat.bedsideNurse._id === selectedBedsideNurseId) {
-        setSelectedChat(chat);
-        handleCloseCreateChat();
-        setSelectedBedWithPatientId("");
-        setSelectedBedsideNurseId("");
-        return;
+        reopenChat(chat._id).then((reopenedChat) => {
+          if (reopenedChat === null) return;
+          setSelectedChat(chat);
+          setChats([...chats, reopenedChat]);
+          handleCloseCreateChat();
+          setSelectedBedWithPatientId("");
+          setSelectedBedsideNurseId("");
+          return;
+        });
       }
     });
 
@@ -489,6 +566,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                           virtualNurse={virtualNurse}
                           handleDeleteMessage={handleDeleteMessage}
                           handleEditMessage={handleEditMessage}
+                          showImageFullScreenModal={showImageFullScreenModal}
                         />
                       );
                     })}
@@ -858,6 +936,53 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
           >
             Share
           </Button>
+        </Box>
+      </Modal>
+      <Modal
+        open={imageFulLScreenVisible}
+        onClose={hideImageFullScreenModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            marginLeft: "auto",
+            marginRight: "auto",
+            marginTop: "20px",
+            width: imageWidth,
+            height: imageHeight,
+            bgcolor: lightIndigo,
+            borderRadius: 5,
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
+            border: "none",
+            outline: "none",
+            padding: "20px",
+            overflowY: "scroll",
+            msOverflowStyle: "none",
+            scrollbarWidth: "none",
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+          }}
+        >
+          {imageLoading && (
+            <>
+              <Typography>Loading...</Typography>
+            </>
+          )}
+          {imageUrl && (
+            <Image
+              onLoadStart={() => setImageLoading(true)}
+              onLoad={() => setImageLoading(false)}
+              src={imageUrl}
+              alt="Image"
+              width={imageWidth}
+              height={imageHeight}
+              style={{ borderRadius: "10px" }}
+            />
+          )}
         </Box>
       </Modal>
     </>
