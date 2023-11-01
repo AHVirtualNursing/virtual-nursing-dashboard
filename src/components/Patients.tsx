@@ -10,6 +10,8 @@ import { useSession } from "next-auth/react";
 import { fetchWardsByVirtualNurse } from "@/pages/api/nurse_api";
 import TableDataRow from "./TableDataRow";
 import { Ward } from "@/models/ward";
+import Link from "next/link";
+import DashboardAlertIcon from "./DashboardAlertIcon";
 
 type PatientListProps = {
   /**
@@ -52,6 +54,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
       );
     }
   };
+
   const fetchPatientVitals = async () => {
     let patientVitalsArr: any[] = [];
     for (const bedData of data) {
@@ -184,7 +187,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
         <tbody ref={parent}>
           {/* ------ sub-headers ------ */}
           <tr className="text-left">
-            <td></td>
+            <td className="text-xs underline text-center">ALERTS</td>
             <td className="p-2">
               <input
                 className="placeholder:italic placeholder:text-slate-400 w-2/3 rounded-md placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
@@ -223,7 +226,12 @@ export default function Patients({ selectedWard }: PatientListProps) {
             .map((pd, index) => (
               <tr className="text-left" key={pd._id}>
                 <td className="w-1/12 text-center">
-                  <CampaignIcon style={{ color: "red" }} />
+                  <Link
+                    href={`/patientVisualisation?patientId=${pd.patient?._id}&bedId=${pd._id}&viewAlerts=true`}
+                    as={`/patientVisualisation?patientId=${pd.patient?._id}&bedId=${pd._id}`}
+                  >
+                    <DashboardAlertIcon patientId={pd.patient?._id} />
+                  </Link>
                 </td>
                 <td
                   id="patientName"

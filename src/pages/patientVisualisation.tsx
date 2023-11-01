@@ -16,9 +16,12 @@ const PatientChart = dynamic(
 
 const patientVisualisationPage = () => {
   const router = useRouter();
-  const { bedId } = router.query;
+  console.log("router query", router.query);
+  const { bedId, viewAlerts } = router.query;
   const [selectedBed, setSelectedBed] = useState<SmartBed>();
-  const [currentTab, setCurrentTab] = useState("overview");
+  const [currentTab, setCurrentTab] = useState(
+    viewAlerts === "true" ? "alerts" : "overview"
+  );
 
   useEffect(() => {
     fetchBedByBedId(bedId).then((res) => setSelectedBed(res));
