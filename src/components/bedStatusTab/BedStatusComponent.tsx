@@ -8,7 +8,7 @@ interface BedProp {
 function BedStatusComponent(bedProp: BedProp) {
   console.log(bedProp.bed);
   return (
-    <div className="px-20 space-y-8 pb-20">
+    <div className="px-20 space-y-8 pb-20 overflow-auto scrollbar max-h-[420px]">
       <div id="bed-photo">
         <img
           src="https://healthjade.net/wp-content/uploads/2020/02/Low-Fowler%E2%80%99s-position.jpg"

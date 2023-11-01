@@ -36,7 +36,9 @@ export default function layout({ children }: { children: React.ReactNode }) {
       </Head>
       <Header />
       <Sidebar />
-      <main className={`${inter.className} flex ml-20 h-screen`}>
+      <main
+        className={`${inter.className} flex ml-20 min-h-[calc(100vh-85px)]`}
+      >
         {children}
       </main>
     </div>
