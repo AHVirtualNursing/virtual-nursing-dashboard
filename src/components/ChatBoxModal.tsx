@@ -45,6 +45,7 @@ import ChatBubble from "./ChatBubble";
 import EditIcon from "@mui/icons-material/Edit";
 import Search from "./ChatSearch";
 import Image from "next/image";
+import { io } from "socket.io-client";
 
 type ChatBoxModalProps = {
   open: boolean;
@@ -157,7 +158,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
 
   useEffect(() => {
     const calculateDimensions = () => {
-        const screenHeight = window.innerHeight * 0.9;
+      const screenHeight = window.innerHeight * 0.9;
       const screenWidth = (screenHeight / 4) * 3;
       setImageWidth(screenWidth);
       setImageHeight(screenHeight);
@@ -171,6 +172,21 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
     // Remove event listener on component unmount
     return () => {
       window.removeEventListener("resize", calculateDimensions);
+    };
+  }, []);
+
+  useEffect(() => {
+    const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
+    socket.emit("connectVirtualNurseForChatMessaging", sessionData?.user.id);
+    socket.on("updateVirtualNurseChat", (updatedChat: Chat) => {
+      //update chats
+      if (updatedChat._id === selectedChat?._id) {
+        setSelectedChat(updatedChat);
+      }
+      getChatsForVirtualNurse(updatedChat.virtualNurse);
+    });
+    return () => {
+      socket.close();
     };
   }, []);
 
@@ -226,6 +242,8 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       setChats([...updatedChats, updatedChat]);
 
       //Send to websocket
+      const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
+      socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
     });
   };
 
@@ -248,6 +266,8 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       setChats([...updatedChats, updatedChat]);
 
       //Send to websocket
+      const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
+      socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
 
       //reset
       setTextMessage("");
@@ -273,6 +293,11 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       const updatedChats = chats.filter((chat) => chat._id !== updatedChat._id);
       setChats([...updatedChats, updatedChat]);
       setSelectedChat(updatedChat);
+
+      //Send to websocket
+      const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
+      socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
+
       handleCloseEditButton();
     });
   };
@@ -311,6 +336,10 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       //update chats
       const updatedChats = chats.filter((chat) => chat._id !== updatedChat._id);
       setChats([...updatedChats, updatedChat]);
+
+      //Send to websocket
+      const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
+      socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
     });
   };
 
