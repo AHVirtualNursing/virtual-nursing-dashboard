@@ -1,8 +1,8 @@
 import React from "react";
 
 export default function TableSubHeader({
-                                         subheaderText,
-                                       }: {
+  subheaderText,
+}: {
   subheaderText: string;
 }) {
   return (
