@@ -4,6 +4,7 @@ import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
 import { Alert } from "@/models/alert";
 import { io } from "socket.io-client";
 import { useSession } from "next-auth/react";
+import Badge from "@mui/material/Badge";
 
 type DashboardAlertIconProps = {
   patientId: string | undefined;
@@ -32,14 +33,15 @@ const DashboardAlertIcon = ({ patientId }: DashboardAlertIconProps) => {
   }, [alertsList.length]);
 
   return (
-    <td className="w-1/12 text-center">
-      <div id="iconBadgeContainer" className="relative">
+    <div id="iconBadgeContainer" className="relative">
+      {/* <CampaignIcon style={{ color: "red", display: "inline-block" }} />
+      <div className="text-xs absolute border-solid border-2 -top-2 left-20 border-slate-100 bg-slate-100">
+        {patientAlerts && patientAlerts.length}
+      </div> */}
+      <Badge badgeContent={patientAlerts.length} color="primary">
         <CampaignIcon style={{ color: "red" }} />
-        <div className="absolute text-xs top-[-10px] left-[75px] border-solid border-2 border-slate-100 bg-slate-100">
-          {patientAlerts && patientAlerts.length}
-        </div>
-      </div>
-    </td>
+      </Badge>
+    </div>
   );
 };
 
