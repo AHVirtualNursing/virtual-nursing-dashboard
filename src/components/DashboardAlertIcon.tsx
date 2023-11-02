@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
 import { Alert } from "@/models/alert";
+import { io } from "socket.io-client";
+import { useSession } from "next-auth/react";
 
 type DashboardAlertIconProps = {
   patientId: string | undefined;
@@ -9,23 +11,25 @@ type DashboardAlertIconProps = {
 
 const DashboardAlertIcon = ({ patientId }: DashboardAlertIconProps) => {
   const [patientAlerts, setPatientAlerts] = useState<Alert[]>([]);
+  const [alertsList, setAlertsList] = useState<Alert[]>([]);
+  const { data: sessionData } = useSession();
   useEffect(() => {
-    // const eventSource = new EventSource(
-    //   `http://localhost:3001/patient/${patientId}/alerts`
-    // );
-    // eventSource.addEventListener("alert", (event) => {
-    //   const result = JSON.parse(event.data);
-    //   console.log(result)
-    //   setPatientAlerts(result);
-    // });
-    // return () => {
-    //   eventSource.close();
-    // };
+    const socket = io("http://localhost:3001");
+    const nurseId = sessionData?.user.id;
+    socket.emit("alertConnections", nurseId);
+    socket.on("patientAlertAdded", (data: any) => {
+      setAlertsList(data);
+    });
+    socket.on("patientAlertDeleted", (data) => {
+      setAlertsList(data);
+    });
     fetchAlertsByPatientId(patientId).then((alerts) => {
-      console.log("patient alerts", alerts);
       setPatientAlerts(alerts);
     });
-  }, [patientAlerts.length]);
+    return () => {
+      socket.close();
+    };
+  }, [alertsList.length]);
 
   return (
     <td className="w-1/12 text-center">
