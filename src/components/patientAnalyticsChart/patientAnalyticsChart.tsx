@@ -2,6 +2,7 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart,
+  ChartData,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -15,8 +16,19 @@ import annotationPlugin from "chartjs-plugin-annotation";
 import { Patient } from "@/models/patient";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import FormGroup from "@mui/material/FormGroup";
-import { Checkbox, FormControlLabel, FormLabel, Grid } from "@mui/material";
-import { showNormalRangeAnnotations } from "./patientAnalyticsChartOptions";
+import {
+  Box,
+  Checkbox,
+  FormControlLabel,
+  FormLabel,
+  Grid,
+} from "@mui/material";
+import {
+  getGradient,
+  updateBorderDash,
+  updateChartOptions,
+  vitalChartAttributes,
+} from "./utils";
 
 interface PatientChartProps {
   patient?: Patient;
@@ -38,6 +50,8 @@ interface VitalData {
   spO2: VitalReading[];
   bloodPressureSys: VitalReading[];
   bloodPressureDia: VitalReading[];
+  temperature: VitalReading[];
+  respRate: VitalReading[];
 }
 
 export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
@@ -58,16 +72,22 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     spO2: [],
     bloodPressureSys: [],
     bloodPressureDia: [],
+    temperature: [],
+    respRate: [],
   });
 
   const [selectedVitals, setSelectedVitals] = useState({
-    bloodPressure: true,
     heartRate: true,
-    spO2: true,
+    bloodPressure: false,
+    spO2: false,
+    temperature: false,
+    respRate: false,
   });
 
   const [selectedIndicators, setSelectedIndicators] = useState({
-    normalRange: false,
+    threshold: false,
+    exceedance: false,
+    increasingTrend: false,
   });
 
   useEffect(() => {
@@ -79,171 +99,131 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     setVitals(res);
   };
 
-  const colors = {
-    heartRate: {
-      low: "rgb(255, 191, 0)",
-      normal: "rgb(147, 197, 114)",
-      high: "rgb(255, 191, 0)",
-    },
-    spO2: {
-      low: "rgb(64, 224, 208)",
-      normal: "rgb(100, 149, 237)",
-      high: "rgb(255, 0, 255)",
-    },
-    bloodPressureSys: {
-      low: "rgb(210, 4, 45)",
-      normal: "rgb(0, 163, 108)",
-      high: "rgb(210, 4, 45)",
-    },
-    bloodPressureDia: {
-      low: "rgb(255, 117, 24)",
-      normal: "rgb(159, 226, 191)",
-      high: "rgb(255, 117, 24)",
-    },
-  };
-
-  const updateColorByThreshold = (
-    reading: any,
-    vitalType: "heartRate" | "spO2" | "bloodPressureSys" | "bloodPressureDia"
-  ) => {
-    const thresholds = {
-      heartRate: {
-        min: 60,
-        max: 100,
-      },
-      spO2: {
-        min: 95,
-        max: 100,
-      },
-      bloodPressureSys: {
-        min: 90,
-        max: 120,
-      },
-      bloodPressureDia: {
-        min: 60,
-        max: 80,
-      },
-    };
-
-    const p1 = reading.p1.raw;
-    if (vitalType === "heartRate") {
-      if (p1 < thresholds.heartRate.min) {
-        return colors.heartRate.low;
-      } else if (p1 > thresholds.heartRate.max) {
-        return colors.heartRate.high;
-      }
-    } else if (vitalType === "spO2") {
-      if (p1 < thresholds.spO2.min) {
-        return colors.spO2.low;
-      }
-    } else if (vitalType === "bloodPressureSys") {
-      if (p1 < thresholds.bloodPressureSys.min) {
-        return colors.bloodPressureSys.low;
-      } else if (p1 > thresholds.bloodPressureSys.max) {
-        return colors.bloodPressureSys.high;
-      }
-    } else if (vitalType === "bloodPressureDia") {
-      if (p1 < thresholds.bloodPressureDia.min) {
-        return colors.bloodPressureDia.low;
-      } else if (p1 > thresholds.bloodPressureDia.max) {
-        return colors.bloodPressureDia.high;
-      }
-    }
-  };
-
-  const updateChartData = () => {
-    const data = {
+  const updateChartData = (chartId: string) => {
+    const data: ChartData<"line"> = {
       labels: vitals.heartRate.map(
         (vitalReading) => vitalReading.datetime.split(" ")[1]
       ),
       datasets: [] as Dataset[],
     };
 
-    if (selectedVitals.heartRate) {
-      data.datasets.push({
-        label: "Heart Rate (bpm)",
-        data: vitals.heartRate.map((vitalReading) => vitalReading.reading),
-        borderColor: colors.heartRate.normal,
-        segment: {
-          borderColor: (segment: any) =>
-            updateColorByThreshold(segment, "heartRate"),
-        },
-        spanGaps: true,
-      } as Dataset);
-    }
+    if (chartId == "chart1") {
+      if (selectedVitals.heartRate) {
+        data.datasets.push({
+          label: "Heart Rate (bpm)",
+          data: vitals.heartRate.map((vitalReading) => vitalReading.reading),
+          borderColor: (context: any) => {
+            return selectedIndicators.exceedance
+              ? getGradient(context, "heartRate")
+              : vitalChartAttributes.heartRate.normal;
+          },
+          segment: {
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
+          },
+          yAxisID: vitalChartAttributes.heartRate.yScaleID,
+        } as unknown as Dataset);
+      }
 
-    if (selectedVitals.spO2) {
-      data.datasets.push({
-        label: "Blood Oxygen (%)",
-        data: vitals.spO2.map((vitalReading) => vitalReading.reading),
-        borderColor: colors.spO2.normal,
-        segment: {
-          borderColor: (segment: any) =>
-            updateColorByThreshold(segment, "spO2"),
-        },
-      } as Dataset);
-    }
+      if (selectedVitals.spO2) {
+        data.datasets.push({
+          label: "Blood Oxygen (%)",
+          data: vitals.spO2.map((vitalReading) => vitalReading.reading),
+          borderColor: (context: any) => {
+            return selectedIndicators.exceedance
+              ? getGradient(context, "spO2")
+              : vitalChartAttributes.spO2.normal;
+          },
+          segment: {
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
+          },
+          yAxisID: vitalChartAttributes.spO2.yScaleID,
+        } as unknown as Dataset);
+      }
 
-    if (selectedVitals.bloodPressure) {
-      data.datasets.push({
-        label: "Blood Pressure Systolic (mm Hg)",
-        data: vitals.bloodPressureSys.map(
-          (vitalReading) => vitalReading.reading
-        ),
-        borderColor: colors.bloodPressureSys.normal,
-        segment: {
-          borderColor: (segment: any) =>
-            updateColorByThreshold(segment, "bloodPressureSys"),
-        },
-      } as Dataset);
-      data.datasets.push({
-        label: "Blood Pressure Diastolic (mm Hg)",
-        data: vitals.bloodPressureDia.map(
-          (vitalReading) => vitalReading.reading
-        ),
-        borderColor: colors.bloodPressureDia.normal,
-        segment: {
-          borderColor: (segment: any) =>
-            updateColorByThreshold(segment, "bloodPressureDia"),
-        },
-      } as Dataset);
-    }
+      if (selectedVitals.bloodPressure) {
+        data.datasets.push({
+          label: "Blood Pressure Systolic (mm Hg)",
+          data: vitals.bloodPressureSys.map(
+            (vitalReading) => vitalReading.reading
+          ),
+          borderColor: (context: any) => {
+            return selectedIndicators.exceedance
+              ? getGradient(context, "bloodPressureSys")
+              : vitalChartAttributes.bloodPressure.normal;
+          },
+          segment: {
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
+          },
+          yAxisID: vitalChartAttributes.bloodPressure.yScaleID,
+        } as unknown as Dataset);
+        data.datasets.push({
+          label: "Blood Pressure Diastolic (mm Hg)",
+          data: vitals.bloodPressureDia.map(
+            (vitalReading) => vitalReading.reading
+          ),
+          borderColor: (context: any) => {
+            return selectedIndicators.exceedance
+              ? getGradient(context, "bloodPressureDia")
+              : vitalChartAttributes.bloodPressure.normal;
+          },
+          segment: {
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
+          },
+          yAxisID: vitalChartAttributes.bloodPressure.yScaleID,
+        } as unknown as Dataset);
+      }
+    } else if (chartId == "chart2") {
+      if (selectedVitals.temperature) {
+        data.datasets.push({
+          label: "Temperature (°C)",
+          data: vitals.temperature.map((vitalReading) => vitalReading.reading),
+          borderColor: (context: any) => {
+            return selectedIndicators.exceedance
+              ? getGradient(context, "temperature")
+              : vitalChartAttributes.temperature.normal;
+          },
+          segment: {
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
+          },
+          yAxisID: vitalChartAttributes.temperature.yScaleID,
+        } as unknown as Dataset);
+      }
 
+      if (selectedVitals.respRate) {
+        data.datasets.push({
+          label: "Respiratory Rate (bpm)",
+          data: vitals.respRate.map((vitalReading) => vitalReading.reading),
+          borderColor: (context: any) => {
+            return selectedIndicators.exceedance
+              ? getGradient(context, "respRate")
+              : vitalChartAttributes.respRate.normal;
+          },
+          segment: {
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
+          },
+          yAxisID: vitalChartAttributes.respRate.yScaleID,
+        } as unknown as Dataset);
+      }
+    }
     return data;
-  };
-
-  const updateChartOptions = () => {
-    const options = {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: {},
-        title: {
-          display: true,
-          text: "Patient Vitals Chart",
-        },
-        zoom: {
-          zoom: {
-            wheel: {
-              enabled: true,
-            },
-          },
-          pan: {
-            enabled: true,
-          },
-        },
-        annotation: {
-          annotations: {},
-        },
-      },
-    };
-
-    if (selectedIndicators.normalRange) {
-      options.plugins.annotation.annotations =
-        showNormalRangeAnnotations(selectedVitals);
-    }
-
-    return options;
   };
 
   const handleSelectedVitalsChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -303,9 +283,28 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
             }
             label="Blood Pressure"
           />
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="temperature"
+                checked={selectedVitals.temperature}
+                onChange={handleSelectedVitalsChange}
+              />
+            }
+            label="Temperature"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="respRate"
+                checked={selectedVitals.respRate}
+                onChange={handleSelectedVitalsChange}
+              />
+            }
+            label="Respiratory Rate"
+          />
         </FormGroup>
       </Grid>
-
       <Grid item xs={6}>
         <FormGroup id="indicators" sx={{ flexDirection: "row" }}>
           <FormLabel
@@ -316,16 +315,55 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           <FormControlLabel
             control={
               <Checkbox
-                name="normalRange"
-                checked={selectedIndicators.normalRange}
+                name="threshold"
+                checked={selectedIndicators.threshold}
                 onChange={handleSelectedIndicatorsChange}
               />
             }
-            label="Normal Range"
+            label="Threshold"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="exceedance"
+                checked={selectedIndicators.exceedance}
+                onChange={handleSelectedIndicatorsChange}
+              />
+            }
+            label="Exceedance"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="increasingTrend"
+                checked={selectedIndicators.increasingTrend}
+                onChange={handleSelectedIndicatorsChange}
+              />
+            }
+            label="Increasing Trend"
           />
         </FormGroup>
       </Grid>
-      <Line data={updateChartData()} options={updateChartOptions()} />
+      <Box sx={{ height: 400 }} id="chart1">
+        <Line
+          data={updateChartData("chart1")}
+          options={updateChartOptions(
+            selectedVitals,
+            selectedIndicators,
+            "chart1"
+          )}
+        />
+      </Box>
+      <Box sx={{ height: 400 }} id="chart2">
+        <Line
+          data={updateChartData("chart2")}
+          options={updateChartOptions(
+            selectedVitals,
+            selectedIndicators,
+            "chart2"
+          )}
+        />
+      </Box>
     </>
   );
 }
