@@ -154,26 +154,10 @@ export default function Wards() {
       </div>
       <div className="grid grid-cols-2 gap-4 flex" ref={parent}>
         {data.map((pd, index) => (
-          <div className="bg-white rounded-2xl p-4 shadow-lg">
-            {/* <div className="flex items-center">
-              <img width={40} src={profilePic.src} />
-              <div className="text-left p-4">
-                <h3>{pd.patient?.name}</h3>
-                <p>
-                  Ward: {pd.ward.wardNum} Bed: {pd.bedNum}
-                </p>
-              </div>
-              <img
-                src="https://healthjade.net/wp-content/uploads/2020/02/Low-Fowler%E2%80%99s-position.jpg"
-                alt="Patient on bed raised 15-30 degrees"
-                className="object-contain w-96 h-48"
-              />
-            </div>
-            <div className="text-left">
-              <p>Condition: {pd.patient?.condition}</p>
-              <p>Acuity Level: {pd.patient?.acuityLevel}</p>
-              <p>Fall Risk Score: {pd.patient?.fallRiskScore}</p>
-            </div> */}
+          <div
+            className="bg-white rounded-2xl p-4 shadow-lg hover:cursor-pointer hover:bg-blue-100"
+            onClick={() => viewPatientVisualisation(pd.patient?._id, pd._id)}
+          >
             <div className="flex items-start">
               <img width={40} src={profilePic.src} />
               <div className="text-left px-4">
