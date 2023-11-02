@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import RangeSlider from "../RangeSlider";
-import { AlertConfig } from "@/models/alertConfig";
 import { Patient } from "@/models/patient";
 import {
   fetchAlertConfigByPatientId,
@@ -18,12 +17,12 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
   const [systolic, setSystolic] = useState<number[]>([]);
   const [diastolic, setDiastolic] = useState<number[]>([]);
   const [spo2, setSpo2] = useState<number[]>([]);
+
   const [saved, setSaved] = useState<boolean>(false);
   const [confirmMessage, setConfirmMessage] = useState<string>("");
 
   useEffect(() => {
     fetchAlertConfigByPatientId(patient?._id).then((res) => {
-      console.log(res?.data);
       setDefaultConfigId(res?.data._id);
       const { hrConfig, rrConfig, spO2Config, bpDiaConfig, bpSysConfig } =
         res?.data;
@@ -53,9 +52,8 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
       bpDiaConfig: diastolic,
       spO2Config: spo2,
     };
-    console.log(alertConfig);
     updateAlertConfig(defaultConfigId, alertConfig).then((res) =>
-      console.log(res)
+      console.log("Updated Alert Config", res)
     );
     setSaved(true);
   }

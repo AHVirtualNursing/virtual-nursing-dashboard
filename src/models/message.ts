@@ -1,3 +1,4 @@
+import { Alert } from "./alert";
 import { Patient } from "./patient";
 
 export type Message = {
@@ -7,4 +8,5 @@ export type Message = {
   createdBy: string;
   createdAt: Date;
   patient?: Patient;
+  alert?: Alert;
 };

@@ -1,7 +1,6 @@
 import React from "react";
 import GroupIcon from "@mui/icons-material/Group";
 import BedIcon from "@mui/icons-material/Bed";
-import { SvgIconProps } from "@material-ui/core";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
 import Link from "next/link";
@@ -9,7 +8,7 @@ import { ChatBox } from "./ChatBox";
 
 export default function Sidebar() {
   return (
-    <div className="left-0 flex flex-col h-screen sticky top-0 p-3 gap-4 bg-blue-900">
+    <div className="left-0 flex flex-col h-screen fixed p-3 gap-4 w-14 bg-blue-900">
       <SidebarTab
         name={"Patients"}
         icon={<GroupIcon style={{ color: "white" }} />}
@@ -37,7 +36,7 @@ export default function Sidebar() {
 
 type SidebarTabProps = {
   name: string;
-  icon: SvgIconProps;
+  icon: JSX.Element;
   dest: string;
 };
 

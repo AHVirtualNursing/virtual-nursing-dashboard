@@ -21,9 +21,12 @@ import autoAnimate from "@formkit/auto-animate";
 
 const patientVisualisationPage = () => {
   const router = useRouter();
-  const { patientId, bedId } = router.query;
+  console.log("router query", router.query);
+  const { bedId, viewAlerts } = router.query;
   const [selectedBed, setSelectedBed] = useState<SmartBed>();
-  const [currentTab, setCurrentTab] = useState("overview");
+  const [currentTab, setCurrentTab] = useState(
+    viewAlerts === "true" ? "alerts" : "overview"
+  );
   const parent = useRef(null);
   useEffect(() => {
     parent.current && autoAnimate(parent.current);

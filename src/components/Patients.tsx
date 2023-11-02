@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import CampaignIcon from "@mui/icons-material/Campaign";
-import { patientData } from "@/mockData";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
-import { fetchAllSmartBeds, fetchBedByBedId } from "@/pages/api/smartbed_api";
+import { fetchBedByBedId } from "@/pages/api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
 import { useRouter } from "next/navigation";
 import TableSubHeader from "./TableSubHeader";
@@ -10,8 +9,19 @@ import autoAnimate from "@formkit/auto-animate";
 import { useSession } from "next-auth/react";
 import { fetchWardsByVirtualNurse } from "@/pages/api/nurse_api";
 import TableDataRow from "./TableDataRow";
+import { Ward } from "@/models/ward";
+import Link from "next/link";
+import DashboardAlertIcon from "./DashboardAlertIcon";
 
-export default function Patients() {
+type PatientListProps = {
+  /**
+   * ward/wards selected by virtual nurse to view in overview page
+   * ward/wards must be assigned to virtual nurse
+   * */
+  selectedWard: string | string[];
+};
+
+export default function Patients({ selectedWard }: PatientListProps) {
   const router = useRouter();
   const [data, setData] = useState<SmartBed[]>([]);
   const [searchPatient, setSearchPatient] = useState<string>("");
@@ -22,6 +32,7 @@ export default function Patients() {
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
   };
+
   const parent = useRef(null);
   useEffect(() => {
     parent.current && autoAnimate(parent.current);
@@ -43,6 +54,7 @@ export default function Patients() {
       );
     }
   };
+
   const fetchPatientVitals = async () => {
     let patientVitalsArr: any[] = [];
     for (const bedData of data) {
@@ -112,27 +124,27 @@ export default function Patients() {
   };
 
   useEffect(() => {
-    // fetchAllSmartBeds().then((res) => {
-    //   setData(
-    //     res.data.filter(
-    //       (smartbed: SmartBed) => smartbed.ward && smartbed.patient
-    //     )
-    //   );
-    // });
     fetchWardsByVirtualNurse(sessionData?.user.id).then((wards) => {
       let promises: Promise<SmartBed>[] = [];
+      let wardsToView = [];
       let smartBedIds = [];
-      for (const ward of wards) {
+      if (selectedWard === "assigned-wards") {
+        wardsToView = wards;
+      } else {
+        wardsToView = wards.filter(
+          (ward: Ward) => ward.wardNum === selectedWard
+        );
+      }
+      for (const ward of wardsToView) {
         const bedArray = ward.smartBeds;
         smartBedIds.push(...bedArray);
       }
       smartBedIds.map((id) => promises.push(fetchBedByBedId(id)));
       Promise.all(promises).then((res) => {
-        console.log("Smart Beds assigned to VN", res);
         setData(res.filter((sb) => sb.ward && sb.patient));
       });
     });
-  }, []);
+  }, [selectedWard]);
 
   // fetching vitals immediately after beds are populated
   useEffect(() => {
@@ -175,7 +187,7 @@ export default function Patients() {
         <tbody ref={parent}>
           {/* ------ sub-headers ------ */}
           <tr className="text-left">
-            <td></td>
+            <td className="text-xs underline text-center">ALERTS</td>
             <td className="p-2">
               <input
                 className="placeholder:italic placeholder:text-slate-400 w-2/3 rounded-md placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
@@ -214,7 +226,12 @@ export default function Patients() {
             .map((pd, index) => (
               <tr className="text-left" key={pd._id}>
                 <td className="w-1/12 text-center">
-                  <CampaignIcon style={{ color: "red" }} />
+                  <Link
+                    href={`/patientVisualisation?patientId=${pd.patient?._id}&bedId=${pd._id}&viewAlerts=true`}
+                    as={`/patientVisualisation?patientId=${pd.patient?._id}&bedId=${pd._id}`}
+                  >
+                    <DashboardAlertIcon patientId={pd.patient?._id} />
+                  </Link>
                 </td>
                 <td
                   id="patientName"

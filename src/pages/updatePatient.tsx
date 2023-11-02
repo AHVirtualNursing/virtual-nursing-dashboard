@@ -69,78 +69,71 @@ function updatePatient() {
   }
 
   return (
-    <main className={`${styles.main} ${inter.className}`}>
-      <Header />
-      <Box sx={{ display: "flex" }}>
-        <DashboardSideBar handleSideBarTabClick={handleSideBarTabClick} />
-        <Box
-          component="main"
-          sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
+    <div
+      className={`flex flex-col p-8 gap-8 bg-slate-100 w-full shadow-lg ${inter.className}`}
+    >
+      <Box
+        component="main"
+        sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
+      >
+        <Typography
+          sx={{ marginBottom: "20px", textAlign: "left" }}
+          variant="h6"
         >
-          <Typography
-            sx={{ marginBottom: "20px", textAlign: "left" }}
-            variant="h6"
-          >
-            Update Patient Details
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1 }}
-          >
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="patientName"
-              label="Name of Patient"
-              defaultValue={patientSelected?.name}
-              name="patientName"
-              autoFocus
-              disabled
-            ></TextField>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="patientNric"
-              label="NRIC of Patient"
-              defaultValue={patientSelected?.nric}
-              name="patientNric"
-              autoFocus
-              disabled
-            ></TextField>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="condition"
-              label="Patient Condition"
-              defaultValue={patientSelected?.condition}
-              name="condition"
-              autoFocus
-              sx={{ paddingBottom: "10px" }}
-            ></TextField>
-            <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
-              Update Patient
-            </Button>
-            {showSuccessMessage ? (
-              <Grid>
-                <p className="text-green-600">Patient Updated.</p>
-              </Grid>
-            ) : null}
-            {showConditionErrorMessage ? (
-              <Grid>
-                <p className="text-red-600">
-                  Please ensure that condition is filled in.
-                </p>
-              </Grid>
-            ) : null}
-          </Box>
+          Update Patient Details
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="patientName"
+            label="Name of Patient"
+            defaultValue={patientSelected?.name}
+            name="patientName"
+            autoFocus
+            disabled
+          ></TextField>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="patientNric"
+            label="NRIC of Patient"
+            defaultValue={patientSelected?.nric}
+            name="patientNric"
+            autoFocus
+            disabled
+          ></TextField>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="condition"
+            label="Patient Condition"
+            defaultValue={patientSelected?.condition}
+            name="condition"
+            autoFocus
+            sx={{ paddingBottom: "10px" }}
+          ></TextField>
+          <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
+            Update Patient
+          </Button>
+          {showSuccessMessage ? (
+            <Grid>
+              <p className="text-green-600">Patient Updated.</p>
+            </Grid>
+          ) : null}
+          {showConditionErrorMessage ? (
+            <Grid>
+              <p className="text-red-600">
+                Please ensure that condition is filled in.
+              </p>
+            </Grid>
+          ) : null}
         </Box>
       </Box>
-    </main>
+    </div>
   );
 }
 export default updatePatient;

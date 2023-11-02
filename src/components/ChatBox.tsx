@@ -10,8 +10,7 @@ export const ChatBox = () => {
   return (
     <>
       <div
-        style={{ marginTop: "auto" }}
-        className="flex group gap-3 hover:bg-blue-400 cursor-pointer p-4 rounded-md"
+        className="flex group gap-3 hover:bg-blue-400 cursor-pointer p-4 rounded-md absolute bottom-0 mb-28"
         onClick={handleOpen}
       >
         <ChatIcon sx={{ color: "white" }} />
