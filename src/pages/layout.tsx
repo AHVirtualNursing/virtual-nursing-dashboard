@@ -1,11 +1,8 @@
 import Head from "next/head";
-import React, { useEffect } from "react";
+import React from "react";
 import { Inter } from "next/font/google";
-import styles from "@/styles/Dashboard.module.css";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
-import { io } from "socket.io-client";
-import { useSession } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +18,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
       <Header />
       <Sidebar />
       <main
-        className={`${inter.className} flex ml-20 min-h-[calc(100vh-85px)]`}
+        className={`${inter.className} flex text-center ml-20 min-h-[calc(100vh-85px)]`}
       >
         {children}
       </main>
