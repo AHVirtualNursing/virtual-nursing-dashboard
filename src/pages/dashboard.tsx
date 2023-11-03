@@ -1,11 +1,11 @@
-import PendingFollowUps from "@/components/PendingFollowUps";
 import Patients from "@/components/Patients";
-import Summary from "@/components/Summary";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchWardsByVirtualNurse } from "./api/nurse_api";
 import { Ward } from "@/models/ward";
+import AlertsSummary from "@/components/AlertsSummary";
+import PatientSummary from "@/components/PatientSummary";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -55,8 +55,8 @@ export default function Dashboard() {
         </select>
       </div>
       <div className="bg-white rounded-2xl h-2/6 p-4 flex shadow-lg ">
-        <PendingFollowUps />
-        <Summary />
+        <AlertsSummary />
+        <PatientSummary />
       </div>
       <div className="bg-white rounded-2xl h-4/6 p-3 shadow-lg">
         <Patients selectedWard={selectedOption} />

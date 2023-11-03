@@ -1,15 +1,5 @@
 import React from "react";
-import {
-  BarChart,
-  Bar,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Label,
-  LabelList,
-} from "recharts";
+import { BarChart, Bar, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 const data = [
   {
@@ -20,10 +10,10 @@ const data = [
   },
 ];
 
-export default function PendingFollowUps() {
+const AlertsSummary = () => {
   return (
     <div className="flex flex-col w-1/2 p-4 gap-y-3">
-      <h3 className="text-left">Pending Follow Ups</h3>
+      <h3 className="text-left">Alerts Summary</h3>
       <div className="h-full flex gap-x-5">
         <div className="w-1/4 rounded-md bg-pink-200 flex items-center justify-center p-3">
           <p>Total: 140</p>
@@ -75,4 +65,6 @@ export default function PendingFollowUps() {
       </div>
     </div>
   );
-}
+};
+
+export default AlertsSummary;

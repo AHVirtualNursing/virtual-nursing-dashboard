@@ -19,7 +19,7 @@ const data = [
   },
 ];
 
-export default function Summary() {
+const PatientSummary = () => {
   return (
     <div className="flex flex-col w-1/2 p-4 gap-y-3">
       <h3 className="text-left">Patients Summary</h3>
@@ -62,4 +62,6 @@ export default function Summary() {
       </div>
     </div>
   );
-}
+};
+
+export default PatientSummary;
