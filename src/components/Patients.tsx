@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import CampaignIcon from "@mui/icons-material/Campaign";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import { fetchBedByBedId } from "@/pages/api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
@@ -12,6 +11,8 @@ import TableDataRow from "./TableDataRow";
 import { Ward } from "@/models/ward";
 import Link from "next/link";
 import DashboardAlertIcon from "./DashboardAlertIcon";
+import { Alert } from "@/models/alert";
+import { io } from "socket.io-client";
 
 type PatientListProps = {
   /**
@@ -28,21 +29,22 @@ export default function Patients({ selectedWard }: PatientListProps) {
   const [searchCondition, setSearchCondition] = useState<string>("");
   const [vitals, setVitals] = useState<any[]>([]);
   const { data: sessionData } = useSession();
+  const [socketData, setSocketData] = useState<Alert>();
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
   };
-
-  const parent = useRef(null);
-  useEffect(() => {
-    parent.current && autoAnimate(parent.current);
-  }, [parent]);
 
   const handleConditionSearch = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setSearchCondition(event.target.value);
   };
+
+  const parent = useRef(null);
+  useEffect(() => {
+    parent.current && autoAnimate(parent.current);
+  }, [parent]);
 
   const viewPatientVisualisation = (
     patientId: string | undefined,
@@ -122,6 +124,23 @@ export default function Patients({ selectedWard }: PatientListProps) {
       setVitals(sortedVitals);
     }
   };
+
+  useEffect(() => {
+    const socket = io("http://localhost:3001");
+    const nurseId = sessionData?.user.id;
+    socket.emit("alertConnections", nurseId);
+    socket.on("alertIncoming", (data: Alert) => {
+      console.log("Data From Socket", data);
+      setSocketData(data);
+    });
+    socket.on("patientAlertDeleted", (data: Alert) => {
+      console.log("Data From Socket", data);
+      setSocketData(data);
+    });
+    return () => {
+      socket.close();
+    };
+  }, []);
 
   useEffect(() => {
     fetchWardsByVirtualNurse(sessionData?.user.id).then((wards) => {
@@ -230,7 +249,14 @@ export default function Patients({ selectedWard }: PatientListProps) {
                     href={`/patientVisualisation?patientId=${pd.patient?._id}&bedId=${pd._id}&viewAlerts=true`}
                     as={`/patientVisualisation?patientId=${pd.patient?._id}&bedId=${pd._id}`}
                   >
-                    <DashboardAlertIcon patientId={pd.patient?._id} />
+                    <DashboardAlertIcon
+                      patientId={pd.patient?._id}
+                      socketData={
+                        socketData?.patient === pd.patient?._id
+                          ? socketData
+                          : null
+                      }
+                    />
                   </Link>
                 </td>
                 <td
