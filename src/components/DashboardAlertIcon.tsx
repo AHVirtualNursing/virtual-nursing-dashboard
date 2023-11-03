@@ -18,8 +18,8 @@ const DashboardAlertIcon = ({ patientId }: DashboardAlertIconProps) => {
     const socket = io("http://localhost:3001");
     const nurseId = sessionData?.user.id;
     socket.emit("alertConnections", nurseId);
-    socket.on("patientAlertAdded", (data: any) => {
-      setAlertsList(data);
+    socket.on("patientAlertAdded", (data: Alert[]) => {
+      setAlertsList(data.filter((alert) => alert.status === "open"));
     });
     socket.on("patientAlertDeleted", (data) => {
       setAlertsList(data);
@@ -34,10 +34,6 @@ const DashboardAlertIcon = ({ patientId }: DashboardAlertIconProps) => {
 
   return (
     <div id="iconBadgeContainer" className="relative">
-      {/* <CampaignIcon style={{ color: "red", display: "inline-block" }} />
-      <div className="text-xs absolute border-solid border-2 -top-2 left-20 border-slate-100 bg-slate-100">
-        {patientAlerts && patientAlerts.length}
-      </div> */}
       <Badge badgeContent={patientAlerts.length} color="primary">
         <CampaignIcon style={{ color: "red" }} />
       </Badge>
