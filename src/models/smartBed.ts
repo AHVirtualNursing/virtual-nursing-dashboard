@@ -11,16 +11,11 @@ export class SmartBed {
   bedPosition: string;
   isBrakeSet: boolean;
   bedAlarmTriggered: boolean;
-  railStatus: {
-    left: {
-      upper: boolean;
-      lower: boolean;
-    };
-    right: {
-      upper: boolean;
-      lower: boolean;
-    };
-  };
+  isLeftUpperRail: boolean;
+  isRightUpperRail: boolean;
+  isLeftLowerRail: boolean;
+  isRightLowerRail: boolean;
+  isLowestPosition: boolean;
   updatedAt: string;
   ward: Ward;
   roomNum: string;
@@ -32,16 +27,11 @@ export class SmartBed {
     createdAt: string,
     name: string,
     nurses: [],
-    railStatus: {
-      left: {
-        upper: boolean;
-        lower: boolean;
-      };
-      right: {
-        upper: boolean;
-        lower: boolean;
-      };
-    },
+    isLeftUpperRail: boolean,
+    isRightUpperRail: boolean,
+    isLeftLowerRail: boolean,
+    isRightLowerRail: boolean,
+    isLowestPosition: boolean,
     updatedAt: string,
     ward: Ward,
     roomNum: string,
@@ -57,7 +47,11 @@ export class SmartBed {
     this.name = name;
     this.nurses = nurses;
     this.patient = patient;
-    this.railStatus = railStatus;
+    this.isLeftLowerRail = isLeftLowerRail;
+    this.isRightUpperRail = isRightUpperRail;
+    this.isRightLowerRail = isRightLowerRail;
+    this.isLeftUpperRail = isLeftUpperRail;
+    this.isLowestPosition = isLowestPosition;
     this.updatedAt = updatedAt;
     this.ward = ward;
     this.roomNum = roomNum;
