@@ -187,17 +187,20 @@ export default function Patients({ selectedWard }: PatientListProps) {
 
   return (
     <div className="h-full overflow-auto scrollbar">
-      <table className="table-fixed w-full border-collapse">
+      <table className="table-fixed w-full border-collapse border-spacing-3">
         <thead className="text-sm text-left">
           {/* ------ column headers ------ */}
           <tr>
             <th></th>
-            <th className="p-2">Patient</th>
+            <th className="px-2">Patient</th>
             <th>Condition</th>
-            <th>Acuity Level</th>
+            <th className="px-2">Acuity Level</th>
             <th>Fall Risk</th>
             <th>Bed</th>
             <th>Ward</th>
+            <th colSpan={4}>Bed Rails</th>
+            <th>Bed Brakes</th>
+            <th>Patient Position</th>
             <th>Blood Pressure</th>
             <th>Heart Rate</th>
             <th>Saturation</th>
@@ -229,7 +232,12 @@ export default function Patients({ selectedWard }: PatientListProps) {
             </td>
             <TableSubHeader subheaderText="" />
             <TableSubHeader subheaderText="" />
+            <TableSubHeader subheaderText="Bed No." />
             <TableSubHeader subheaderText="Ward No." />
+            <TableSubHeader subheaderText="Right Upper" />
+            <TableSubHeader subheaderText="Right Lower" />
+            <TableSubHeader subheaderText="Left Upper" />
+            <TableSubHeader subheaderText="Left Lower" />
             <TableSubHeader subheaderText="Result" />
             <TableSubHeader subheaderText="Reading" />
             <TableSubHeader subheaderText="Reading" />
@@ -288,6 +296,16 @@ export default function Patients({ selectedWard }: PatientListProps) {
                   id="wardNum"
                   width="1/12"
                   data={pd.ward.wardNum}
+                />
+                <TableDataRow id="right-upper-rail" width="1/12" data={"Up"} />
+                <TableDataRow id="right-lower-rail" width="1/12" data={"Up"} />
+                <TableDataRow id="left-upper-rail" width="1/12" data={"Up"} />
+                <TableDataRow id="left-lower-rail" width="1/12" data={"Up"} />
+                <TableDataRow id="bed-brakes" width="1/12" data={"Set"} />
+                <TableDataRow
+                  id="patient-position"
+                  width="1/12"
+                  data={"Flat"}
                 />
                 <TableDataRow
                   id="bp-reading"
