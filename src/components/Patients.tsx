@@ -297,15 +297,35 @@ export default function Patients({ selectedWard }: PatientListProps) {
                   width="1/12"
                   data={pd.ward.wardNum}
                 />
-                <TableDataRow id="right-upper-rail" width="1/12" data={"Up"} />
-                <TableDataRow id="right-lower-rail" width="1/12" data={"Up"} />
-                <TableDataRow id="left-upper-rail" width="1/12" data={"Up"} />
-                <TableDataRow id="left-lower-rail" width="1/12" data={"Up"} />
-                <TableDataRow id="bed-brakes" width="1/12" data={"Set"} />
+                <TableDataRow
+                  id="right-upper-rail"
+                  width="1/12"
+                  data={pd.railStatus.right.upper ? "Up" : "Down"}
+                />
+                <TableDataRow
+                  id="right-lower-rail"
+                  width="1/12"
+                  data={pd.railStatus.right.lower ? "Up" : "Down"}
+                />
+                <TableDataRow
+                  id="left-upper-rail"
+                  width="1/12"
+                  data={pd.railStatus.left.upper ? "Up" : "Down"}
+                />
+                <TableDataRow
+                  id="left-lower-rail"
+                  width="1/12"
+                  data={pd.railStatus.left.lower ? "Up" : "Down"}
+                />
+                <TableDataRow
+                  id="bed-brakes"
+                  width="1/12"
+                  data={pd.isBrakeSet ? "Set" : "Not Set"}
+                />
                 <TableDataRow
                   id="patient-position"
                   width="1/12"
-                  data={"Flat"}
+                  data={pd.bedPosition}
                 />
                 <TableDataRow
                   id="bp-reading"
