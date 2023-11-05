@@ -1,74 +1,102 @@
 import { SmartBed } from "@/models/smartBed";
 import React from "react";
+import ManIcon from "@mui/icons-material/Man";
+import WarningIcon from "@mui/icons-material/Warning";
 
 interface BedProp {
   bed: SmartBed | undefined;
 }
 
 function BedStatusComponent(bedProp: BedProp) {
-  console.log(bedProp.bed);
   return (
-    <div className="px-20 space-y-8 pb-3 overflow-auto scrollbar max-h-[470px]">
-      <div id="bed-photo">
-        <img
-          src="https://healthjade.net/wp-content/uploads/2020/02/Low-Fowler%E2%80%99s-position.jpg"
-          alt="Patient on bed raised 15-30 degrees"
-          className="object-contain w-96 h-48"
+    <div className="flex max-h-[470px] overflow-auto scrollbar p-2 gap-5">
+      <div id="bed-image" className="flex-1 p-2">
+        <div id="upper-rails" className="flex gap-5 justify-evenly pt-4">
+          <BedRailCard
+            id="upper-left"
+            info={bedProp.bed?.isLeftUpperRail}
+            rail="Upper Left"
+          />
+          <BedRailCard
+            id="upper-right"
+            info={bedProp.bed?.isRightUpperRail}
+            rail="Upper Right"
+          />
+        </div>
+        <ManIcon
+          sx={{
+            fontSize: "200px",
+            transform: "rotate(-90deg)",
+          }}
         />
+        <div id="lower-rails" className="flex gap-5 justify-evenly pb-4">
+          <BedRailCard
+            id="lower-left"
+            info={bedProp.bed?.isLeftLowerRail}
+            rail="Lower Left"
+          />
+          <BedRailCard
+            id="lower-right"
+            info={bedProp.bed?.isRightLowerRail}
+            rail="Lower Right"
+          />
+        </div>
+        <div
+          id="legend-green"
+          className="flex gap-2 justify-center items-center text-sm p-3"
+        >
+          <div className="bg-green-400 w-4 h-4"></div>
+          <p>Rail Up / Patient Present</p>
+        </div>
+        <div
+          id="legend-orange"
+          className="flex gap-2 justify-center items-center text-sm p-2"
+        >
+          <div className="bg-orange-400 w-4 h-4"></div>
+          <p>Rail Down / Patient Absent</p>
+        </div>
       </div>
-      <div id="bedrails" className="grid grid-cols-2 grid-rows-2 gap-4">
-        <BedInfoCard
-          id="left-upper"
-          info={bedProp.bed?.railStatus.left.upper}
-          displayMsg={["Up", "Down", "Upper Left Rail: "]}
+      <div id="bed-info" className="bg-white flex-1 space-y-4 p-2 text-left">
+        <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
+          Bed Position: {bedProp.bed?.bedPosition}
+        </div>
+        <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
+          Bed Height: {bedProp.bed?.isLowestPosition ? "Lowest" : "Not Lowest"}
+        </div>
+        <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
+          Brake Wheels: {bedProp.bed?.isBrakeSet ? "Locked" : "Not Locked"}
+        </div>
+        <div className="bg-slate-200 font-bold rounded-lg uppercase flex gap-x-10 px-2 py-1 items-center ">
+          <p>
+            Bed Alarm: {bedProp.bed?.bedAlarmTriggered ? "On" : "Not Turned On"}
+          </p>
+          <WarningIcon />
+        </div>
+        <textarea
+          placeholder="Please input reason for protocol breach"
+          className=" focus:border-red-400 p-1 w-full"
         />
-        <BedInfoCard
-          id="right-upper"
-          info={bedProp.bed?.railStatus.right.upper}
-          displayMsg={["Up", "Down", "Upper Right Rail: "]}
-        />
-        <BedInfoCard
-          id="left-lower"
-          info={bedProp.bed?.railStatus.left.lower}
-          displayMsg={["Up", "Down", "Lower Left Rail: "]}
-        />
-        <BedInfoCard
-          id="right-lower"
-          info={bedProp.bed?.railStatus.right.lower}
-          displayMsg={["Up", "Down", "Lower Right Rail: "]}
-        />
-      </div>
-      <BedInfoCard
-        id="bed-brakes"
-        info={bedProp.bed?.isBrakeSet}
-        displayMsg={["Set", "Not Set", "Bed Brakes are: "]}
-      />
-      <BedInfoCard
-        id="bed-alarm"
-        info={!bedProp.bed?.bedAlarmTriggered}
-        displayMsg={["Not Triggered", "Triggered", "Bed alarm is: "]}
-      />
-      <div id="bed-position" className="bg-blue-300 rounded-lg p-4">
-        Bed Position is {bedProp.bed?.bedPosition}
+        <button className="float-right p-1">Confirm</button>
       </div>
     </div>
   );
 }
 
-type BedInfoCardProps = {
+type BedRailCardProps = {
   id: string;
   info: boolean | undefined;
-  displayMsg: string[];
+  rail: string;
 };
 
-const BedInfoCard = ({ id, info, displayMsg }: BedInfoCardProps) => {
+const BedRailCard = ({ id, info, rail }: BedRailCardProps) => {
   return (
     <div
       id={id}
-      className={`${info ? "bg-green-400" : "bg-red-400"} rounded-lg p-4`}
+      className={`${
+        info ? "bg-green-400" : "bg-orange-400"
+      } rounded-lg py-3 px-10`}
     >
-      <p className="font-bold">{displayMsg[2]}</p>
-      <p>{info ? displayMsg[0] : displayMsg[1]}</p>
+      <p>{rail}</p>
     </div>
   );
 };

@@ -200,7 +200,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
             <th>Ward</th>
             <th colSpan={4}>Bed Rails</th>
             <th>Bed Brakes</th>
-            <th>Patient Position</th>
+            <th>Bed Lowest</th>
             <th>Blood Pressure</th>
             <th>Heart Rate</th>
             <th>Saturation</th>
@@ -300,22 +300,22 @@ export default function Patients({ selectedWard }: PatientListProps) {
                 <TableDataRow
                   id="right-upper-rail"
                   width="1/12"
-                  data={pd.railStatus.right.upper ? "Up" : "Down"}
+                  data={pd.isRightUpperRail ? "Up" : "Down"}
                 />
                 <TableDataRow
                   id="right-lower-rail"
                   width="1/12"
-                  data={pd.railStatus.right.lower ? "Up" : "Down"}
+                  data={pd.isRightLowerRail ? "Up" : "Down"}
                 />
                 <TableDataRow
                   id="left-upper-rail"
                   width="1/12"
-                  data={pd.railStatus.left.upper ? "Up" : "Down"}
+                  data={pd.isLeftUpperRail ? "Up" : "Down"}
                 />
                 <TableDataRow
                   id="left-lower-rail"
                   width="1/12"
-                  data={pd.railStatus.left.lower ? "Up" : "Down"}
+                  data={pd.isLeftLowerRail ? "Up" : "Down"}
                 />
                 <TableDataRow
                   id="bed-brakes"
@@ -323,9 +323,9 @@ export default function Patients({ selectedWard }: PatientListProps) {
                   data={pd.isBrakeSet ? "Set" : "Not Set"}
                 />
                 <TableDataRow
-                  id="patient-position"
+                  id="lowest-position"
                   width="1/12"
-                  data={pd.bedPosition}
+                  data={pd.isLowestPosition ? "Yes" : "No"}
                 />
                 <TableDataRow
                   id="bp-reading"
