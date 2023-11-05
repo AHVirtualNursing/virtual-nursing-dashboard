@@ -6,6 +6,7 @@ export class VirtualNurse {
   username: string;
   passwordReset: boolean;
   name: string;
+  cardLayout: string[];
   ward?: Ward[];
 
   constructor(
@@ -13,12 +14,14 @@ export class VirtualNurse {
     username: string,
     passwordReset: boolean,
     name: string,
+    cardLayout: string[],
     ward?: Ward[]
   ) {
     this._id = _id;
     this.username = username;
     this.ward = ward;
     this.name = name;
+    this.cardLayout = cardLayout;
     this.passwordReset = passwordReset;
   }
 }

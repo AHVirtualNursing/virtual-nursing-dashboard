@@ -22,7 +22,7 @@ import autoAnimate from "@formkit/auto-animate";
 const patientVisualisationPage = () => {
   const router = useRouter();
   console.log("router query", router.query);
-  const { bedId, viewAlerts } = router.query;
+  const { patientId, bedId, viewAlerts } = router.query;
   const [selectedBed, setSelectedBed] = useState<SmartBed>();
   const [currentTab, setCurrentTab] = useState(
     viewAlerts === "true" ? "alerts" : "overview"
@@ -60,7 +60,7 @@ const patientVisualisationPage = () => {
     <div className="flex flex-col p-8 gap-8 bg-slate-100 w-full shadow-lg">
       <Box>
         <div className="flex bg-white mb-8 rounded-2xl shadow-lg">
-          <Box sx={{ padding: "20px" }}>
+          <Box className="p-4 text-center">
             <Image
               style={{
                 width: "40%",

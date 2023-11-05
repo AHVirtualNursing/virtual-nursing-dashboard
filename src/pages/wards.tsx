@@ -8,6 +8,9 @@ import { fetchBedByBedId } from "./api/smartbed_api";
 import autoAnimate from "@formkit/auto-animate";
 import profilePic from "../../public/profilepic.jpg";
 import VitalTiles from "@/components/VitalTiles";
+import TileCustomisationModal from "@/components/TileCustomisationModal";
+import BedTiles from "@/components/BedTiles";
+import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
 
 export default function Wards() {
   const router = useRouter();
@@ -144,13 +147,14 @@ export default function Wards() {
           Create Patient
         </button>
       </div>
-      <div className="gap-x-3 flex justify-start items-center">
+      <div className="gap-x-3 flex justify-between items-center">
         <label
           htmlFor="ward-select"
           className="text-sm font-medium text-gray-900"
         >
           Card View
         </label>
+        <TileCustomisationModal />
       </div>
       <div className="grid grid-cols-2 gap-4 flex" ref={parent}>
         {data.map((pd, index) => (
@@ -158,25 +162,32 @@ export default function Wards() {
             className="bg-white rounded-2xl p-4 shadow-lg hover:cursor-pointer hover:bg-blue-100"
             onClick={() => viewPatientVisualisation(pd.patient?._id, pd._id)}
           >
-            <div className="flex items-start">
-              <img width={40} src={profilePic.src} />
-              <div className="text-left px-4">
-                <h3>{pd.patient?.name}</h3>
-                <p>
-                  Ward: {pd.ward.wardNum} Bed: {pd.bedNum}
-                </p>
+            <div className="flex items-start justify-start">
+              <div className="w-1/2 flex items-start justify-start">
+                <img width={40} src={profilePic.src} />
+                <div className="text-left px-4">
+                  <h3>{pd.patient?.name}</h3>
+                  <p>
+                    Ward: {pd.ward.wardNum} Bed: {pd.bedNum}
+                  </p>
+                </div>
+              </div>
+              <div className="w-1/2 flex items-start justify-around">
+                <div>
+                  <p>Fall Risk</p>
+                  <div className="flex items-center justify-center">
+                    <p>High</p>
+                    <NotificationImportantIcon className="fill-red-500" />
+                  </div>
+                </div>
+                <div>
+                  <p>NEWS2</p>
+                  <p>2</p>
+                </div>
               </div>
             </div>
-            <img
-              src="https://healthjade.net/wp-content/uploads/2020/02/Low-Fowler%E2%80%99s-position.jpg"
-              alt="Patient on bed raised 15-30 degrees"
-              className="object-contain w-96 h-48"
-            />
-            <div className="text-left">
-              <p>Condition: {pd.patient?.condition}</p>
-              <p>Acuity Level: {pd.patient?.acuityLevel}</p>
-              <p>Fall Risk Score: {pd.patient?.fallRiskScore}</p>
-            </div>
+
+            <BedTiles />
             <VitalTiles data={vitals[index]} />
           </div>
         ))}

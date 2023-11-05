@@ -37,7 +37,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
       <Header />
       <Sidebar />
       <main
-        className={`${inter.className} flex ml-20 min-h-[calc(100vh-85px)]`}
+        className={`${inter.className} text-center flex ml-20 min-h-[calc(100vh-85px)]`}
       >
         {children}
       </main>

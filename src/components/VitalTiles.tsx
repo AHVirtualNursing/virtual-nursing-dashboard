@@ -10,7 +10,7 @@ const VitalTiles = ({ data }: VitalProps) => {
 
   return (
     <div className="flex justify-between mt-2">
-      <div className="w-1/5 bg-red-400 rounded-2xl mx-2">
+      <div className="w-1/5 bg-emerald-400 rounded-2xl mx-2">
         <p>HR</p>
         <p>
           {data && data.heartRate.length > 0
@@ -18,7 +18,7 @@ const VitalTiles = ({ data }: VitalProps) => {
             : "-"}
         </p>
       </div>
-      <div className="w-1/5 bg-orange-400 rounded-2xl mx-2">
+      <div className="w-1/5 bg-red-400 rounded-2xl mx-2">
         <p>RR</p>
         <p>
           {data && data.respRate.length > 0
@@ -26,7 +26,7 @@ const VitalTiles = ({ data }: VitalProps) => {
             : "-"}
         </p>
       </div>
-      <div className="w-1/5 bg-amber-400 rounded-2xl mx-2">
+      <div className="w-1/5 bg-emerald-400 rounded-2xl mx-2">
         <p>BP</p>
         <p>
           {data &&
@@ -38,7 +38,7 @@ const VitalTiles = ({ data }: VitalProps) => {
             : "-"}
         </p>
       </div>
-      <div className="w-1/5 bg-lime-400 rounded-2xl mx-2">
+      <div className="w-1/5 bg-emerald-400 rounded-2xl mx-2">
         <p>SPO2</p>
         <p>
           {data && data.spO2.length > 0
@@ -46,7 +46,7 @@ const VitalTiles = ({ data }: VitalProps) => {
             : "-"}
         </p>
       </div>
-      <div className="w-1/5 bg-teal-400 rounded-2xl mx-2">
+      <div className="w-1/5 bg-emerald-400 rounded-2xl mx-2">
         <p>TEMP</p>
         <p>
           {data && data.temperature.length > 0
