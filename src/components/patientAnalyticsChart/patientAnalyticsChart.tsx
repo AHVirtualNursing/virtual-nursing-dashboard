@@ -4,31 +4,41 @@ import {
   Chart,
   ChartData,
   CategoryScale,
+  Legend,
   LinearScale,
-  PointElement,
   LineElement,
+  PointElement,
   Title,
   Tooltip,
-  Legend,
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
 import annotationPlugin from "chartjs-plugin-annotation";
 import { Patient } from "@/models/patient";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
-import FormGroup from "@mui/material/FormGroup";
 import {
   Box,
+  Button,
   Checkbox,
   FormControlLabel,
+  FormGroup,
   FormLabel,
   Grid,
+  InputAdornment,
+  Modal,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
 } from "@mui/material";
 import {
   getGradient,
   updateBorderDash,
   updateChartOptions,
   vitalChartAttributes,
+  updateLabels,
+  getDateTime,
 } from "./utils";
+import { ModalBoxStyle } from "@/styles/StyleTemplates";
 
 interface PatientChartProps {
   patient?: Patient;
@@ -90,6 +100,13 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     increasingTrend: false,
   });
 
+  const [selectedTimeRange, setSelectedTimeRange] = useState("1D");
+
+  const [customStartDate, setCustomStartDate] = useState(new Date());
+  const [customEndDate, setCustomEndDate] = useState(new Date());
+  const [showCustomDateRangeModal, setShowCustomDateRangeModal] =
+    useState(false);
+
   useEffect(() => {
     fetchVitalData();
   }, []);
@@ -101,9 +118,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
 
   const updateChartData = (chartId: string) => {
     const data: ChartData<"line"> = {
-      labels: vitals.heartRate.map(
-        (vitalReading) => vitalReading.datetime.split(" ")[1]
-      ),
+      labels: updateLabels(vitals.heartRate, selectedTimeRange),
       datasets: [] as Dataset[],
     };
 
@@ -244,6 +259,24 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     });
   };
 
+  const handleSelectedTimeRangeChange = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>,
+    value: string
+  ) => {
+    setSelectedTimeRange(value);
+  };
+
+  const handleShowCustomDateRangeModal = () => {
+    setShowCustomDateRangeModal((prevState) => !prevState);
+  };
+
+  const handleUpdateCustomDateRange = () => {
+    handleShowCustomDateRangeModal();
+    setSelectedTimeRange(
+      `${getDateTime(customStartDate)},${getDateTime(customEndDate)}`
+    );
+  };
+
   return (
     <>
       <Grid item xs={6}>
@@ -350,6 +383,10 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           options={updateChartOptions(
             selectedVitals,
             selectedIndicators,
+            {
+              min: 0,
+              max: 7,
+            },
             "chart1"
           )}
         />
@@ -360,10 +397,95 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           options={updateChartOptions(
             selectedVitals,
             selectedIndicators,
+            {
+              min: 0,
+              max: 7,
+            },
             "chart2"
           )}
         />
       </Box>
+      <ToggleButtonGroup
+        value={selectedTimeRange}
+        exclusive
+        onChange={handleSelectedTimeRangeChange}
+        aria-label="text alignment">
+        <ToggleButton value="12H" aria-label="left aligned">
+          12H
+        </ToggleButton>
+        <ToggleButton value="1D" aria-label="left aligned">
+          1D
+        </ToggleButton>
+        <ToggleButton value="3D" aria-label="left aligned">
+          3D
+        </ToggleButton>
+        <ToggleButton value="all" aria-label="left aligned">
+          All
+        </ToggleButton>
+        <ToggleButton
+          value="custom"
+          aria-label="left aligned"
+          onClick={() => handleShowCustomDateRangeModal()}
+          selected={selectedTimeRange.match(
+            /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}),(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/g
+          ) != null}>
+          Custom
+        </ToggleButton>
+      </ToggleButtonGroup>
+      <Modal
+        open={showCustomDateRangeModal}
+        onClose={handleShowCustomDateRangeModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description">
+        <Box sx={ModalBoxStyle}>
+          <Typography variant="h6" component="h2" sx={{ marginBottom: 2 }}>
+            Select Date Range
+          </Typography>
+          <TextField
+            label="Start Date and Time"
+            type="datetime-local"
+            value={new Date(customStartDate.getTime() + 8 * 60 * 60 * 1000)
+              .toISOString()
+              .slice(0, 16)}
+            onChange={(e) => setCustomStartDate(new Date(e.target.value))}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <i className="far fa-clock"></i>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            label="End Date and Time"
+            type="datetime-local"
+            value={new Date(customEndDate.getTime() + 8 * 60 * 60 * 1000)
+              .toISOString()
+              .slice(0, 16)}
+            onChange={(e) => setCustomEndDate(new Date(e.target.value))}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <i className="far fa-clock"></i>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Grid item xs={12} sx={{ marginTop: 2 }}>
+            <Button
+              variant="contained"
+              onClick={() => handleUpdateCustomDateRange()}>
+              Set Range
+            </Button>
+          </Grid>
+        </Box>
+      </Modal>
     </>
   );
 }

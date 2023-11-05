@@ -58,6 +58,10 @@ export const updateChartOptions = (
   selectedIndicators: {
     threshold: boolean;
   },
+  xRange: {
+    min: number;
+    max: number;
+  },
   chartId: string
 ) => {
   const options: ChartOptions<"line"> = {
@@ -452,4 +456,84 @@ export const getGradient = (
     }
   }
   return gradient;
+};
+
+interface Label {
+  datetime: string;
+}
+
+export const updateLabels = (labels: Label[], timeRange: string) => {
+  let updatedLabels: Label[] = [];
+  let previousDate = "";
+
+  if (timeRange == "12H") {
+    updatedLabels = labels.filter((vitalReading) => {
+      const minDatetime = new Date();
+      minDatetime.setHours(minDatetime.getHours() - 12);
+      return vitalReading.datetime >= getDateTime(minDatetime);
+    });
+  } else if (timeRange == "1D") {
+    updatedLabels = labels.filter((vitalReading) => {
+      const currentDate = new Date(vitalReading.datetime)
+        .setHours(0, 0, 0, 0)
+        .toString();
+      return vitalReading.datetime >= currentDate;
+    });
+  } else if (timeRange == "3D") {
+    updatedLabels = labels.filter((vitalReading) => {
+      const minDatetime = new Date();
+      minDatetime.setDate(minDatetime.getDate() - 2);
+      return vitalReading.datetime >= getDateTime(minDatetime);
+    });
+  } else if (timeRange == "all") {
+    updatedLabels = labels;
+  } else if (
+    timeRange &&
+    timeRange.match(
+      /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}),(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/g
+    )
+  ) {
+    const minTimeRange = timeRange.split(",")[0];
+    const maxTimeRange = timeRange.split(",")[1];
+
+    updatedLabels = labels.filter(
+      (vitalReading) =>
+        vitalReading.datetime >= minTimeRange &&
+        vitalReading.datetime <= maxTimeRange
+    );
+  }
+
+  return updatedLabels
+    .sort((a, b) => {
+      return a.datetime.localeCompare(b.datetime);
+    })
+    .map((vitalReading) => {
+      const currentDate = vitalReading.datetime.slice(0, 10);
+
+      if (currentDate !== previousDate) {
+        previousDate = currentDate;
+        return currentDate;
+      }
+
+      return vitalReading.datetime.slice(11, -3);
+    });
+};
+
+export const getDateTime = (date: Date = new Date()) => {
+  function twoDigit(n: number) {
+    return (n < 10 ? "0" : "") + n;
+  }
+
+  return (
+    "" +
+    date.getFullYear() +
+    "-" +
+    twoDigit(date.getMonth() + 1) +
+    "-" +
+    twoDigit(date.getDate()) +
+    " " +
+    twoDigit(date.getHours()) +
+    ":" +
+    twoDigit(date.getMinutes())
+  );
 };
