@@ -470,20 +470,24 @@ export const updateLabels = (labels: Label[], timeRange: string) => {
     updatedLabels = labels.filter((vitalReading) => {
       const minDatetime = new Date();
       minDatetime.setHours(minDatetime.getHours() - 12);
+
       return vitalReading.datetime >= getDateTime(minDatetime);
     });
   } else if (timeRange == "1D") {
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    const datetime = getDateTime(currentDate);
+
     updatedLabels = labels.filter((vitalReading) => {
-      const currentDate = new Date(vitalReading.datetime)
-        .setHours(0, 0, 0, 0)
-        .toString();
-      return vitalReading.datetime >= currentDate;
+      return vitalReading.datetime >= datetime;
     });
   } else if (timeRange == "3D") {
+    const currentDatetime = new Date();
+    currentDatetime.setDate(currentDatetime.getDate() - 3);
+    const minDatetime = getDateTime(currentDatetime);
+
     updatedLabels = labels.filter((vitalReading) => {
-      const minDatetime = new Date();
-      minDatetime.setDate(minDatetime.getDate() - 2);
-      return vitalReading.datetime >= getDateTime(minDatetime);
+      return vitalReading.datetime >= minDatetime;
     });
   } else if (timeRange == "all") {
     updatedLabels = labels;

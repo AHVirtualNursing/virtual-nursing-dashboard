@@ -78,9 +78,6 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     zoomPlugin,
     annotationPlugin
   );
-  const { toPDF, targetRef } = usePDF({
-    filename: `${patient?.name} Vitals Charts.pdf`,
-  });
 
   const [vitals, setVitals] = useState<VitalData>({
     heartRate: [],
@@ -111,6 +108,16 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
   const [customEndDate, setCustomEndDate] = useState(new Date());
   const [showCustomDateRangeModal, setShowCustomDateRangeModal] =
     useState(false);
+
+  const [pdfDetails, setPdfDetails] = useState({
+    name: `${patient?.name} Vitals Charts`,
+    notes: "",
+  });
+  const [showSavePdfModal, setShowSavePdfModal] = useState(false);
+
+  const { toPDF, targetRef } = usePDF({
+    filename: pdfDetails.name + ".pdf",
+  });
 
   useEffect(() => {
     fetchVitalData();
@@ -284,175 +291,210 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     );
   };
 
+  const handleShowSavePdfModal = () => {
+    setShowSavePdfModal((prevState) => !prevState);
+  };
+
+  const handlePdfDetails = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.target;
+    setPdfDetails({
+      ...pdfDetails,
+      [name]: value,
+    });
+  };
+
+  const handleSavePdf = () => {
+    handleShowSavePdfModal();
+    toPDF();
+    setPdfDetails({
+      ...pdfDetails,
+      notes: "",
+    });
+  };
+
   return (
     <>
-      <Grid item xs={6}>
-        <FormGroup id="vitals" sx={{ flexDirection: "row" }}>
-          <FormLabel
-            sx={{ display: "flex", alignItems: "center", marginRight: 2 }}
-            component="legend">
-            Vitals
-          </FormLabel>
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="heartRate"
-                checked={selectedVitals.heartRate}
-                onChange={handleSelectedVitalsChange}
-              />
-            }
-            label="Heart Rate"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="spO2"
-                checked={selectedVitals.spO2}
-                onChange={handleSelectedVitalsChange}
-              />
-            }
-            label="Blood Oxygen"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="bloodPressure"
-                checked={selectedVitals.bloodPressure}
-                onChange={handleSelectedVitalsChange}
-              />
-            }
-            label="Blood Pressure"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="temperature"
-                checked={selectedVitals.temperature}
-                onChange={handleSelectedVitalsChange}
-              />
-            }
-            label="Temperature"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="respRate"
-                checked={selectedVitals.respRate}
-                onChange={handleSelectedVitalsChange}
-              />
-            }
-            label="Respiratory Rate"
-          />
-          <div className="ml-auto">
-            <Button startIcon={<FileDownloadIcon />} onClick={() => toPDF()}>
-              Save As PDF
-            </Button>
-          </div>
-        </FormGroup>
-      </Grid>
-      <Grid item xs={6}>
-        <FormGroup id="indicators" sx={{ flexDirection: "row" }}>
-          <FormLabel
-            sx={{ display: "flex", alignItems: "center", marginRight: 2 }}
-            component="legend">
-            Indicators
-          </FormLabel>
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="threshold"
-                checked={selectedIndicators.threshold}
-                onChange={handleSelectedIndicatorsChange}
-              />
-            }
-            label="Threshold"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="exceedance"
-                checked={selectedIndicators.exceedance}
-                onChange={handleSelectedIndicatorsChange}
-              />
-            }
-            label="Exceedance"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="increasingTrend"
-                checked={selectedIndicators.increasingTrend}
-                onChange={handleSelectedIndicatorsChange}
-              />
-            }
-            label="Increasing Trend"
-          />
-        </FormGroup>
-      </Grid>
       <Box ref={targetRef}>
+        <Grid item xs={6}>
+          <FormGroup id="vitals" sx={{ flexDirection: "row" }}>
+            <FormLabel
+              sx={{ display: "flex", alignItems: "center", marginRight: 2 }}
+              component="legend">
+              Vitals
+            </FormLabel>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="heartRate"
+                  checked={selectedVitals.heartRate}
+                  onChange={handleSelectedVitalsChange}
+                />
+              }
+              label="Heart Rate"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="spO2"
+                  checked={selectedVitals.spO2}
+                  onChange={handleSelectedVitalsChange}
+                />
+              }
+              label="Blood Oxygen"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="bloodPressure"
+                  checked={selectedVitals.bloodPressure}
+                  onChange={handleSelectedVitalsChange}
+                />
+              }
+              label="Blood Pressure"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="temperature"
+                  checked={selectedVitals.temperature}
+                  onChange={handleSelectedVitalsChange}
+                />
+              }
+              label="Temperature"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="respRate"
+                  checked={selectedVitals.respRate}
+                  onChange={handleSelectedVitalsChange}
+                />
+              }
+              label="Respiratory Rate"
+            />
+            <div className="ml-auto">
+              <Button
+                className="ml-auto"
+                startIcon={<FileDownloadIcon />}
+                onClick={handleShowSavePdfModal}>
+                Save As PDF
+              </Button>
+            </div>
+          </FormGroup>
+        </Grid>
+        <Grid item xs={6}>
+          <FormGroup id="indicators" sx={{ flexDirection: "row" }}>
+            <FormLabel
+              sx={{ display: "flex", alignItems: "center", marginRight: 2 }}
+              component="legend">
+              Indicators
+            </FormLabel>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="threshold"
+                  checked={selectedIndicators.threshold}
+                  onChange={handleSelectedIndicatorsChange}
+                />
+              }
+              label="Threshold"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="exceedance"
+                  checked={selectedIndicators.exceedance}
+                  onChange={handleSelectedIndicatorsChange}
+                />
+              }
+              label="Exceedance"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="increasingTrend"
+                  checked={selectedIndicators.increasingTrend}
+                  onChange={handleSelectedIndicatorsChange}
+                />
+              }
+              label="Increasing Trend"
+            />
+          </FormGroup>
+        </Grid>
         <Box sx={{ height: 400 }} id="chart1">
           <Line
             data={updateChartData("chart1")}
-            options={updateChartOptions(
-              selectedVitals,
-              selectedIndicators,
-              {
-                min: 0,
-                max: 7,
-              },
-              "chart1"
-            )}
+            options={{
+              ...updateChartOptions(
+                selectedVitals,
+                selectedIndicators,
+                {
+                  min: 0,
+                  max: 7,
+                },
+                "chart1"
+              ),
+              maintainAspectRatio: false,
+              aspectRatio: 1,
+            }}
           />
         </Box>
         <Box sx={{ height: 400 }} id="chart2">
           <Line
             data={updateChartData("chart2")}
-            options={updateChartOptions(
-              selectedVitals,
-              selectedIndicators,
-              {
-                min: 0,
-                max: 7,
-              },
-              "chart2"
-            )}
+            options={{
+              ...updateChartOptions(
+                selectedVitals,
+                selectedIndicators,
+                {
+                  min: 0,
+                  max: 7,
+                },
+                "chart2"
+              ),
+              maintainAspectRatio: false,
+              aspectRatio: 1,
+            }}
           />
         </Box>
+        <ToggleButtonGroup
+          value={selectedTimeRange}
+          exclusive
+          onChange={handleSelectedTimeRangeChange}
+          aria-label="text alignment">
+          <ToggleButton value="12H" aria-label="left aligned">
+            12H
+          </ToggleButton>
+          <ToggleButton value="1D" aria-label="left aligned">
+            1D
+          </ToggleButton>
+          <ToggleButton value="3D" aria-label="left aligned">
+            3D
+          </ToggleButton>
+          <ToggleButton value="all" aria-label="left aligned">
+            All
+          </ToggleButton>
+          <ToggleButton
+            value="custom"
+            aria-label="left aligned"
+            onClick={() => handleShowCustomDateRangeModal()}
+            selected={
+              selectedTimeRange.match(
+                /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}),(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/g
+              ) != null
+            }>
+            Custom
+          </ToggleButton>
+        </ToggleButtonGroup>
+        <Box marginTop={2}>
+          <Typography>Nurse Notes: {pdfDetails.notes}</Typography>
+        </Box>
       </Box>
-      <ToggleButtonGroup
-        value={selectedTimeRange}
-        exclusive
-        onChange={handleSelectedTimeRangeChange}
-        aria-label="text alignment">
-        <ToggleButton value="12H" aria-label="left aligned">
-          12H
-        </ToggleButton>
-        <ToggleButton value="1D" aria-label="left aligned">
-          1D
-        </ToggleButton>
-        <ToggleButton value="3D" aria-label="left aligned">
-          3D
-        </ToggleButton>
-        <ToggleButton value="all" aria-label="left aligned">
-          All
-        </ToggleButton>
-        <ToggleButton
-          value="custom"
-          aria-label="left aligned"
-          onClick={() => handleShowCustomDateRangeModal()}
-          selected={
-            selectedTimeRange.match(
-              /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}),(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/g
-            ) != null
-          }>
-          Custom
-        </ToggleButton>
-      </ToggleButtonGroup>
       <Modal
         open={showCustomDateRangeModal}
-        onClose={handleShowCustomDateRangeModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description">
+        onClose={handleShowCustomDateRangeModal}>
         <Box sx={ModalBoxStyle}>
           <Typography variant="h6" component="h2" sx={{ marginBottom: 2 }}>
             Select Date Range
@@ -500,6 +542,34 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
               Set Range
             </Button>
           </Grid>
+        </Box>
+      </Modal>
+      <Modal open={showSavePdfModal} onClose={handleShowSavePdfModal}>
+        <Box sx={ModalBoxStyle}>
+          <TextField
+            label="PDF Name"
+            name="name"
+            margin="normal"
+            fullWidth
+            value={pdfDetails.name}
+            onChange={handlePdfDetails}
+            sx={{ width: "600px" }}
+          />
+          <TextField
+            label="Nurse Notes"
+            name="notes"
+            margin="normal"
+            fullWidth
+            multiline
+            rows={6}
+            value={pdfDetails.notes}
+            onChange={handlePdfDetails}
+          />
+          <Box marginTop={2}>
+            <Button variant="contained" onClick={() => handleSavePdf()}>
+              Save as PDF
+            </Button>
+          </Box>
         </Box>
       </Modal>
     </>
