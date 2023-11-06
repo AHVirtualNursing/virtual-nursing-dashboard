@@ -488,7 +488,6 @@ export const updateLabels = (labels: Label[], timeRange: string) => {
   } else if (timeRange == "all") {
     updatedLabels = labels;
   } else if (
-    timeRange &&
     timeRange.match(
       /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}),(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/g
     )

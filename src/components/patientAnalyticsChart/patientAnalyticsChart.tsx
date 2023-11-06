@@ -260,10 +260,12 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
   };
 
   const handleSelectedTimeRangeChange = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>,
+    _: React.MouseEvent<HTMLElement, MouseEvent>,
     value: string
   ) => {
-    setSelectedTimeRange(value);
+    if (value != null && value != "custom") {
+      setSelectedTimeRange(value);
+    }
   };
 
   const handleShowCustomDateRangeModal = () => {
@@ -426,9 +428,11 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           value="custom"
           aria-label="left aligned"
           onClick={() => handleShowCustomDateRangeModal()}
-          selected={selectedTimeRange.match(
-            /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}),(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/g
-          ) != null}>
+          selected={
+            selectedTimeRange.match(
+              /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}),(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/g
+            ) != null
+          }>
           Custom
         </ToggleButton>
       </ToggleButtonGroup>
