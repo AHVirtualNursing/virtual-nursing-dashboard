@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart,
@@ -13,6 +13,7 @@ import {
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
 import annotationPlugin from "chartjs-plugin-annotation";
+import { usePDF } from "react-to-pdf";
 import { Patient } from "@/models/patient";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import {
@@ -30,6 +31,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import {
   getGradient,
   updateBorderDash,
@@ -76,6 +78,9 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     zoomPlugin,
     annotationPlugin
   );
+  const { toPDF, targetRef } = usePDF({
+    filename: `${patient?.name} Vitals Charts.pdf`,
+  });
 
   const [vitals, setVitals] = useState<VitalData>({
     heartRate: [],
@@ -338,6 +343,11 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
             }
             label="Respiratory Rate"
           />
+          <div className="ml-auto">
+            <Button startIcon={<FileDownloadIcon />} onClick={() => toPDF()}>
+              Save As PDF
+            </Button>
+          </div>
         </FormGroup>
       </Grid>
       <Grid item xs={6}>
@@ -379,33 +389,35 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           />
         </FormGroup>
       </Grid>
-      <Box sx={{ height: 400 }} id="chart1">
-        <Line
-          data={updateChartData("chart1")}
-          options={updateChartOptions(
-            selectedVitals,
-            selectedIndicators,
-            {
-              min: 0,
-              max: 7,
-            },
-            "chart1"
-          )}
-        />
-      </Box>
-      <Box sx={{ height: 400 }} id="chart2">
-        <Line
-          data={updateChartData("chart2")}
-          options={updateChartOptions(
-            selectedVitals,
-            selectedIndicators,
-            {
-              min: 0,
-              max: 7,
-            },
-            "chart2"
-          )}
-        />
+      <Box ref={targetRef}>
+        <Box sx={{ height: 400 }} id="chart1">
+          <Line
+            data={updateChartData("chart1")}
+            options={updateChartOptions(
+              selectedVitals,
+              selectedIndicators,
+              {
+                min: 0,
+                max: 7,
+              },
+              "chart1"
+            )}
+          />
+        </Box>
+        <Box sx={{ height: 400 }} id="chart2">
+          <Line
+            data={updateChartData("chart2")}
+            options={updateChartOptions(
+              selectedVitals,
+              selectedIndicators,
+              {
+                min: 0,
+                max: 7,
+              },
+              "chart2"
+            )}
+          />
+        </Box>
       </Box>
       <ToggleButtonGroup
         value={selectedTimeRange}
