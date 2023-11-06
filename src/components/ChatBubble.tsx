@@ -213,10 +213,10 @@ const ChatBubble = ({
                 {message?.patient?.news2Score}
               </Typography>
               <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
-                Vitals
+                Content
               </Typography>
               <Typography style={{ whiteSpace: "pre-line" }}>
-                ADD VITALS HERE
+                {message.content}
               </Typography>
             </Box>
           </Box>
