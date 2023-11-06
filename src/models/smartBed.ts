@@ -1,3 +1,4 @@
+import { BedSideNurse } from "./bedsideNurse";
 import { Patient } from "./patient";
 import { Ward } from "./ward";
 
@@ -6,11 +7,12 @@ export class SmartBed {
   bedStatus: string;
   createdAt: string;
   name: string;
-  nurses: [];
+  nurses: BedSideNurse[];
   patient?: Patient;
   bedPosition: string;
   isBrakeSet: boolean;
-  bedAlarmTriggered: boolean;
+  isBedAlarmOn: boolean;
+  bedAlarmProtocolBreachReason: string;
   isLeftUpperRail: boolean;
   isRightUpperRail: boolean;
   isLeftLowerRail: boolean;
@@ -26,7 +28,7 @@ export class SmartBed {
     bedStatus: string,
     createdAt: string,
     name: string,
-    nurses: [],
+    nurses: BedSideNurse[],
     isLeftUpperRail: boolean,
     isRightUpperRail: boolean,
     isLeftLowerRail: boolean,
@@ -38,7 +40,8 @@ export class SmartBed {
     bedNum: string,
     bedPosition: string,
     isBrakeSet: boolean,
-    bedAlarmTriggered: boolean,
+    isBedAlarmOn: boolean,
+    bedAlarmProtocolBreachReason: string,
     patient?: Patient
   ) {
     this._id = _id;
@@ -57,7 +60,8 @@ export class SmartBed {
     this.roomNum = roomNum;
     this.bedPosition = bedPosition;
     this.isBrakeSet = isBrakeSet;
-    this.bedAlarmTriggered = bedAlarmTriggered;
+    this.isBedAlarmOn = isBedAlarmOn;
+    this.bedAlarmProtocolBreachReason = bedAlarmProtocolBreachReason;
     this.bedNum = bedNum;
   }
 }
