@@ -3,7 +3,10 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { SmartBed } from "@/models/smartBed";
 import { fetchVitalByVitalId } from "./api/vitals_api";
-import { fetchWardsByVirtualNurse } from "./api/nurse_api";
+import {
+  fetchVirtualNurseByNurseId,
+  fetchWardsByVirtualNurse,
+} from "./api/nurse_api";
 import { fetchBedByBedId } from "./api/smartbed_api";
 import autoAnimate from "@formkit/auto-animate";
 import profilePic from "../../public/profilepic.jpg";
@@ -11,11 +14,14 @@ import VitalTiles from "@/components/VitalTiles";
 import TileCustomisationModal from "@/components/TileCustomisationModal";
 import BedTiles from "@/components/BedTiles";
 import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
+import { VirtualNurse } from "@/models/virtualNurse";
+import { Tooltip } from "@mui/material";
 
 export default function Wards() {
   const router = useRouter();
   const [data, setData] = useState<SmartBed[]>([]);
   const [vitals, setVitals] = useState<any[]>([]);
+  const [nurse, setNurse] = useState<VirtualNurse>();
   const { data: sessionData } = useSession();
 
   const parent = useRef(null);
@@ -114,6 +120,9 @@ export default function Wards() {
         setData(res.filter((sb) => sb.ward && sb.patient));
       });
     });
+    fetchVirtualNurseByNurseId(sessionData?.user.id).then((res) => {
+      setNurse(res.data);
+    });
   }, []);
 
   // fetching vitals immediately after beds are populated
@@ -154,7 +163,7 @@ export default function Wards() {
         >
           Card View
         </label>
-        <TileCustomisationModal />
+        <TileCustomisationModal cardLayout={nurse?.cardLayout} />
       </div>
       <div className="grid grid-cols-2 gap-4 flex" ref={parent}>
         {data.map((pd, index) => (
@@ -173,22 +182,30 @@ export default function Wards() {
                 </div>
               </div>
               <div className="w-1/2 flex items-start justify-around">
-                <div>
-                  <p>Fall Risk</p>
-                  <div className="flex items-center justify-center">
-                    <p>High</p>
-                    <NotificationImportantIcon className="fill-red-500" />
+                {nurse?.cardLayout.fallRisk ? (
+                  <div>
+                    <p>Fall Risk</p>
+                    <div className="flex items-center justify-center">
+                      <p>High</p>
+                      <Tooltip
+                        title={<p style={{ fontSize: "16px" }}>REASON</p>}
+                        placement="top"
+                      >
+                        <NotificationImportantIcon className="fill-red-500" />
+                      </Tooltip>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <p>NEWS2</p>
-                  <p>2</p>
-                </div>
+                ) : null}
+                {nurse?.cardLayout.news2 ? (
+                  <div>
+                    <p>NEWS2</p>
+                    <p>2</p>
+                  </div>
+                ) : null}
               </div>
             </div>
-
-            <BedTiles />
-            <VitalTiles data={vitals[index]} />
+            <BedTiles cardLayout={nurse?.cardLayout} />
+            <VitalTiles cardLayout={nurse?.cardLayout} data={vitals[index]} />
           </div>
         ))}
       </div>

@@ -3,64 +3,53 @@ import {
   Checkbox,
   FormControl,
   FormControlLabel,
-  FormGroup,
-  FormHelperText,
   FormLabel,
   Modal,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { ModalBoxStyle } from "@/styles/StyleTemplates";
+import layout from "@/pages/layout";
+import { updateVirtualNurseCardLayoutByNurseId } from "@/pages/api/nurse_api";
+import { useSession } from "next-auth/react";
+import router from "next/router";
 
-function TileCustomisationModal() {
+interface layout {
+  [key: string]: boolean;
+  allVitals: boolean;
+  hr: boolean;
+  rr: boolean;
+  spo2: boolean;
+  bp: boolean;
+  temp: boolean;
+  news2: boolean;
+  allBedStatuses: boolean;
+  rail: boolean;
+  exit: boolean;
+  lowestPosition: boolean;
+  brake: boolean;
+  weight: boolean;
+  fallRisk: boolean;
+}
+
+interface layoutProp {
+  cardLayout: layout | undefined;
+}
+
+function TileCustomisationModal({ cardLayout }: layoutProp) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const handleSubmit = () => {
-    console.log("submit and redirect");
-  };
+  const [currLayout, setCurrLayout] = useState(cardLayout as layout);
+  const { data: sessionData } = useSession();
 
-  interface Vital {
-    allVitals: boolean;
-    hr: boolean;
-    rr: boolean;
-    spo2: boolean;
-    bp: boolean;
-    temp: boolean;
-    news2: boolean;
-  }
+  useEffect(() => {
+    if (cardLayout) {
+      setCurrLayout(cardLayout);
+    }
+  }, [cardLayout]);
 
-  interface Bed {
-    allBedStatuses: boolean;
-    rail: boolean;
-    exit: boolean;
-    lowestPosition: boolean;
-    brake: boolean;
-    weight: boolean;
-    fallRisk: boolean;
-  }
-
-  const [vitals, setVitalsState] = useState<Vital>({
-    allVitals: true,
-    hr: true,
-    rr: true,
-    spo2: true,
-    bp: true,
-    temp: true,
-    news2: true,
-  });
-
-  const [bed, setBedState] = useState<Bed>({
-    allBedStatuses: true,
-    rail: true,
-    exit: true,
-    lowestPosition: true,
-    brake: true,
-    weight: true,
-    fallRisk: true,
-  });
-
-  const vitalCheckboxes: { name: keyof Vital; label: string }[] = [
+  const checkboxes: { name: string; label: string }[] = [
     { name: "allVitals", label: "All Vitals" },
     { name: "hr", label: "Heart Rate" },
     { name: "rr", label: "Respiratory Rate" },
@@ -68,9 +57,6 @@ function TileCustomisationModal() {
     { name: "bp", label: "Blood Pressure" },
     { name: "temp", label: "Temperature" },
     { name: "news2", label: "NEWS2" },
-  ];
-
-  const bedCheckboxes: { name: keyof Bed; label: string }[] = [
     { name: "allBedStatuses", label: "All Bed Statuses" },
     { name: "rail", label: "Patient & Rail Visuals" },
     { name: "exit", label: "Bed Exit Status" },
@@ -80,42 +66,19 @@ function TileCustomisationModal() {
     { name: "fallRisk", label: "Fall Risk of Patient" },
   ];
 
-  const handleVitalsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = event.target;
-    if (name === "allVitals") {
-      setVitalsState((prevVitals) => {
-        const updatedVitals = { ...prevVitals };
-        for (const key in updatedVitals) {
-          const vitalKey = key as keyof Vital;
-          updatedVitals[vitalKey] = checked;
-        }
-        return updatedVitals;
-      });
-    } else {
-      setVitalsState({
-        ...vitals,
-        [name]: checked,
-      });
-    }
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name } = event.target;
+    const updatedLayout = { ...currLayout };
+    updatedLayout[name] = !updatedLayout[name];
+    setCurrLayout(updatedLayout);
   };
 
-  const handleBedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = event.target;
-    if (name === "allBedStatuses") {
-      setBedState((prevBed) => {
-        const updatedBed = { ...prevBed };
-        for (const key in updatedBed) {
-          const bedKey = key as keyof Bed;
-          updatedBed[bedKey] = checked;
-        }
-        return updatedBed;
-      });
-    } else {
-      setBedState({
-        ...bed,
-        [name]: checked,
-      });
-    }
+  const handleSubmit = () => {
+    console.log("submitting");
+    const res = updateVirtualNurseCardLayoutByNurseId(
+      sessionData?.user.id,
+      currLayout
+    );
   };
 
   return (
@@ -142,13 +105,13 @@ function TileCustomisationModal() {
           <Box display={"flex"}>
             <FormControl sx={{ m: 0 }}>
               <FormLabel disabled={true}>Vitals</FormLabel>
-              {vitalCheckboxes.map((checkbox, index) => (
+              {checkboxes.slice(1, 7).map((checkbox, index) => (
                 <FormControlLabel
                   key={index}
                   control={
                     <Checkbox
-                      checked={vitals[checkbox.name]}
-                      onChange={handleVitalsChange}
+                      checked={currLayout?.[checkbox.name]}
+                      onChange={handleChange}
                       name={checkbox.name}
                     />
                   }
@@ -157,14 +120,14 @@ function TileCustomisationModal() {
               ))}
             </FormControl>
             <FormControl sx={{ m: 0 }}>
-              <FormLabel disabled={true}>Bed</FormLabel>
-              {bedCheckboxes.map((checkbox, index) => (
+              <FormLabel disabled={true}>Vitals</FormLabel>
+              {checkboxes.slice(8, 14).map((checkbox, index) => (
                 <FormControlLabel
                   key={index}
                   control={
                     <Checkbox
-                      checked={bed[checkbox.name]}
-                      onChange={handleBedChange}
+                      checked={currLayout?.[checkbox.name]}
+                      onChange={handleChange}
                       name={checkbox.name}
                     />
                   }
