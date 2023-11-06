@@ -32,3 +32,17 @@ export const updateSmartbedByBedId = async (
     console.error(error);
   }
 };
+
+export const updateProtocolBreachReason = async (
+  bedId: string | string[] | undefined,
+  reason: string
+) => {
+  try {
+    const res = await axios.put(`http://localhost:3001/smartbed/${bedId}/`, {
+      bedAlarmProtocolBreachReason: reason,
+    });
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
+};

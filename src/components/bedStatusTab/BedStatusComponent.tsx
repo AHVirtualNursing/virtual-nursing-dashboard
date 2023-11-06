@@ -1,39 +1,68 @@
 import { SmartBed } from "@/models/smartBed";
-import React from "react";
-import ManIcon from "@mui/icons-material/Man";
+import React, { useState } from "react";
 import WarningIcon from "@mui/icons-material/Warning";
+import { updateProtocolBreachReason } from "@/pages/api/smartbed_api";
 
 interface BedProp {
   bed: SmartBed | undefined;
 }
 
-function BedStatusComponent(bedProp: BedProp) {
+const BedStatusComponent = (bedProp: BedProp) => {
+  const [fallRisk, setFallRisk] = useState<string>("high");
+  const [reasonAdded, setReasonAdded] = useState<boolean>(false);
+  const [inputReason, setInputReason] = useState<string>("");
+
+  const { bed } = bedProp;
+
+  const handleConfirm = () => {
+    setReasonAdded(true);
+    updateProtocolBreachReason(bed?._id, inputReason);
+  };
+
+  const BedAlarmWarning = () => {
+    return (
+      fallRisk === "high" &&
+      !bed?.isBedAlarmOn && (
+        <WarningIcon color={reasonAdded ? "warning" : "error"} />
+      )
+    );
+  };
+
+  const ConfirmButton = () => {
+    return (
+      fallRisk === "high" &&
+      !bed?.isBedAlarmOn &&
+      reasonAdded === false && (
+        <button className="float-right p-1" onClick={handleConfirm}>
+          Confirm
+        </button>
+      )
+    );
+  };
+
   return (
     <div className="flex max-h-[470px] overflow-auto scrollbar p-2 gap-5">
       <div id="bed-image" className="flex-1 p-2">
-        <div id="upper-rails" className="flex gap-5 justify-evenly pt-4">
+        <div id="left-rails" className="flex gap-5 justify-evenly pt-4">
           <BedRailCard
             id="upper-left"
             info={bedProp.bed?.isLeftUpperRail}
             rail="Upper Left"
           />
           <BedRailCard
-            id="upper-right"
-            info={bedProp.bed?.isRightUpperRail}
-            rail="Upper Right"
-          />
-        </div>
-        <ManIcon
-          sx={{
-            fontSize: "200px",
-            transform: "rotate(-90deg)",
-          }}
-        />
-        <div id="lower-rails" className="flex gap-5 justify-evenly pb-4">
-          <BedRailCard
             id="lower-left"
             info={bedProp.bed?.isLeftLowerRail}
             rail="Lower Left"
+          />
+        </div>
+
+        <img src="/bed_stock.png" alt="Patient lying in bed" />
+
+        <div id="right-rails" className="flex gap-5 justify-evenly pb-4">
+          <BedRailCard
+            id="upper-right"
+            info={bedProp.bed?.isRightUpperRail}
+            rail="Upper Right"
           />
           <BedRailCard
             id="lower-right"
@@ -60,27 +89,38 @@ function BedStatusComponent(bedProp: BedProp) {
         <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
           Bed Position: {bedProp.bed?.bedPosition}
         </div>
-        <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
-          Bed Height: {bedProp.bed?.isLowestPosition ? "Lowest" : "Not Lowest"}
+        <div className="bg-slate-200 font-bold rounded-lg uppercase flex gap-x-10 px-2 py-1 items-center ">
+          <p>
+            Bed Alarm: {bedProp.bed?.isLowestPosition ? "lowest" : "not lowest"}
+          </p>
+          {!bedProp.bed?.isLowestPosition && <WarningIcon color="warning" />}
         </div>
         <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
           Brake Wheels: {bedProp.bed?.isBrakeSet ? "Locked" : "Not Locked"}
         </div>
         <div className="bg-slate-200 font-bold rounded-lg uppercase flex gap-x-10 px-2 py-1 items-center ">
-          <p>
-            Bed Alarm: {bedProp.bed?.bedAlarmTriggered ? "On" : "Not Turned On"}
-          </p>
-          <WarningIcon />
+          {/* - when fall risk high, bed alarm not turned on, red alert, input box and confirm appears
+              - when VN inputs + confirm,  red warning turns orange
+              - if bed alarm ON, or fall risk drop to medium/low, warning sign and input disappear
+          */}
+          <p>Bed Alarm: {bedProp.bed?.isBedAlarmOn ? "On" : "Not Turned On"}</p>
+          <BedAlarmWarning />
         </div>
-        <textarea
-          placeholder="Please input reason for protocol breach"
-          className=" focus:border-red-400 p-1 w-full"
-        />
-        <button className="float-right p-1">Confirm</button>
+        {fallRisk === "high" && !bed?.isBedAlarmOn && (
+          <textarea
+            value={inputReason}
+            name="reason-input"
+            placeholder="Please input reason for protocol breach"
+            className=" focus:border-red-400 p-1 w-full"
+            disabled={reasonAdded ? true : false}
+            onChange={(event) => setInputReason(event.target.value)}
+          />
+        )}
+        <ConfirmButton />
       </div>
     </div>
   );
-}
+};
 
 type BedRailCardProps = {
   id: string;
