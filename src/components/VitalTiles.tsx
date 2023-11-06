@@ -25,7 +25,7 @@ interface layout {
 }
 
 const VitalTiles = ({ data, cardLayout }: VitalProps) => {
-  console.log(data);
+  // console.log(data);
 
   return (
     <div className="flex justify-around mt-2">

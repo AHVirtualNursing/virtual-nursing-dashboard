@@ -148,14 +148,14 @@ export default function Patients({ selectedWard }: PatientListProps) {
 
   // fetching vitals immediately after beds are populated
   useEffect(() => {
-    console.log("first");
+    // console.log("first");
     if (data.length > 0) {
       fetchPatientVitals();
     }
   }, [data]);
 
   useEffect(() => {
-    console.log("fetch vitals interval use effect");
+    // console.log("fetch vitals interval use effect");
     if (data.length > 0) {
       const interval = setInterval(() => {
         fetchPatientVitals();

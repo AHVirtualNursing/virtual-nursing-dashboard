@@ -30,7 +30,7 @@ export const fetchVirtualNurseByNurseId = async (
     const res = await axios.get(`http://localhost:3001/user/${nurseId}`, {
       headers,
     });
-    console.log(res);
+    // console.log(res);
     return res.data;
   } catch (error) {
     console.error(error);

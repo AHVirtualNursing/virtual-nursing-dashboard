@@ -17,7 +17,7 @@ const DashboardAlertIcon = ({ patientId }: DashboardAlertIconProps) => {
   useEffect(() => {
     const socket = io("http://localhost:3001");
     const nurseId = sessionData?.user.id;
-    socket.emit("alertConnections", nurseId);
+    // socket.emit("alertConnections", nurseId);
     socket.on("patientAlertAdded", (data: any) => {
       setAlertsList(data);
     });

@@ -116,7 +116,7 @@ export default function Wards() {
       }
       smartBedIds.map((id) => promises.push(fetchBedByBedId(id)));
       Promise.all(promises).then((res) => {
-        console.log("Smart Beds assigned to VN", res);
+        // console.log("Smart Beds assigned to VN", res);
         setData(res.filter((sb) => sb.ward && sb.patient));
       });
     });
@@ -127,14 +127,14 @@ export default function Wards() {
 
   // fetching vitals immediately after beds are populated
   useEffect(() => {
-    console.log("first");
+    // console.log("first");
     if (data.length > 0) {
       fetchPatientVitals();
     }
   }, [data]);
 
   useEffect(() => {
-    console.log("fetch vitals interval use effect");
+    // console.log("fetch vitals interval use effect");
     if (data.length > 0) {
       const interval = setInterval(() => {
         fetchPatientVitals();

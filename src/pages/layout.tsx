@@ -6,23 +6,40 @@ import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { io } from "socket.io-client";
 import { useSession } from "next-auth/react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function layout({ children }: { children: React.ReactNode }) {
   const { data: sessionData } = useSession();
+  const socket = io("http://localhost:3001");
+  const nurseId = sessionData?.user.id;
 
   useEffect(() => {
     console.log("SOCKET USEEFFECT");
-    const socket = io("http://localhost:3001");
-    const nurseId = sessionData?.user.id;
     console.log(nurseId);
+    console.log("BEFORE EMIT");
     socket.emit("alertConnections", nurseId);
-    socket.on("alertIncoming", (data: any) => {
+    const handleAlertIncoming = (data: any) => {
       console.log(data);
-    });
+      toast.error("VERY SERIOUS ALERT", {
+        position: "bottom-right",
+        autoClose: 10000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    };
+
+    socket.on("alertIncoming", handleAlertIncoming);
+
+    // Clean up the event listener when the component unmounts
     return () => {
-      socket.close();
+      socket.off("alertIncoming", handleAlertIncoming);
     };
   }, []);
 
@@ -34,6 +51,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <ToastContainer />
       <Header />
       <Sidebar />
       <main

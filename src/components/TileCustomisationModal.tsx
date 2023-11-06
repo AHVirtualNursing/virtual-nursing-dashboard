@@ -9,7 +9,6 @@ import {
 } from "@mui/material";
 import React, { use, useEffect, useState } from "react";
 import { ModalBoxStyle } from "@/styles/StyleTemplates";
-import layout from "@/pages/layout";
 import { updateVirtualNurseCardLayoutByNurseId } from "@/pages/api/nurse_api";
 import { useSession } from "next-auth/react";
 import router from "next/router";
