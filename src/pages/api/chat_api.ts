@@ -41,7 +41,8 @@ export const addNewMessageToChat = async (
 export const addNewPatientMessageToChat = async (
   chatId: string,
   message: Message,
-  createdBy: string
+  createdBy: string,
+  content: string
 ) => {
   try {
     const url = process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + "/chat/message";
@@ -50,7 +51,7 @@ export const addNewPatientMessageToChat = async (
         chatId: chatId,
         patient: message.patient?._id,
         createdBy: createdBy,
-        content: "Virtual Nurse shared a Patient vitals with you."
+        content: content
       });
 
       const data = await res.data;
