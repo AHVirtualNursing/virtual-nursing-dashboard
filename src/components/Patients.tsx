@@ -238,6 +238,8 @@ export default function Patients({ selectedWard }: PatientListProps) {
             <TableSubHeader subheaderText="Right Lower" />
             <TableSubHeader subheaderText="Left Upper" />
             <TableSubHeader subheaderText="Left Lower" />
+            <TableSubHeader subheaderText="" />
+            <TableSubHeader subheaderText="" />
             <TableSubHeader subheaderText="Result" />
             <TableSubHeader subheaderText="Reading" />
             <TableSubHeader subheaderText="Reading" />

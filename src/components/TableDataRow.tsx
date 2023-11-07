@@ -2,7 +2,7 @@ import React from "react";
 
 type TableDataRowProps = {
   id: string;
-  width: string;
+  width?: string;
   data: string | string[] | number | undefined;
 };
 
