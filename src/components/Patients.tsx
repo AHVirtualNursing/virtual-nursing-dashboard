@@ -186,8 +186,8 @@ export default function Patients({ selectedWard }: PatientListProps) {
   }, [vitals, data]);
 
   return (
-    <div className="h-full overflow-auto scrollbar">
-      <table className="table-fixed w-full border-collapse border-spacing-3">
+    <div className="h-full overflow-auto scrollbar w-full">
+      <table className="table-fixed border-collapse border-spacing-3">
         <thead className="text-sm text-left">
           {/* ------ column headers ------ */}
           <tr>
@@ -199,11 +199,13 @@ export default function Patients({ selectedWard }: PatientListProps) {
             <th>Bed</th>
             <th>Ward</th>
             <th colSpan={4}>Bed Rails</th>
-            <th>Bed Brakes</th>
-            <th>Bed Lowest</th>
+            <th className="px-1">Bed Brakes</th>
+            <th className="px-1">Bed Lowest</th>
             <th>Blood Pressure</th>
             <th>Heart Rate</th>
-            <th>Saturation</th>
+            <th className="px-1">Respiratory Rate</th>
+            <th className="px-1">Saturation</th>
+            <th>Temperature</th>
           </tr>
         </thead>
         <tbody ref={parent}>
@@ -241,6 +243,8 @@ export default function Patients({ selectedWard }: PatientListProps) {
             <TableSubHeader subheaderText="" />
             <TableSubHeader subheaderText="" />
             <TableSubHeader subheaderText="Result" />
+            <TableSubHeader subheaderText="Reading" />
+            <TableSubHeader subheaderText="Reading" />
             <TableSubHeader subheaderText="Reading" />
             <TableSubHeader subheaderText="Reading" />
           </tr>
@@ -351,12 +355,28 @@ export default function Patients({ selectedWard }: PatientListProps) {
                     ]?.reading
                   )}
                 />
+                <TableDataRow
+                  id="resp-reading"
+                  width="1/5"
+                  data={
+                    vitals[index]?.respRate[vitals[index]?.respRate.length - 1]
+                      ?.reading
+                  }
+                />
 
                 <TableDataRow
                   id="spo2-reading"
-                  width="1/12"
                   data={
                     vitals[index]?.spO2[vitals[index]?.spO2.length - 1]?.reading
+                  }
+                />
+
+                <TableDataRow
+                  id="temp-reading"
+                  data={
+                    vitals[index]?.temperature[
+                      vitals[index]?.temperature.length - 1
+                    ]?.reading
                   }
                 />
               </tr>
