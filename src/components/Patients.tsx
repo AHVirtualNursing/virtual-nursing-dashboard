@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import { fetchBedByBedId } from "@/pages/api/smartbed_api";
@@ -12,6 +12,8 @@ import TableDataRow from "./TableDataRow";
 import { Ward } from "@/models/ward";
 import Link from "next/link";
 import DashboardAlertIcon from "./DashboardAlertIcon";
+import { SocketContext } from "@/pages/layout";
+import { Alert } from "@/models/alert";
 
 type PatientListProps = {
   /**
@@ -28,6 +30,8 @@ export default function Patients({ selectedWard }: PatientListProps) {
   const [searchCondition, setSearchCondition] = useState<string>("");
   const [vitals, setVitals] = useState<any[]>([]);
   const { data: sessionData } = useSession();
+  const socket = useContext(SocketContext);
+  const [socketData, setSocketData] = useState<Alert>();
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
@@ -122,6 +126,21 @@ export default function Patients({ selectedWard }: PatientListProps) {
       setVitals(sortedVitals);
     }
   };
+
+  useEffect(() => {
+    const handleAlertIncoming = (data: any) => {
+      setSocketData(data);
+    };
+    const handleDeleteAlert = (data: any) => {
+      setSocketData(data);
+    };
+    socket.on("alertIncoming", handleAlertIncoming);
+    socket.on("patientAlertDeleted", handleDeleteAlert);
+    return () => {
+      socket.off("alertIncoming", handleAlertIncoming);
+      socket.off("patientAlertDeleted", handleDeleteAlert);
+    };
+  }, []);
 
   useEffect(() => {
     fetchWardsByVirtualNurse(sessionData?.user.id).then((wards) => {
@@ -230,7 +249,14 @@ export default function Patients({ selectedWard }: PatientListProps) {
                     href={`/patientVisualisation?patientId=${pd.patient?._id}&bedId=${pd._id}&viewAlerts=true`}
                     as={`/patientVisualisation?patientId=${pd.patient?._id}&bedId=${pd._id}`}
                   >
-                    <DashboardAlertIcon patientId={pd.patient?._id} />
+                    <DashboardAlertIcon
+                      patientId={pd.patient?._id}
+                      socketData={
+                        socketData?.patient === pd.patient?._id
+                          ? socketData
+                          : null
+                      }
+                    />
                   </Link>
                 </td>
                 <td
