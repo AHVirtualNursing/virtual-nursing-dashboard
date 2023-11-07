@@ -109,7 +109,7 @@ const patientVisualisationPage = () => {
         ) : currentTab === "analytics" ? (
           <PatientChart patient={selectedBed?.patient} />
         ) : currentTab === "reports" ? (
-          <PatientReport patient={selectedBed?.patient} />
+          <PatientReport patientId={patientId as string} />
         ) : currentTab === "alerts" ? (
           <AlertTabComponent patient={selectedBed?.patient} />
         ) : null}

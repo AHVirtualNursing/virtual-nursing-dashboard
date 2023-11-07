@@ -1,9 +1,8 @@
-export class Report {
-  _id: string;
+export interface Report {
+  _id: string
+  name: string;
+  type: string;
   content: string;
-
-  constructor(_id: string, content: string) {
-    this._id = _id;
-    this.content = content;
-  }
+  url: string;
+  createdAt: string;
 }

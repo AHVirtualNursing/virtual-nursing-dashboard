@@ -1,6 +1,5 @@
 import { Alert } from "./alert";
 import { Reminder } from "./reminder";
-import { Vital } from "./vital";
 import { Report } from "./report";
 import { AlertConfig } from "./alertConfig";
 import { Layouts } from "react-grid-layout";
@@ -22,7 +21,7 @@ export class Patient {
   reminders?: Reminder[];
   isDischarged?: boolean;
   vital?: string;
-  reports?: Report[];
+  reports?: string[];
   layout?: Layouts;
 
   constructor(
@@ -42,7 +41,7 @@ export class Patient {
     reminders?: Reminder[],
     isDischarged?: boolean,
     vital?: string,
-    reports?: Report[],
+    reports?: string[],
     layout?: Layouts
   ) {
     this._id = _id;

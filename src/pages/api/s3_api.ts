@@ -57,8 +57,7 @@ export const callRetrieveFileWithPresignedUrl = async (url: string) => {
         url: url,
       }
     );
-
-    return response.data.url;
+    return response.data.presignedUrl;
   } catch (error) {
     console.error(error);
   }
