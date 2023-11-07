@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart,
@@ -14,6 +14,8 @@ import {
 import zoomPlugin from "chartjs-plugin-zoom";
 import annotationPlugin from "chartjs-plugin-annotation";
 import { usePDF } from "react-to-pdf";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import { Patient } from "@/models/patient";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import {
@@ -26,12 +28,18 @@ import {
   Grid,
   InputAdornment,
   Modal,
+  Snackbar,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
+import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import SettingsIcon from "@mui/icons-material/Settings";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import {
   getGradient,
   updateBorderDash,
@@ -41,6 +49,8 @@ import {
   getDateTime,
 } from "./utils";
 import { ModalBoxStyle } from "@/styles/StyleTemplates";
+import { callUploadFileToS3Api } from "@/pages/api/s3_api";
+import { callCreateReportApi } from "@/pages/api/report_api";
 
 interface PatientChartProps {
   patient?: Patient;
@@ -65,6 +75,13 @@ interface VitalData {
   temperature: VitalReading[];
   respRate: VitalReading[];
 }
+
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref
+) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
   Chart.register(
@@ -113,7 +130,10 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     name: `${patient?.name} Vitals Charts`,
     notes: "",
   });
-  const [showSavePdfModal, setShowSavePdfModal] = useState(false);
+  const [showChartOptionsModal, setShowChartOptionsModal] = useState(false);
+
+  const [uploading, setUploading] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const { toPDF, targetRef } = usePDF({
     filename: pdfDetails.name + ".pdf",
@@ -291,8 +311,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     );
   };
 
-  const handleShowSavePdfModal = () => {
-    setShowSavePdfModal((prevState) => !prevState);
+  const handleShowChartOptionsModal = () => {
+    setShowChartOptionsModal((prevState) => !prevState);
   };
 
   const handlePdfDetails = (
@@ -305,13 +325,65 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     });
   };
 
-  const handleSavePdf = () => {
-    handleShowSavePdfModal();
-    toPDF();
+  const resetChart = () => {
+    setSelectedVitals({
+      heartRate: true,
+      bloodPressure: false,
+      spO2: false,
+      temperature: false,
+      respRate: false,
+    });
+
+    setSelectedIndicators({
+      threshold: false,
+      exceedance: false,
+      increasingTrend: false,
+    });
+
+    setSelectedTimeRange("1D");
+
     setPdfDetails({
-      ...pdfDetails,
+      name: `${patient?.name} Vitals Charts`,
       notes: "",
     });
+  };
+
+  const handleSavePdf = () => {
+    handleShowChartOptionsModal();
+    toPDF();
+  };
+
+  const uploadChart = (componentRef: any) => {
+    const pdf = new jsPDF("p", "mm", "a4");
+    if (componentRef && patient) {
+      html2canvas(componentRef).then(async (canvas) => {
+        setUploading(true);
+        const imgData = canvas.toDataURL("image/png");
+        pdf.addImage(imgData, "PNG", 10, 10, 180, 140);
+        const blob = new Blob([pdf.output("blob")], {
+          type: "application/pdf",
+        });
+        const fileName = `${pdfDetails.name}.pdf`;
+        const pdfFile = new File([blob], fileName, {
+          type: "application/pdf",
+        });
+        const url = await callUploadFileToS3Api(
+          pdfFile,
+          "reports/event-reports"
+        );
+        await callCreateReportApi(patient._id, fileName, "event", url);
+        setOpenSnackbar(true);
+        handleShowChartOptionsModal();
+        setUploading(false);
+      });
+    }
+  };
+
+  const handleCloseSnackbar = (_?: SyntheticEvent | Event, reason?: string) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenSnackbar(false);
   };
 
   return (
@@ -377,9 +449,15 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
             <div className="ml-auto">
               <Button
                 className="ml-auto"
-                startIcon={<FileDownloadIcon />}
-                onClick={handleShowSavePdfModal}>
-                Save As PDF
+                startIcon={<RestartAltIcon />}
+                onClick={resetChart}>
+                Reset Chart
+              </Button>
+              <Button
+                className="ml-auto"
+                startIcon={<SettingsIcon />}
+                onClick={handleShowChartOptionsModal}>
+                Chart Options
               </Button>
             </div>
           </FormGroup>
@@ -544,7 +622,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           </Grid>
         </Box>
       </Modal>
-      <Modal open={showSavePdfModal} onClose={handleShowSavePdfModal}>
+      <Modal open={showChartOptionsModal} onClose={handleShowChartOptionsModal}>
         <Box sx={ModalBoxStyle}>
           <TextField
             label="PDF Name"
@@ -565,13 +643,37 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
             value={pdfDetails.notes}
             onChange={handlePdfDetails}
           />
-          <Box marginTop={2}>
-            <Button variant="contained" onClick={() => handleSavePdf()}>
+          <Box
+            marginTop={2}
+            sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+            <Button
+              startIcon={<FileDownloadIcon />}
+              variant="contained"
+              onClick={() => handleSavePdf()}>
               Save as PDF
             </Button>
+            <LoadingButton
+              startIcon={<CloudUploadIcon />}
+              variant="contained"
+              loading={uploading}
+              loadingPosition="start"
+              onClick={() => uploadChart(targetRef.current)}>
+              Upload Report
+            </LoadingButton>
           </Box>
         </Box>
       </Modal>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="success"
+          sx={{ width: "100%" }}>
+          Report uploaded successfully.
+        </Alert>
+      </Snackbar>
     </>
   );
 }
