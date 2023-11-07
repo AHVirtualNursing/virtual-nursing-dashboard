@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import CampaignIcon from "@mui/icons-material/Campaign";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import { fetchBedByBedId } from "@/pages/api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
@@ -37,16 +36,16 @@ export default function Patients({ selectedWard }: PatientListProps) {
     setSearchPatient(event.target.value);
   };
 
-  const parent = useRef(null);
-  useEffect(() => {
-    parent.current && autoAnimate(parent.current);
-  }, [parent]);
-
   const handleConditionSearch = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setSearchCondition(event.target.value);
   };
+
+  const parent = useRef(null);
+  useEffect(() => {
+    parent.current && autoAnimate(parent.current);
+  }, [parent]);
 
   const viewPatientVisualisation = (
     patientId: string | undefined,
@@ -187,17 +186,20 @@ export default function Patients({ selectedWard }: PatientListProps) {
 
   return (
     <div className="h-full overflow-auto scrollbar">
-      <table className="table-fixed w-full border-collapse">
+      <table className="table-fixed w-full border-collapse border-spacing-3">
         <thead className="text-sm text-left">
           {/* ------ column headers ------ */}
           <tr>
             <th></th>
-            <th className="p-2">Patient</th>
+            <th className="px-2">Patient</th>
             <th>Condition</th>
-            <th>Acuity Level</th>
+            <th className="px-2">Acuity Level</th>
             <th>Fall Risk</th>
             <th>Bed</th>
             <th>Ward</th>
+            <th colSpan={4}>Bed Rails</th>
+            <th>Bed Brakes</th>
+            <th>Bed Lowest</th>
             <th>Blood Pressure</th>
             <th>Heart Rate</th>
             <th>Saturation</th>
@@ -229,7 +231,14 @@ export default function Patients({ selectedWard }: PatientListProps) {
             </td>
             <TableSubHeader subheaderText="" />
             <TableSubHeader subheaderText="" />
+            <TableSubHeader subheaderText="Bed No." />
             <TableSubHeader subheaderText="Ward No." />
+            <TableSubHeader subheaderText="Right Upper" />
+            <TableSubHeader subheaderText="Right Lower" />
+            <TableSubHeader subheaderText="Left Upper" />
+            <TableSubHeader subheaderText="Left Lower" />
+            <TableSubHeader subheaderText="" />
+            <TableSubHeader subheaderText="" />
             <TableSubHeader subheaderText="Result" />
             <TableSubHeader subheaderText="Reading" />
             <TableSubHeader subheaderText="Reading" />
@@ -288,6 +297,36 @@ export default function Patients({ selectedWard }: PatientListProps) {
                   id="wardNum"
                   width="1/12"
                   data={pd.ward.wardNum}
+                />
+                <TableDataRow
+                  id="right-upper-rail"
+                  width="1/12"
+                  data={pd.isRightUpperRail ? "Up" : "Down"}
+                />
+                <TableDataRow
+                  id="right-lower-rail"
+                  width="1/12"
+                  data={pd.isRightLowerRail ? "Up" : "Down"}
+                />
+                <TableDataRow
+                  id="left-upper-rail"
+                  width="1/12"
+                  data={pd.isLeftUpperRail ? "Up" : "Down"}
+                />
+                <TableDataRow
+                  id="left-lower-rail"
+                  width="1/12"
+                  data={pd.isLeftLowerRail ? "Up" : "Down"}
+                />
+                <TableDataRow
+                  id="bed-brakes"
+                  width="1/12"
+                  data={pd.isBrakeSet ? "Set" : "Not Set"}
+                />
+                <TableDataRow
+                  id="lowest-position"
+                  width="1/12"
+                  data={pd.isLowestPosition ? "Yes" : "No"}
                 />
                 <TableDataRow
                   id="bp-reading"

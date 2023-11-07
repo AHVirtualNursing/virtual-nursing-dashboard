@@ -1,15 +1,14 @@
-import PendingFollowUps from "@/components/PendingFollowUps";
 import RuleConfigs from "@/components/RuleConfigs";
 import VitalConfigs from "@/components/VitalConfigs";
-import React, {useState} from "react";
+import React, { useState } from "react";
 
 function Configs() {
-  const tabPages = [{title: "Vitals"}, {title: "Rules"}];
+  const tabPages = [{ title: "Vitals" }, { title: "Rules" }];
   const vitalSelections = [
-    {name: "Blood Pressure"},
-    {name: "Heart Rate"},
-    {name: "Saturation"},
-    {name: "Temp"},
+    { name: "Blood Pressure" },
+    { name: "Heart Rate" },
+    { name: "Saturation" },
+    { name: "Temp" },
   ];
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedVital, setSelectedVital] = useState(0);
@@ -54,8 +53,8 @@ function Configs() {
           </div>
         )}
         <div className={`${selectedTab === 0 ? "w-11/12" : "w-full"}`}>
-          {selectedTab === 0 && <VitalConfigs/>}
-          {selectedTab === 1 && <RuleConfigs/>}
+          {selectedTab === 0 && <VitalConfigs />}
+          {selectedTab === 1 && <RuleConfigs />}
         </div>
       </div>
     </div>
