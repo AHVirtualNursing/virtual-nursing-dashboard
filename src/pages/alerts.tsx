@@ -1,71 +1,85 @@
-import React from "react";
-import { Typography, Box, Button } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import { styled } from "@mui/material/styles";
-import { signOut } from "next-auth/react";
-import { rows, columns } from "../mockData";
+import React, { useEffect, useState } from "react";
+import { fetchAllAlerts } from "./api/alerts_api";
+import { fetchPatientByPatientId } from "./api/patients_api";
+import { Alert } from "@/types/alert";
+import { Patient } from "@/types/patient";
+import TableDataRow from "@/components/TableDataRow";
+import AlertsTableRow from "@/components/AlertsTableRow";
 
-export default function Alerts() {
-  const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
-    "& .alert-OPEN": {
-      backgroundColor: "#FF5151",
-      "&:hover": {
-        cursor: "pointer",
-        backgroundColor: "#FF5151",
-      },
-    },
-    "& .alert-HANDLING": {
-      backgroundColor: "#FFA829",
-      "&:hover": {
-        cursor: "pointer",
-        backgroundColor: "#FFA829",
-      },
-    },
-    "& .alert-COMPLETED": {
-      backgroundColor: "lightgreen",
-      "&:hover": {
-        cursor: "pointer",
-        backgroundColor: "lightgreen",
-      },
-    },
-  }));
+const Alerts = () => {
+  const [alerts, setAlerts] = useState<Alert[]>();
+  const [patients, setPatients] = useState<Patient[] | undefined>();
 
-  const handleLogoutButton = () => {
-    signOut();
-  };
+  useEffect(() => {
+    fetchAllAlerts().then((alertsList) => {
+      setAlerts(alertsList.data);
+      const patientIds = alertsList.data.map((alert: Alert) => alert.patient);
+      let promises = patientIds.map((id: string) =>
+        fetchPatientByPatientId(id)
+      );
+      Promise.all(promises).then((res) => {
+        setPatients(res);
+      });
+    });
+  }, [alerts?.length]);
+
   return (
-    <div className="flex flex-col p-8 gap-8 bg-slate-100 w-full shadow-lg">
-      <Typography textAlign="left" sx={{ marginBottom: "20px" }} variant="h6">
-        View List of Alerts
-      </Typography>
-      <Box
-        sx={{
-          height: "70%",
-          width: "100%",
-        }}
-      >
-        <StyledDataGrid
-          rows={rows}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
-              },
-            },
-          }}
-          pageSizeOptions={[10]}
-          onRowDoubleClick={() => alert("You clicked me")}
-          getRowClassName={(params) => `alert-${params.row.Status}`}
-        />
-      </Box>
-      <Button
-        sx={{ marginTop: "20px" }}
-        variant="contained"
-        onClick={handleLogoutButton}
-      >
-        Temporary Logout
-      </Button>
+    <div className="overflow-auto scrollbar p-4 bg-slate-200 w-full">
+      <table className="table-auto border-collapse border-spacing-3">
+        <thead className="text-sm text-left">
+          {/* ------ column headers ------ */}
+          <tr>
+            <th>Patient</th>
+            <th>Status</th>
+            <th>Alert Type</th>
+            <th>Vital Measurement</th>
+            <th className="p-2">Description</th>
+            <th className="p-1">Bedside Nurse</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {alerts &&
+            alerts.map((alert, index) => (
+              <tr key={index} className="text-left">
+                <AlertsTableRow
+                  id="patient-name"
+                  width="1/12"
+                  data={patients && patients[index].name}
+                />
+                <AlertsTableRow
+                  id="alert-status"
+                  width="1/12"
+                  data={alert.status}
+                />
+                <AlertsTableRow
+                  id="abnormal-vital"
+                  data={alert.alertVitals.map((value) => value.vital)}
+                />
+                <AlertsTableRow
+                  id="abnormal-vital-reading"
+                  data={alert.alertVitals.map((value) => value.reading)}
+                />
+                <AlertsTableRow
+                  id="alert-description"
+                  data={alert.description}
+                />
+                <AlertsTableRow
+                  id="handling-nurse"
+                  width="1/12"
+                  data={alert.handledBy}
+                />
+                <AlertsTableRow
+                  id="alert-datetime"
+                  data={alert.createdAt.replace("T", " ").substring(0, 16)}
+                />
+              </tr>
+            ))}
+        </tbody>
+      </table>
     </div>
   );
-}
+};
+
+export default Alerts;
