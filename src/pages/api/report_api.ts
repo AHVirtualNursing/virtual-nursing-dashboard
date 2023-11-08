@@ -25,6 +25,30 @@ export const callCreateReportApi = async (
   }
 };
 
+export const callFetchAllReportsApi = async () => {
+  try {
+    const response = await axios.get(
+      process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + "/report"
+    );
+
+    return response.data.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const callFetchAllReportsWithPatientParticularsApi = async () => {
+  try {
+    const response = await axios.get(
+      process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + "/report/patient"
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const callFetchReportApi = async (reportId: string) => {
   try {
     const response = await axios.get(

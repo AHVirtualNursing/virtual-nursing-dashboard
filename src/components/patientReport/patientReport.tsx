@@ -17,13 +17,23 @@ import { Patient } from "@/models/patient";
 import { Report } from "@/models/report";
 import {
   callDeleteReportApi,
+  callFetchAllReportsWithPatientParticularsApi,
   callFetchReportApi,
 } from "@/pages/api/report_api";
 import { callRetrieveFileWithPresignedUrl } from "@/pages/api/s3_api";
 import { ModalBoxStyle } from "@/styles/StyleTemplates";
 import { fetchPatientByPatientId } from "@/pages/api/patients_api";
+import { convertToSingaporeTime } from "../utils/datetime";
 
-export default function PatientReport({ patientId }: { patientId: string }) {
+interface PatientReportProps {
+  viewType: "all" | "single";
+  patientId?: string;
+}
+
+export default function PatientReport({
+  viewType,
+  patientId,
+}: PatientReportProps) {
   const [reports, setReports] = useState<Report[]>([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -33,13 +43,17 @@ export default function PatientReport({ patientId }: { patientId: string }) {
   }, [refreshKey]);
 
   const fetchPatientReports = async () => {
-    const patient: Patient = await fetchPatientByPatientId(patientId);
-    if (patient && patient.reports) {
-      const reportPromises = patient.reports.map((reportId) => {
-        return callFetchReportApi(reportId);
-      });
-      const reports = await Promise.all(reportPromises);
-      console.log(reports);
+    if (patientId) {
+      const patient: Patient = await fetchPatientByPatientId(patientId);
+      if (patient && patient.reports) {
+        const reportPromises = patient.reports.map((reportId) => {
+          return callFetchReportApi(reportId);
+        });
+        const reports = await Promise.all(reportPromises);
+        setReports(reports);
+      }
+    } else {
+      const reports = await callFetchAllReportsWithPatientParticularsApi();
       setReports(reports);
     }
   };
@@ -75,8 +89,14 @@ export default function PatientReport({ patientId }: { patientId: string }) {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Type</TableCell>
+                {viewType == "all" && (
+                  <>
+                    <TableCell>Patient Name</TableCell>
+                    <TableCell>Patient NRIC</TableCell>
+                  </>
+                )}
+                <TableCell>Report Name</TableCell>
+                <TableCell>Report Type</TableCell>
                 <TableCell>Created At</TableCell>
                 <TableCell></TableCell>
               </TableRow>
@@ -84,11 +104,19 @@ export default function PatientReport({ patientId }: { patientId: string }) {
             {reports.map((report, index) => (
               <>
                 <TableRow key={index}>
+                  {viewType == "all" && (
+                    <>
+                      <TableCell>{report.patientName}</TableCell>
+                      <TableCell>{report.patientNric}</TableCell>
+                    </>
+                  )}
                   <TableCell>{report.name}</TableCell>
                   <TableCell>
                     {capitaliseFirstLetter(report.type)} Report
                   </TableCell>
-                  <TableCell>{report.createdAt}</TableCell>
+                  <TableCell>
+                    {convertToSingaporeTime(report.createdAt)}
+                  </TableCell>
                   <TableCell>
                     <Button
                       onClick={() => handleShowDeleteModal()}
