@@ -1,18 +1,31 @@
-import { SmartBed } from "@/models/smartBed";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import WarningIcon from "@mui/icons-material/Warning";
 import { updateProtocolBreachReason } from "@/pages/api/smartbed_api";
+import { SmartBed } from "@/types/smartbed";
+import { io } from "socket.io-client";
 
 interface BedProp {
   bed: SmartBed | undefined;
 }
 
 const BedStatusComponent = (bedProp: BedProp) => {
-  const [fallRisk, setFallRisk] = useState<string>("high");
+  const [fallRisk, setFallRisk] = useState<string | undefined>();
   const [reasonAdded, setReasonAdded] = useState<boolean>(false);
   const [inputReason, setInputReason] = useState<string>("");
 
   const { bed } = bedProp;
+  const socket = io("http://localhost:3001");
+  useEffect(() => {
+    socket.emit("connectPatient", bed?.patient?._id);
+    socket.on("newFallRisk", (data) => {
+      setFallRisk(data);
+    });
+    setFallRisk(bed?.patient?.fallRisk);
+
+    return () => {
+      socket.off("newFallRisk");
+    };
+  }, []);
 
   const handleConfirm = () => {
     setReasonAdded(true);
@@ -21,7 +34,7 @@ const BedStatusComponent = (bedProp: BedProp) => {
 
   const BedAlarmWarning = () => {
     return (
-      fallRisk === "high" &&
+      fallRisk === "High" &&
       !bed?.isBedAlarmOn && (
         <WarningIcon color={reasonAdded ? "warning" : "error"} />
       )
@@ -30,7 +43,7 @@ const BedStatusComponent = (bedProp: BedProp) => {
 
   const ConfirmButton = () => {
     return (
-      fallRisk === "high" &&
+      fallRisk === "High" &&
       !bed?.isBedAlarmOn &&
       reasonAdded === false && (
         <button className="float-right p-1" onClick={handleConfirm}>
@@ -106,7 +119,7 @@ const BedStatusComponent = (bedProp: BedProp) => {
           <p>Bed Alarm: {bedProp.bed?.isBedAlarmOn ? "On" : "Not Turned On"}</p>
           <BedAlarmWarning />
         </div>
-        {fallRisk === "high" && !bed?.isBedAlarmOn && (
+        {fallRisk === "High" && !bed?.isBedAlarmOn && (
           <textarea
             value={inputReason}
             name="reason-input"

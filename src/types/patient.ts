@@ -4,6 +4,7 @@ import { Reminder } from "./reminder";
 import { Vital } from "./vital";
 
 export type Patient = {
+  _id: string;
   name: string;
   nric: string;
   picture: string;
