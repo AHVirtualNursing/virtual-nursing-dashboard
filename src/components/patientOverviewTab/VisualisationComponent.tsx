@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { Patient } from "@/models/patient";
 import { updatePatientLayoutByPatientId } from "@/pages/api/patients_api";
-import { io } from "socket.io-client";
 import { useRouter } from "next/router";
 import { Vital } from "@/models/vital";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
@@ -33,17 +32,18 @@ import ClearIcon from "@mui/icons-material/Clear";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AddIcon from "@mui/icons-material/Add";
+import { SocketContext } from "@/pages/layout";
 
 interface ComponentProp {
   patient: Patient | undefined;
 }
 
 export default function VisualisationComponent({ patient }: ComponentProp) {
-  // const [order, setOrder] = useState([]);
-  // const [drawerOrder, setDrawerOrder] = useState([]);
   const [order, setOrder] = useState<string[]>([]);
   const [drawerOrder, setDrawerOrder] = useState<string[]>([]);
   const [changesMade, setChangeMade] = useState(false);
+  const socket = useContext(SocketContext);
+
   console.log(order);
   console.log(drawerOrder);
 
@@ -252,11 +252,7 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
   const router = useRouter();
 
   useEffect(() => {
-    const socket = io("http://localhost:3001");
-    const patientId = router.query.patientId;
-    socket.emit("connectDashboard", patientId);
-    socket.on("updateVitals", (data: SocketData) => {
-      console.log(data);
+    const updateCharts = (data: any) => {
       const datetime = new Date(data.datetime);
       const hours = datetime.getHours().toString().padStart(2, "0");
       const minutes = datetime.getMinutes().toString().padStart(2, "0");
@@ -310,10 +306,15 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
           return newData;
         });
       }
-    });
+    };
+
+    const patientId = router.query.patientId;
+    socket.emit("connectDashboard", patientId);
+    socket.on("updateVitals", updateCharts);
 
     return () => {
-      socket.close();
+      socket.off("updateVitals", updateCharts);
+      socket.emit("disconnectDashboard", patientId);
     };
   }, []);
 
