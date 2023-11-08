@@ -1,22 +1,46 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart,
+  ChartData,
   CategoryScale,
+  Legend,
   LinearScale,
-  PointElement,
   LineElement,
+  PointElement,
   Title,
   Tooltip,
-  Legend,
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
 import annotationPlugin from "chartjs-plugin-annotation";
+import { usePDF } from "react-to-pdf";
 import { Patient } from "@/models/patient";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
-import FormGroup from "@mui/material/FormGroup";
-import { Checkbox, FormControlLabel, FormLabel, Grid } from "@mui/material";
-import { showNormalRangeAnnotations } from "./patientAnalyticsChartOptions";
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  FormLabel,
+  Grid,
+  InputAdornment,
+  Modal,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import {
+  getGradient,
+  updateBorderDash,
+  updateChartOptions,
+  vitalChartAttributes,
+  updateLabels,
+  getDateTime,
+} from "./utils";
+import { ModalBoxStyle } from "@/styles/StyleTemplates";
 
 interface PatientChartProps {
   patient?: Patient;
@@ -38,6 +62,8 @@ interface VitalData {
   spO2: VitalReading[];
   bloodPressureSys: VitalReading[];
   bloodPressureDia: VitalReading[];
+  temperature: VitalReading[];
+  respRate: VitalReading[];
 }
 
 export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
@@ -58,16 +84,39 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     spO2: [],
     bloodPressureSys: [],
     bloodPressureDia: [],
+    temperature: [],
+    respRate: [],
   });
 
   const [selectedVitals, setSelectedVitals] = useState({
-    bloodPressure: true,
     heartRate: true,
-    spO2: true,
+    bloodPressure: false,
+    spO2: false,
+    temperature: false,
+    respRate: false,
   });
 
   const [selectedIndicators, setSelectedIndicators] = useState({
-    normalRange: false,
+    threshold: false,
+    exceedance: false,
+    increasingTrend: false,
+  });
+
+  const [selectedTimeRange, setSelectedTimeRange] = useState("1D");
+
+  const [customStartDate, setCustomStartDate] = useState(new Date());
+  const [customEndDate, setCustomEndDate] = useState(new Date());
+  const [showCustomDateRangeModal, setShowCustomDateRangeModal] =
+    useState(false);
+
+  const [pdfDetails, setPdfDetails] = useState({
+    name: `${patient?.name} Vitals Charts`,
+    notes: "",
+  });
+  const [showSavePdfModal, setShowSavePdfModal] = useState(false);
+
+  const { toPDF, targetRef } = usePDF({
+    filename: pdfDetails.name + ".pdf",
   });
 
   useEffect(() => {
@@ -79,171 +128,129 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     setVitals(res);
   };
 
-  const colors = {
-    heartRate: {
-      low: "rgb(255, 191, 0)",
-      normal: "rgb(147, 197, 114)",
-      high: "rgb(255, 191, 0)",
-    },
-    spO2: {
-      low: "rgb(64, 224, 208)",
-      normal: "rgb(100, 149, 237)",
-      high: "rgb(255, 0, 255)",
-    },
-    bloodPressureSys: {
-      low: "rgb(210, 4, 45)",
-      normal: "rgb(0, 163, 108)",
-      high: "rgb(210, 4, 45)",
-    },
-    bloodPressureDia: {
-      low: "rgb(255, 117, 24)",
-      normal: "rgb(159, 226, 191)",
-      high: "rgb(255, 117, 24)",
-    },
-  };
-
-  const updateColorByThreshold = (
-    reading: any,
-    vitalType: "heartRate" | "spO2" | "bloodPressureSys" | "bloodPressureDia"
-  ) => {
-    const thresholds = {
-      heartRate: {
-        min: 60,
-        max: 100,
-      },
-      spO2: {
-        min: 95,
-        max: 100,
-      },
-      bloodPressureSys: {
-        min: 90,
-        max: 120,
-      },
-      bloodPressureDia: {
-        min: 60,
-        max: 80,
-      },
-    };
-
-    const p1 = reading.p1.raw;
-    if (vitalType === "heartRate") {
-      if (p1 < thresholds.heartRate.min) {
-        return colors.heartRate.low;
-      } else if (p1 > thresholds.heartRate.max) {
-        return colors.heartRate.high;
-      }
-    } else if (vitalType === "spO2") {
-      if (p1 < thresholds.spO2.min) {
-        return colors.spO2.low;
-      }
-    } else if (vitalType === "bloodPressureSys") {
-      if (p1 < thresholds.bloodPressureSys.min) {
-        return colors.bloodPressureSys.low;
-      } else if (p1 > thresholds.bloodPressureSys.max) {
-        return colors.bloodPressureSys.high;
-      }
-    } else if (vitalType === "bloodPressureDia") {
-      if (p1 < thresholds.bloodPressureDia.min) {
-        return colors.bloodPressureDia.low;
-      } else if (p1 > thresholds.bloodPressureDia.max) {
-        return colors.bloodPressureDia.high;
-      }
-    }
-  };
-
-  const updateChartData = () => {
-    const data = {
-      labels: vitals.heartRate.map(
-        (vitalReading) => vitalReading.datetime.split(" ")[1]
-      ),
+  const updateChartData = (chartId: string) => {
+    const data: ChartData<"line"> = {
+      labels: updateLabels(vitals.heartRate, selectedTimeRange),
       datasets: [] as Dataset[],
     };
 
-    if (selectedVitals.heartRate) {
-      data.datasets.push({
-        label: "Heart Rate (bpm)",
-        data: vitals.heartRate.map((vitalReading) => vitalReading.reading),
-        borderColor: colors.heartRate.normal,
-        segment: {
-          borderColor: (segment: any) =>
-            updateColorByThreshold(segment, "heartRate"),
-        },
-        spanGaps: true,
-      } as Dataset);
-    }
+    if (chartId == "chart1") {
+      if (selectedVitals.heartRate) {
+        data.datasets.push({
+          label: "Heart Rate (bpm)",
+          data: vitals.heartRate.map((vitalReading) => vitalReading.reading),
+          borderColor: (context: any) => {
+            return selectedIndicators.exceedance
+              ? getGradient(context, "heartRate")
+              : vitalChartAttributes.heartRate.normal;
+          },
+          segment: {
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
+          },
+          yAxisID: vitalChartAttributes.heartRate.yScaleID,
+        } as unknown as Dataset);
+      }
 
-    if (selectedVitals.spO2) {
-      data.datasets.push({
-        label: "Blood Oxygen (%)",
-        data: vitals.spO2.map((vitalReading) => vitalReading.reading),
-        borderColor: colors.spO2.normal,
-        segment: {
-          borderColor: (segment: any) =>
-            updateColorByThreshold(segment, "spO2"),
-        },
-      } as Dataset);
-    }
+      if (selectedVitals.spO2) {
+        data.datasets.push({
+          label: "Blood Oxygen (%)",
+          data: vitals.spO2.map((vitalReading) => vitalReading.reading),
+          borderColor: (context: any) => {
+            return selectedIndicators.exceedance
+              ? getGradient(context, "spO2")
+              : vitalChartAttributes.spO2.normal;
+          },
+          segment: {
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
+          },
+          yAxisID: vitalChartAttributes.spO2.yScaleID,
+        } as unknown as Dataset);
+      }
 
-    if (selectedVitals.bloodPressure) {
-      data.datasets.push({
-        label: "Blood Pressure Systolic (mm Hg)",
-        data: vitals.bloodPressureSys.map(
-          (vitalReading) => vitalReading.reading
-        ),
-        borderColor: colors.bloodPressureSys.normal,
-        segment: {
-          borderColor: (segment: any) =>
-            updateColorByThreshold(segment, "bloodPressureSys"),
-        },
-      } as Dataset);
-      data.datasets.push({
-        label: "Blood Pressure Diastolic (mm Hg)",
-        data: vitals.bloodPressureDia.map(
-          (vitalReading) => vitalReading.reading
-        ),
-        borderColor: colors.bloodPressureDia.normal,
-        segment: {
-          borderColor: (segment: any) =>
-            updateColorByThreshold(segment, "bloodPressureDia"),
-        },
-      } as Dataset);
-    }
+      if (selectedVitals.bloodPressure) {
+        data.datasets.push({
+          label: "Blood Pressure Systolic (mm Hg)",
+          data: vitals.bloodPressureSys.map(
+            (vitalReading) => vitalReading.reading
+          ),
+          borderColor: (context: any) => {
+            return selectedIndicators.exceedance
+              ? getGradient(context, "bloodPressureSys")
+              : vitalChartAttributes.bloodPressure.normal;
+          },
+          segment: {
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
+          },
+          yAxisID: vitalChartAttributes.bloodPressure.yScaleID,
+        } as unknown as Dataset);
+        data.datasets.push({
+          label: "Blood Pressure Diastolic (mm Hg)",
+          data: vitals.bloodPressureDia.map(
+            (vitalReading) => vitalReading.reading
+          ),
+          borderColor: (context: any) => {
+            return selectedIndicators.exceedance
+              ? getGradient(context, "bloodPressureDia")
+              : vitalChartAttributes.bloodPressure.normal;
+          },
+          segment: {
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
+          },
+          yAxisID: vitalChartAttributes.bloodPressure.yScaleID,
+        } as unknown as Dataset);
+      }
+    } else if (chartId == "chart2") {
+      if (selectedVitals.temperature) {
+        data.datasets.push({
+          label: "Temperature (°C)",
+          data: vitals.temperature.map((vitalReading) => vitalReading.reading),
+          borderColor: (context: any) => {
+            return selectedIndicators.exceedance
+              ? getGradient(context, "temperature")
+              : vitalChartAttributes.temperature.normal;
+          },
+          segment: {
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
+          },
+          yAxisID: vitalChartAttributes.temperature.yScaleID,
+        } as unknown as Dataset);
+      }
 
+      if (selectedVitals.respRate) {
+        data.datasets.push({
+          label: "Respiratory Rate (bpm)",
+          data: vitals.respRate.map((vitalReading) => vitalReading.reading),
+          borderColor: (context: any) => {
+            return selectedIndicators.exceedance
+              ? getGradient(context, "respRate")
+              : vitalChartAttributes.respRate.normal;
+          },
+          segment: {
+            borderDash: (segment: any) =>
+              selectedIndicators.increasingTrend
+                ? updateBorderDash(segment)
+                : [],
+          },
+          yAxisID: vitalChartAttributes.respRate.yScaleID,
+        } as unknown as Dataset);
+      }
+    }
     return data;
-  };
-
-  const updateChartOptions = () => {
-    const options = {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: {},
-        title: {
-          display: true,
-          text: "Patient Vitals Chart",
-        },
-        zoom: {
-          zoom: {
-            wheel: {
-              enabled: true,
-            },
-          },
-          pan: {
-            enabled: true,
-          },
-        },
-        annotation: {
-          annotations: {},
-        },
-      },
-    };
-
-    if (selectedIndicators.normalRange) {
-      options.plugins.annotation.annotations =
-        showNormalRangeAnnotations(selectedVitals);
-    }
-
-    return options;
   };
 
   const handleSelectedVitalsChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -264,68 +271,307 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     });
   };
 
+  const handleSelectedTimeRangeChange = (
+    _: React.MouseEvent<HTMLElement, MouseEvent>,
+    value: string
+  ) => {
+    if (value != null && value != "custom") {
+      setSelectedTimeRange(value);
+    }
+  };
+
+  const handleShowCustomDateRangeModal = () => {
+    setShowCustomDateRangeModal((prevState) => !prevState);
+  };
+
+  const handleUpdateCustomDateRange = () => {
+    handleShowCustomDateRangeModal();
+    setSelectedTimeRange(
+      `${getDateTime(customStartDate)},${getDateTime(customEndDate)}`
+    );
+  };
+
+  const handleShowSavePdfModal = () => {
+    setShowSavePdfModal((prevState) => !prevState);
+  };
+
+  const handlePdfDetails = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.target;
+    setPdfDetails({
+      ...pdfDetails,
+      [name]: value,
+    });
+  };
+
+  const handleSavePdf = () => {
+    handleShowSavePdfModal();
+    toPDF();
+    setPdfDetails({
+      ...pdfDetails,
+      notes: "",
+    });
+  };
+
   return (
     <>
-      <Grid item xs={6}>
-        <FormGroup id="vitals" sx={{ flexDirection: "row" }}>
-          <FormLabel
-            sx={{ display: "flex", alignItems: "center", marginRight: 2 }}
-            component="legend">
-            Vitals
-          </FormLabel>
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="heartRate"
-                checked={selectedVitals.heartRate}
-                onChange={handleSelectedVitalsChange}
-              />
-            }
-            label="Heart Rate"
+      <Box ref={targetRef}>
+        <Grid item xs={6}>
+          <FormGroup id="vitals" sx={{ flexDirection: "row" }}>
+            <FormLabel
+              sx={{ display: "flex", alignItems: "center", marginRight: 2 }}
+              component="legend">
+              Vitals
+            </FormLabel>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="heartRate"
+                  checked={selectedVitals.heartRate}
+                  onChange={handleSelectedVitalsChange}
+                />
+              }
+              label="Heart Rate"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="spO2"
+                  checked={selectedVitals.spO2}
+                  onChange={handleSelectedVitalsChange}
+                />
+              }
+              label="Blood Oxygen"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="bloodPressure"
+                  checked={selectedVitals.bloodPressure}
+                  onChange={handleSelectedVitalsChange}
+                />
+              }
+              label="Blood Pressure"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="temperature"
+                  checked={selectedVitals.temperature}
+                  onChange={handleSelectedVitalsChange}
+                />
+              }
+              label="Temperature"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="respRate"
+                  checked={selectedVitals.respRate}
+                  onChange={handleSelectedVitalsChange}
+                />
+              }
+              label="Respiratory Rate"
+            />
+            <div className="ml-auto">
+              <Button
+                className="ml-auto"
+                startIcon={<FileDownloadIcon />}
+                onClick={handleShowSavePdfModal}>
+                Save As PDF
+              </Button>
+            </div>
+          </FormGroup>
+        </Grid>
+        <Grid item xs={6}>
+          <FormGroup id="indicators" sx={{ flexDirection: "row" }}>
+            <FormLabel
+              sx={{ display: "flex", alignItems: "center", marginRight: 2 }}
+              component="legend">
+              Indicators
+            </FormLabel>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="threshold"
+                  checked={selectedIndicators.threshold}
+                  onChange={handleSelectedIndicatorsChange}
+                />
+              }
+              label="Threshold"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="exceedance"
+                  checked={selectedIndicators.exceedance}
+                  onChange={handleSelectedIndicatorsChange}
+                />
+              }
+              label="Exceedance"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="increasingTrend"
+                  checked={selectedIndicators.increasingTrend}
+                  onChange={handleSelectedIndicatorsChange}
+                />
+              }
+              label="Increasing Trend"
+            />
+          </FormGroup>
+        </Grid>
+        <Box sx={{ height: 400 }} id="chart1">
+          <Line
+            data={updateChartData("chart1")}
+            options={{
+              ...updateChartOptions(
+                selectedVitals,
+                selectedIndicators,
+                {
+                  min: 0,
+                  max: 7,
+                },
+                "chart1"
+              ),
+              maintainAspectRatio: false,
+              aspectRatio: 1,
+            }}
           />
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="spO2"
-                checked={selectedVitals.spO2}
-                onChange={handleSelectedVitalsChange}
-              />
-            }
-            label="Blood Oxygen"
+        </Box>
+        <Box sx={{ height: 400 }} id="chart2">
+          <Line
+            data={updateChartData("chart2")}
+            options={{
+              ...updateChartOptions(
+                selectedVitals,
+                selectedIndicators,
+                {
+                  min: 0,
+                  max: 7,
+                },
+                "chart2"
+              ),
+              maintainAspectRatio: false,
+              aspectRatio: 1,
+            }}
           />
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="bloodPressure"
-                checked={selectedVitals.bloodPressure}
-                onChange={handleSelectedVitalsChange}
-              />
-            }
-            label="Blood Pressure"
+        </Box>
+        <ToggleButtonGroup
+          value={selectedTimeRange}
+          exclusive
+          onChange={handleSelectedTimeRangeChange}
+          aria-label="text alignment">
+          <ToggleButton value="12H" aria-label="left aligned">
+            12H
+          </ToggleButton>
+          <ToggleButton value="1D" aria-label="left aligned">
+            1D
+          </ToggleButton>
+          <ToggleButton value="3D" aria-label="left aligned">
+            3D
+          </ToggleButton>
+          <ToggleButton value="all" aria-label="left aligned">
+            All
+          </ToggleButton>
+          <ToggleButton
+            value="custom"
+            aria-label="left aligned"
+            onClick={() => handleShowCustomDateRangeModal()}
+            selected={
+              selectedTimeRange.match(
+                /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}),(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/g
+              ) != null
+            }>
+            Custom
+          </ToggleButton>
+        </ToggleButtonGroup>
+        <Box marginTop={2}>
+          <Typography>Nurse Notes: {pdfDetails.notes}</Typography>
+        </Box>
+      </Box>
+      <Modal
+        open={showCustomDateRangeModal}
+        onClose={handleShowCustomDateRangeModal}>
+        <Box sx={ModalBoxStyle}>
+          <Typography variant="h6" component="h2" sx={{ marginBottom: 2 }}>
+            Select Date Range
+          </Typography>
+          <TextField
+            label="Start Date and Time"
+            type="datetime-local"
+            value={new Date(customStartDate.getTime() + 8 * 60 * 60 * 1000)
+              .toISOString()
+              .slice(0, 16)}
+            onChange={(e) => setCustomStartDate(new Date(e.target.value))}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <i className="far fa-clock"></i>
+                </InputAdornment>
+              ),
+            }}
           />
-        </FormGroup>
-      </Grid>
-
-      <Grid item xs={6}>
-        <FormGroup id="indicators" sx={{ flexDirection: "row" }}>
-          <FormLabel
-            sx={{ display: "flex", alignItems: "center", marginRight: 2 }}
-            component="legend">
-            Indicators
-          </FormLabel>
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="normalRange"
-                checked={selectedIndicators.normalRange}
-                onChange={handleSelectedIndicatorsChange}
-              />
-            }
-            label="Normal Range"
+          <TextField
+            label="End Date and Time"
+            type="datetime-local"
+            value={new Date(customEndDate.getTime() + 8 * 60 * 60 * 1000)
+              .toISOString()
+              .slice(0, 16)}
+            onChange={(e) => setCustomEndDate(new Date(e.target.value))}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <i className="far fa-clock"></i>
+                </InputAdornment>
+              ),
+            }}
           />
-        </FormGroup>
-      </Grid>
-      <Line data={updateChartData()} options={updateChartOptions()} />
+          <Grid item xs={12} sx={{ marginTop: 2 }}>
+            <Button
+              variant="contained"
+              onClick={() => handleUpdateCustomDateRange()}>
+              Set Range
+            </Button>
+          </Grid>
+        </Box>
+      </Modal>
+      <Modal open={showSavePdfModal} onClose={handleShowSavePdfModal}>
+        <Box sx={ModalBoxStyle}>
+          <TextField
+            label="PDF Name"
+            name="name"
+            margin="normal"
+            fullWidth
+            value={pdfDetails.name}
+            onChange={handlePdfDetails}
+            sx={{ width: "600px" }}
+          />
+          <TextField
+            label="Nurse Notes"
+            name="notes"
+            margin="normal"
+            fullWidth
+            multiline
+            rows={6}
+            value={pdfDetails.notes}
+            onChange={handlePdfDetails}
+          />
+          <Box marginTop={2}>
+            <Button variant="contained" onClick={() => handleSavePdf()}>
+              Save as PDF
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </>
   );
 }
