@@ -11,16 +11,18 @@ export const fetchAllPatients = async () => {
   }
 };
 
-export const fetchAlertsByPatientId = async(
+export const fetchAlertsByPatientId = async (
   patientId: string | string[] | undefined
 ) => {
   try {
-    const res = await axios.get(`http://localhost:3001/patient/${patientId}/alerts`);
+    const res = await axios.get(
+      `http://localhost:3001/patient/${patientId}/alerts`
+    );
     return res.data;
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 export const fetchPatientByPatientId = async (
   patientId: string | string[] | undefined
@@ -49,11 +51,11 @@ export const updatePatientConditionByPatientId = async (
 
 export const updatePatientLayoutByPatientId = async (
   patientId: string | string[] | undefined,
-  layout: Layouts
+  order: string[]
 ) => {
   try {
     const res = await axios.put(`http://localhost:3001/patient/${patientId}`, {
-      layout: layout,
+      order: order,
     });
     return res;
   } catch (error) {

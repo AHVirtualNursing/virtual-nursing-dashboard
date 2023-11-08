@@ -249,7 +249,6 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
         if (updatedChat === undefined) return;
         //capture selected Chat
         setSelectedChat(updatedChat);
-
         //update chats
         const updatedChats = chats.filter(
           (chat) => chat._id !== updatedChat._id

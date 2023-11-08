@@ -23,7 +23,8 @@ export default function Header() {
   }, [sessionData?.user.id]);
 
   return (
-    <div className="flex align-middle justify-between p-2 border-solid border-0 border-b-2 border-gray-300">
+    // header has height of 64px
+    <div className="flex align-middle justify-between p-2 border-solid border-0 border-b-2 top-0 sticky bg-white border-gray-300 h-16">
       <div className={styles.imageContainer}>
         <Image
           src={"/VND_Logo.png"}

@@ -1,7 +1,6 @@
 import React from "react";
 import GroupIcon from "@mui/icons-material/Group";
 import BedIcon from "@mui/icons-material/Bed";
-import { SvgIconProps } from "@material-ui/core";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
 import Link from "next/link";
@@ -9,7 +8,7 @@ import { ChatBox } from "./ChatBox";
 
 export default function Sidebar() {
   return (
-    <div className="left-0 flex flex-col h-screen sticky top-0 p-3 gap-4 bg-blue-900">
+    <div className="left-0 flex flex-col h-screen fixed p-3 gap-4 w-14 bg-blue-900">
       <SidebarTab
         name={"Patients"}
         icon={<GroupIcon style={{ color: "white" }} />}
@@ -37,14 +36,14 @@ export default function Sidebar() {
 
 type SidebarTabProps = {
   name: string;
-  icon: SvgIconProps;
+  icon: JSX.Element;
   dest: string;
 };
 
-const SidebarTab = ({ name, icon, dest }: SidebarTabProps) => {
+const SidebarTab = ({ icon, dest }: SidebarTabProps) => {
   return (
     <Link href={dest} className="no-underline text-black">
-      <div className="flex group gap-3 hover:bg-slate-500 cursor-pointer p-4 rounded-md">
+      <div className="flex group gap-3 hover:bg-blue-400 cursor-pointer p-4 rounded-md">
         {icon}
       </div>
     </Link>
