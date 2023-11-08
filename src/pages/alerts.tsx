@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { fetchAllAlerts } from "./api/alerts_api";
 import { fetchPatientByPatientId } from "./api/patients_api";
 import { Alert } from "@/types/alert";
-import { Patient } from "@/types/patient";
 import AlertsTableRow from "@/components/AlertsTableRow";
+import AlertDetailsModal from "@/components/AlertDetailsModal";
 
 type AlertPatientMapping = {
   alert: Alert;
@@ -16,6 +16,7 @@ const Alerts = () => {
   const [nurseSearch, setNurseSearch] = useState<string>("");
   const [statusCriteria, setStatusCriteria] = useState("open");
   const [vitalCriteria, setVitalCriteria] = useState("");
+  const [shown, setShown] = useState(false);
 
   useEffect(() => {
     fetchAllAlerts().then((alertsList) => {
@@ -120,7 +121,19 @@ const Alerts = () => {
                 )
               )
               .map((alertMapping, index) => (
-                <tr key={index} className="text-left">
+                <tr
+                  key={index}
+                  className="text-left hover:bg-blue-300"
+                  onClick={() => setShown(!shown)}
+                >
+                  {shown && (
+                    <AlertDetailsModal
+                      pressed={shown}
+                      setShown={setShown}
+                      alertPatientMapping={alertMapping}
+                    />
+                  )}
+
                   <AlertsTableRow
                     id="patient-name"
                     width="1/12"
