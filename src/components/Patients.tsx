@@ -160,7 +160,11 @@ export default function Patients({ selectedWard }: PatientListProps) {
       }
       smartBedIds.map((id) => promises.push(fetchBedByBedId(id)));
       Promise.all(promises).then((res) => {
-        setData(res.filter((sb) => sb.ward && sb.patient));
+        setData(
+          res.filter(
+            (sb) => sb.ward && sb.patient && sb.bedStatus === "occupied"
+          )
+        );
       });
     });
   }, [selectedWard]);
