@@ -21,6 +21,12 @@ export default function layout({ children }: { children: React.ReactNode }) {
   const { data: sessionData } = useSession();
   const nurseId = sessionData?.user.id;
 
+  const CustomToast = ({ message }: any) => (
+    <div>
+      <p>{message}</p>
+    </div>
+  );
+
   useEffect(() => {
     console.log("SOCKET USEEFFECT");
     console.log(nurseId);
@@ -28,16 +34,10 @@ export default function layout({ children }: { children: React.ReactNode }) {
     socket.emit("alertConnections", nurseId);
     const handleAlertIncoming = (data: any) => {
       console.log(data);
-      toast.error("VERY SERIOUS ALERT", {
-        position: "bottom-right",
-        autoClose: 10000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      console.log(data.patient);
+      console.log(data.alert);
+      const message = `${data.patient.name}: ${data.alert.description}`;
+      toast.error(<CustomToast message={message} />);
     };
 
     socket.on("alertIncoming", handleAlertIncoming);
@@ -57,7 +57,18 @@ export default function layout({ children }: { children: React.ReactNode }) {
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <ToastContainer />
+        <ToastContainer
+          position="bottom-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss={false}
+          draggable={false}
+          pauseOnHover
+          theme="light"
+        />
         <Header />
         <Sidebar />
         <main

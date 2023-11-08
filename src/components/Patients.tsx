@@ -13,6 +13,7 @@ import Link from "next/link";
 import DashboardAlertIcon from "./DashboardAlertIcon";
 import { SocketContext } from "@/pages/layout";
 import { Alert } from "@/models/alert";
+import { Patient } from "@/models/patient";
 
 type PatientListProps = {
   /**
@@ -30,7 +31,8 @@ export default function Patients({ selectedWard }: PatientListProps) {
   const [vitals, setVitals] = useState<any[]>([]);
   const { data: sessionData } = useSession();
   const socket = useContext(SocketContext);
-  const [socketData, setSocketData] = useState<Alert>();
+  const [socketAlertList, setSocketAlertList] = useState<Alert[]>();
+  const [socketPatient, setSocketPatient] = useState<Patient>();
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
@@ -128,15 +130,17 @@ export default function Patients({ selectedWard }: PatientListProps) {
 
   useEffect(() => {
     const handleAlertIncoming = (data: any) => {
-      setSocketData(data);
+      setSocketAlertList(data.alertList);
+      setSocketPatient(data.patient);
     };
     const handleDeleteAlert = (data: any) => {
-      setSocketData(data);
+      setSocketAlertList(data.alertList);
+      setSocketPatient(data.patient);
     };
-    socket.on("alertIncoming", handleAlertIncoming);
+    socket.on("patientAlertAdded", handleAlertIncoming);
     socket.on("patientAlertDeleted", handleDeleteAlert);
     return () => {
-      socket.off("alertIncoming", handleAlertIncoming);
+      socket.off("patientAlertAdded", handleAlertIncoming);
       socket.off("patientAlertDeleted", handleDeleteAlert);
     };
   }, []);
@@ -261,8 +265,8 @@ export default function Patients({ selectedWard }: PatientListProps) {
                     <DashboardAlertIcon
                       patientId={pd.patient?._id}
                       socketData={
-                        socketData?.patient === pd.patient?._id
-                          ? socketData
+                        socketPatient?._id === pd.patient?._id
+                          ? socketAlertList
                           : null
                       }
                     />
