@@ -16,9 +16,7 @@ interface layout {
   news2: boolean;
   allBedStatuses: boolean;
   rail: boolean;
-  exit: boolean;
-  lowestPosition: boolean;
-  brake: boolean;
+  warnings: boolean;
   weight: boolean;
   fallRisk: boolean;
 }

@@ -7,11 +7,10 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ModalBoxStyle } from "@/styles/StyleTemplates";
 import { updateVirtualNurseCardLayoutByNurseId } from "@/pages/api/nurse_api";
 import { useSession } from "next-auth/react";
-import router from "next/router";
 
 interface layout {
   [key: string]: boolean;
@@ -24,18 +23,17 @@ interface layout {
   news2: boolean;
   allBedStatuses: boolean;
   rail: boolean;
-  exit: boolean;
-  lowestPosition: boolean;
-  brake: boolean;
+  warnings: boolean;
   weight: boolean;
   fallRisk: boolean;
 }
 
 interface layoutProp {
   cardLayout: layout | undefined;
+  setNurse: Function;
 }
 
-function TileCustomisationModal({ cardLayout }: layoutProp) {
+function TileCustomisationModal({ cardLayout, setNurse }: layoutProp) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -55,12 +53,10 @@ function TileCustomisationModal({ cardLayout }: layoutProp) {
     { name: "spo2", label: "SPO2" },
     { name: "bp", label: "Blood Pressure" },
     { name: "temp", label: "Temperature" },
-    { name: "news2", label: "NEWS2" },
     { name: "allBedStatuses", label: "All Bed Statuses" },
+    { name: "news2", label: "NEWS2" },
     { name: "rail", label: "Patient & Rail Visuals" },
-    { name: "exit", label: "Bed Exit Status" },
-    { name: "lowestPosition", label: "Bed Lowest Position Status" },
-    { name: "brake", label: "Bed Brake On Status" },
+    { name: "warnings", label: "Bed Warnings" },
     { name: "weight", label: "Weight of Patient" },
     { name: "fallRisk", label: "Fall Risk of Patient" },
   ];
@@ -72,12 +68,14 @@ function TileCustomisationModal({ cardLayout }: layoutProp) {
     setCurrLayout(updatedLayout);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log("submitting");
-    const res = updateVirtualNurseCardLayoutByNurseId(
+    const res = await updateVirtualNurseCardLayoutByNurseId(
       sessionData?.user.id,
       currLayout
     );
+    setNurse(res?.data);
+    handleClose();
   };
 
   return (
@@ -103,8 +101,7 @@ function TileCustomisationModal({ cardLayout }: layoutProp) {
           </Typography>
           <Box display={"flex"}>
             <FormControl sx={{ m: 0 }}>
-              <FormLabel disabled={true}>Vitals</FormLabel>
-              {checkboxes.slice(1, 7).map((checkbox, index) => (
+              {checkboxes.slice(1, 6).map((checkbox, index) => (
                 <FormControlLabel
                   key={index}
                   control={
@@ -119,8 +116,7 @@ function TileCustomisationModal({ cardLayout }: layoutProp) {
               ))}
             </FormControl>
             <FormControl sx={{ m: 0 }}>
-              <FormLabel disabled={true}>Vitals</FormLabel>
-              {checkboxes.slice(8, 14).map((checkbox, index) => (
+              {checkboxes.slice(7, 12).map((checkbox, index) => (
                 <FormControlLabel
                   key={index}
                   control={
