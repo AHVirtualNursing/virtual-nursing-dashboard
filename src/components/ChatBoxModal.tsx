@@ -247,15 +247,11 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
         content
       ).then((updatedChat) => {
         if (updatedChat === undefined) return;
-        //capture selected Chat
         setSelectedChat(updatedChat);
-        //update chats
         const updatedChats = chats.filter(
           (chat) => chat._id !== updatedChat._id
         );
         setChats([...updatedChats, updatedChat]);
-
-        //Send to websocket
         const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
         socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
       });
@@ -265,7 +261,6 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
   const handleSendMessage = () => {
     if (textMessage === "") return;
     if (selectedChat === undefined) return;
-    //capture textMessage
     const trimmedTextMessage = textMessage.trim();
     addNewMessageToChat(
       selectedChat._id,
@@ -273,14 +268,11 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       virtualNurse!._id
     ).then((updatedChat) => {
       if (updatedChat === undefined) return;
-      //capture selected Chat
       setSelectedChat(updatedChat);
 
-      //update chats
       const updatedChats = chats.filter((chat) => chat._id !== updatedChat._id);
       setChats([...updatedChats, updatedChat]);
 
-      //Send to websocket
       const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
       socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
 
@@ -978,6 +970,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                   handleDeleteMessage={() => {}}
                   handleEditMessage={() => {}}
                   enableActionsUponRightClick={false}
+                  showImageFullScreenModal={showImageFullScreenModal}
                 />
               )}
             </Box>

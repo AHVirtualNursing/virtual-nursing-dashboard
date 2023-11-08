@@ -357,7 +357,7 @@ const ChatBubble = ({
                   left: isMsgFromVirtualNurse ? "-55px" : undefined,
                   right: isMsgFromVirtualNurse ? undefined : "-55px",
                 }}
-                onClick={() => handleDeleteMessage(message)}
+                onClick={() => handleDeleteMessage(message!)}
               >
                 <DeleteIcon sx={{ fontSize: "20", color: darkIndigo }} />
               </IconButton>
@@ -373,7 +373,7 @@ const ChatBubble = ({
                 }}
                 onClick={() => {
                   setHoverChatBubble((prevState) => !prevState);
-                  handleEditMessage(message);
+                  handleEditMessage(message!);
                 }}
               >
                 <EditIcon sx={{ fontSize: "20", color: darkIndigo }} />
