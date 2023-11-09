@@ -1,5 +1,5 @@
 export class AlertConfig {
-  _id: string;
+  _id: string | undefined;
   rrConfig: number[];
   hrConfig: number[];
   bpSysConfig: number[];
@@ -12,13 +12,13 @@ export class AlertConfig {
     hrConfig: number[],
     bpSysConfig: number[],
     bpDiaConfig: number[],
-    spO2Config: number[],
+    spO2Config: number[]
   ) {
     this._id = _id;
     this.rrConfig = rrConfig;
     this.hrConfig = hrConfig;
-    this.bpDiaConfig = bpDiaConfig
-    this.bpSysConfig = bpSysConfig
-    this.spO2Config = spO2Config
+    this.bpDiaConfig = bpDiaConfig;
+    this.bpSysConfig = bpSysConfig;
+    this.spO2Config = spO2Config;
   }
 }

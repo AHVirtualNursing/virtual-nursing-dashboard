@@ -2,13 +2,14 @@ import { Box, Button, Tab, Tabs } from "@mui/material";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import profilePic from "../../public/profilepic.jpg";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
-import VisualisationComponent from "@/components/VisualisationComponent";
+import VisualisationComponent from "@/components/patientOverviewTab/VisualisationComponent";
 import dynamic from "next/dynamic";
 import PatientReport from "@/components/patientReport/patientReport";
 import AlertTabComponent from "@/components/patientAlertTab/AlertTabComponent";
+import BedStatusComponent from "@/components/bedStatusTab/BedStatusComponent";
 import { CloudUpload } from "@mui/icons-material";
 import { VisuallyHiddenInput } from "@/styles/Components";
 import { callUploadAndParseMockDataFromS3Api } from "./api/s3_api";
@@ -16,12 +17,20 @@ const PatientChart = dynamic(
   () => import("@/components/patientAnalyticsChart/patientAnalyticsChart"),
   { ssr: false }
 );
+import autoAnimate from "@formkit/auto-animate";
 
 const patientVisualisationPage = () => {
   const router = useRouter();
-  const { patientId, bedId } = router.query;
+  console.log("router query", router.query);
+  const { patientId, bedId, viewAlerts } = router.query;
   const [selectedBed, setSelectedBed] = useState<SmartBed>();
-  const [currentTab, setCurrentTab] = useState("overview");
+  const [currentTab, setCurrentTab] = useState(
+    viewAlerts === "true" ? "alerts" : "overview"
+  );
+  const parent = useRef(null);
+  useEffect(() => {
+    parent.current && autoAnimate(parent.current);
+  }, [parent]);
   const [processingData, setProcessingData] = useState(false);
 
   useEffect(() => {
@@ -51,7 +60,7 @@ const patientVisualisationPage = () => {
     <div className="flex flex-col p-8 gap-8 bg-slate-100 w-full shadow-lg">
       <Box>
         <div className="flex bg-white mb-8 rounded-2xl shadow-lg">
-          <Box sx={{ padding: "20px" }}>
+          <Box className="p-4 text-center">
             <Image
               style={{
                 width: "40%",
@@ -79,7 +88,8 @@ const patientVisualisationPage = () => {
             <Box textAlign={"right"} marginRight={2}>
               <button
                 className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full border-none"
-                onClick={updateSelectedPatient}>
+                onClick={updateSelectedPatient}
+              >
                 Update Details
               </button>
             </Box>
@@ -87,32 +97,37 @@ const patientVisualisationPage = () => {
               <Button
                 component="label"
                 variant="contained"
-                startIcon={<CloudUpload />}>
+                startIcon={<CloudUpload />}
+              >
                 <VisuallyHiddenInput type="file" onChange={handleFileChange} />
                 {processingData ? "Processing Data..." : "Upload Data"}
               </Button>
             </Box>
           </Box>
         </div>
-        <Tabs
-          value={currentTab}
-          onChange={handleTabChange}
-          centered
-          sx={{ marginBottom: 3, backgroundColor: undefined }}>
-          <Tab value="overview" label="Overview" />
-          <Tab value="analytics" label="Analytics" />
-          <Tab value="alerts" label="Alerts" />
-          <Tab value="reports" label="Reports" />
-        </Tabs>
-        {currentTab === "overview" ? (
-          <VisualisationComponent patient={selectedBed?.patient} />
-        ) : currentTab === "analytics" ? (
-          <PatientChart patient={selectedBed?.patient} />
-        ) : currentTab === "reports" ? (
-          <PatientReport viewType="single" patientId={patientId as string} />
-        ) : currentTab === "alerts" ? (
-          <AlertTabComponent patient={selectedBed?.patient} />
-        ) : null}
+        <div className="bg-white rounded-2xl shadow-lg" ref={parent}>
+          <Tabs
+            value={currentTab}
+            onChange={handleTabChange}
+            centered
+            sx={{ marginBottom: 3, backgroundColor: undefined }}
+          >
+            <Tab value="overview" label="Overview" />
+            <Tab value="analytics" label="Analytics" />
+            <Tab value="alerts" label="Alerts" />
+            <Tab value="reports" label="Reports" />
+            <Tab value="bedstatus" label="Bed Status" />
+          </Tabs>
+          {currentTab === "overview" ? (
+            <VisualisationComponent patient={selectedBed?.patient} />
+          ) : currentTab === "analytics" ? (
+            <PatientChart patient={selectedBed?.patient} />
+          ) : currentTab === "reports" ? <PatientReport viewType="single" patientId={patientId as string} /> : currentTab === "alerts" ? (
+            <AlertTabComponent patient={selectedBed?.patient} />
+          ) : currentTab === "bedstatus" ? (
+            <BedStatusComponent bed={selectedBed} />
+          ) : null}
+        </div>
       </Box>
     </div>
   );

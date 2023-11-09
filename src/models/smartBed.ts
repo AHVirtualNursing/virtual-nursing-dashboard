@@ -1,4 +1,4 @@
-import { StringLiteral } from "typescript";
+import { BedSideNurse } from "./bedsideNurse";
 import { Patient } from "./patient";
 import { Ward } from "./ward";
 
@@ -7,9 +7,17 @@ export class SmartBed {
   bedStatus: string;
   createdAt: string;
   name: string;
-  nurses: [];
+  nurses: BedSideNurse[];
   patient?: Patient;
-  railStatus: boolean;
+  bedPosition: string;
+  isBrakeSet: boolean;
+  isBedAlarmOn: boolean;
+  bedAlarmProtocolBreachReason: string;
+  isLeftUpperRail: boolean;
+  isRightUpperRail: boolean;
+  isLeftLowerRail: boolean;
+  isRightLowerRail: boolean;
+  isLowestPosition: boolean;
   updatedAt: string;
   ward: Ward;
   roomNum: string;
@@ -20,12 +28,20 @@ export class SmartBed {
     bedStatus: string,
     createdAt: string,
     name: string,
-    nurses: [],
-    railStatus: boolean,
+    nurses: BedSideNurse[],
+    isLeftUpperRail: boolean,
+    isRightUpperRail: boolean,
+    isLeftLowerRail: boolean,
+    isRightLowerRail: boolean,
+    isLowestPosition: boolean,
     updatedAt: string,
     ward: Ward,
     roomNum: string,
     bedNum: string,
+    bedPosition: string,
+    isBrakeSet: boolean,
+    isBedAlarmOn: boolean,
+    bedAlarmProtocolBreachReason: string,
     patient?: Patient
   ) {
     this._id = _id;
@@ -34,10 +50,18 @@ export class SmartBed {
     this.name = name;
     this.nurses = nurses;
     this.patient = patient;
-    this.railStatus = railStatus;
+    this.isLeftLowerRail = isLeftLowerRail;
+    this.isRightUpperRail = isRightUpperRail;
+    this.isRightLowerRail = isRightLowerRail;
+    this.isLeftUpperRail = isLeftUpperRail;
+    this.isLowestPosition = isLowestPosition;
     this.updatedAt = updatedAt;
     this.ward = ward;
     this.roomNum = roomNum;
+    this.bedPosition = bedPosition;
+    this.isBrakeSet = isBrakeSet;
+    this.isBedAlarmOn = isBedAlarmOn;
+    this.bedAlarmProtocolBreachReason = bedAlarmProtocolBreachReason;
     this.bedNum = bedNum;
   }
 }

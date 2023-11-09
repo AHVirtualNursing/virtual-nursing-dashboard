@@ -13,7 +13,7 @@ const AlertTabComponent = ({ patient }: PropType) => {
   const tabs = ["ALERTS", "ALERT CONFIGS"];
   const [selectedTab, setSelectedTab] = useState<number>(0);
   return (
-    <div className="bg-white p-2 rounded-lg shadow-lg">
+    <div className="bg-white p-2 rounded-lg shadow-lg max-h-[470px] overflow-y-auto scrollbar">
       <div
         id="pageTabs"
         className="bg-blue-900 p-2 rounded-xl flex justify-between items-center gap-x-5"
@@ -35,7 +35,7 @@ const AlertTabComponent = ({ patient }: PropType) => {
         ))}
       </div>
       <div>
-        {selectedTab === 0 && <PatientAlerts />}
+        {selectedTab === 0 && <PatientAlerts patient={patient} />}
         {selectedTab === 1 && <PatientConfigs patient={patient} />}
       </div>
     </div>

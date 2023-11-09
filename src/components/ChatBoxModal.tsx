@@ -46,6 +46,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import Search from "./ChatSearch";
 import Image from "next/image";
 import { io } from "socket.io-client";
+import { Vital } from "@/models/vital";
+import { getVitalByPatientId } from "@/pages/api/patients_api";
+import { Patient } from "@/models/patient";
 
 type ChatBoxModalProps = {
   open: boolean;
@@ -152,7 +155,9 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
 
   useEffect(() => {
     if (shareToSelectedChatBedWithPatientId !== "") {
-      setPatientPreviewMessage(createPatientPreviewMessage());
+      createPatientPreviewMessage().then((msg) => {
+        setPatientPreviewMessage(msg);
+      });
     }
   }, [shareToSelectedChatBedWithPatientId]);
 
@@ -180,9 +185,14 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
     socket.emit("connectVirtualNurseForChatMessaging", sessionData?.user.id);
     socket.on("updateVirtualNurseChat", (updatedChat: Chat) => {
       //update chats
-      if (updatedChat._id === selectedChat?._id) {
-        setSelectedChat(updatedChat);
-      }
+      console.log("Received an update from bedside nurse");
+      setSelectedChat((prevState) => {
+        if (prevState?._id === updatedChat._id) {
+          return updatedChat;
+        } else {
+          return prevState;
+        }
+      });
       getChatsForVirtualNurse(updatedChat.virtualNurse);
     });
     return () => {
@@ -228,29 +238,29 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
     if (patientPreviewMessage === undefined || selectedChat === undefined)
       return;
 
-    addNewPatientMessageToChat(
-      selectedChat._id,
-      patientPreviewMessage,
-      virtualNurse!._id
-    ).then((updatedChat) => {
-      if (updatedChat === undefined) return;
-      //capture selected Chat
-      setSelectedChat(updatedChat);
-
-      //update chats
-      const updatedChats = chats.filter((chat) => chat._id !== updatedChat._id);
-      setChats([...updatedChats, updatedChat]);
-
-      //Send to websocket
-      const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
-      socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
+    createPatientPreviewMessage().then((msg) => {
+      const content = msg.content;
+      addNewPatientMessageToChat(
+        selectedChat._id,
+        patientPreviewMessage,
+        virtualNurse!._id,
+        content
+      ).then((updatedChat) => {
+        if (updatedChat === undefined) return;
+        setSelectedChat(updatedChat);
+        const updatedChats = chats.filter(
+          (chat) => chat._id !== updatedChat._id
+        );
+        setChats([...updatedChats, updatedChat]);
+        const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
+        socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
+      });
     });
   };
 
   const handleSendMessage = () => {
     if (textMessage === "") return;
     if (selectedChat === undefined) return;
-    //capture textMessage
     const trimmedTextMessage = textMessage.trim();
     addNewMessageToChat(
       selectedChat._id,
@@ -258,14 +268,11 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       virtualNurse!._id
     ).then((updatedChat) => {
       if (updatedChat === undefined) return;
-      //capture selected Chat
       setSelectedChat(updatedChat);
 
-      //update chats
       const updatedChats = chats.filter((chat) => chat._id !== updatedChat._id);
       setChats([...updatedChats, updatedChat]);
 
-      //Send to websocket
       const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
       socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
 
@@ -404,11 +411,11 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
     setTextMessage(event.target.value);
   };
 
-  const createPatientPreviewMessage = (): Message => {
+  const createPatientPreviewMessage = async (): Promise<Message> => {
     if (bedsWithPatientsData === undefined || virtualNurse === undefined) {
       const newMsg: Message = {
         _id: "123",
-        content: "",
+        content: "Please check on patient.",
         createdAt: new Date(Date.now()),
         createdBy: "123",
       };
@@ -421,17 +428,63 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
     if (chosenBeds.length === 0) {
       const newMsg: Message = {
         _id: "123",
-        content: "",
+        content: "Please check on patient.",
         createdAt: new Date(Date.now()),
         createdBy: "123",
       };
       return newMsg;
     }
 
+    const patient = chosenBeds[0]!.patient as Patient;
+    let patientVitalsMsg = "Please check on patient.";
+    const vital = await getVitalByPatientId(patient._id);
+    if (vital !== null) {
+      const respRate =
+        vital?.respRate && vital?.respRate[vital?.respRate.length - 1]?.reading
+          ? vital?.respRate[vital?.respRate.length - 1].reading
+          : "NA";
+      const temp =
+        vital?.temperature &&
+        vital?.temperature[vital?.temperature.length - 1]?.reading
+          ? vital?.temperature[vital?.temperature.length - 1].reading
+          : "NA";
+      const heartRate =
+        vital?.heartRate &&
+        vital?.heartRate[vital?.heartRate.length - 1]?.reading
+          ? vital?.heartRate[vital?.heartRate.length - 1].reading
+          : "NA";
+      const bpSys =
+        vital?.bloodPressureSys &&
+        vital?.bloodPressureSys[vital?.bloodPressureSys.length - 1]?.reading
+          ? vital?.bloodPressureSys[vital?.bloodPressureSys.length - 1].reading
+          : "NA";
+      const bpDia =
+        vital?.bloodPressureDia &&
+        vital?.bloodPressureDia[vital?.bloodPressureDia.length - 1]?.reading
+          ? vital?.bloodPressureDia[vital?.bloodPressureDia.length - 1].reading
+          : "NA";
+      const spO2 =
+        vital?.spO2 && vital?.spO2[vital?.spO2.length - 1]?.reading
+          ? vital?.spO2[vital?.spO2.length - 1].reading
+          : "NA";
+      const news2 =
+        vital?.news2Score &&
+        vital?.news2Score[vital?.news2Score.length - 1]?.reading
+          ? vital?.news2Score[vital?.news2Score.length - 1].reading
+          : "NA";
+
+      patientVitalsMsg = "Virtual Nurse shared a Patient vitals with you.";
+      patientVitalsMsg += "\nRR: " + respRate;
+      patientVitalsMsg += "\nTemp: " + temp;
+      patientVitalsMsg += "\nHR: " + heartRate;
+      patientVitalsMsg += "\nBP Sys/Dia: " + bpSys + "/" + bpDia;
+      patientVitalsMsg += "\nNews2: " + news2;
+    }
+
     const newMsg: Message = {
       _id: "123",
       patient: chosenBeds[0]!.patient,
-      content: "",
+      content: patientVitalsMsg,
       createdAt: new Date(Date.now()),
       createdBy: virtualNurse!._id,
     };
@@ -917,6 +970,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                   handleDeleteMessage={() => {}}
                   handleEditMessage={() => {}}
                   enableActionsUponRightClick={false}
+                  showImageFullScreenModal={showImageFullScreenModal}
                 />
               )}
             </Box>
