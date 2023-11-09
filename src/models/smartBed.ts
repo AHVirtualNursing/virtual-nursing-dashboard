@@ -11,7 +11,8 @@ export class SmartBed {
   patient?: Patient;
   bedPosition: string;
   isBrakeSet: boolean;
-  isBedAlarmOn: boolean;
+  isBedExitAlarmOn: boolean;
+  isPatientOnBed: boolean;
   bedAlarmProtocolBreachReason: string;
   isLeftUpperRail: boolean;
   isRightUpperRail: boolean;
@@ -40,7 +41,8 @@ export class SmartBed {
     bedNum: string,
     bedPosition: string,
     isBrakeSet: boolean,
-    isBedAlarmOn: boolean,
+    isBedExitAlarmOn: boolean,
+    isPatientOnBed: boolean,
     bedAlarmProtocolBreachReason: string,
     patient?: Patient
   ) {
@@ -60,7 +62,8 @@ export class SmartBed {
     this.roomNum = roomNum;
     this.bedPosition = bedPosition;
     this.isBrakeSet = isBrakeSet;
-    this.isBedAlarmOn = isBedAlarmOn;
+    this.isBedExitAlarmOn = isBedExitAlarmOn;
+    this.isPatientOnBed = isPatientOnBed;
     this.bedAlarmProtocolBreachReason = bedAlarmProtocolBreachReason;
     this.bedNum = bedNum;
   }

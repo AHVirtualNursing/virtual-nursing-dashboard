@@ -15,7 +15,7 @@ export class Patient {
   picture?: string;
   addInfo?: string;
   copd?: boolean;
-  fallRiskScore: number;
+  fallRisk: string;
   o2Intake?: string;
   consciousness?: string;
   temperature?: number;
@@ -34,7 +34,7 @@ export class Patient {
     name: string,
     nric: string,
     condition: string,
-    fallRiskScore: number,
+    fallRisk: string,
     order: string[],
     picture?: string,
     addInfo?: string,
@@ -60,7 +60,8 @@ export class Patient {
     this.condition = condition;
     this.addInfo = addInfo;
     this.copd = copd;
-    (this.fallRiskScore = fallRiskScore), (this.o2Intake = o2Intake);
+    this.fallRisk = fallRisk; 
+    this.o2Intake = o2Intake;
     this.consciousness = consciousness;
     this.temperature = temperature;
     this.news2Score = news2Score;

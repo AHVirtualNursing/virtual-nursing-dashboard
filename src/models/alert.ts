@@ -5,6 +5,7 @@ export class Alert {
   status: string;
   description: string;
   patient: Patient;
+  redelegate: boolean;
   notes?: string;
   createdAt?: string;
 
@@ -12,6 +13,7 @@ export class Alert {
     _id: string,
     status: string,
     description: string,
+    redelegate: boolean,
     patient: Patient,
     notes?: string,
     createdAt?: string
@@ -20,6 +22,7 @@ export class Alert {
     this.status = status;
     this.description = description;
     this.patient = patient;
+    this.redelegate = redelegate;
     this.notes = notes;
     this.createdAt = createdAt;
   }

@@ -8,3 +8,16 @@ export const fetchAllAlerts = async () => {
     console.error(error);
   }
 };
+
+export const redelegateAlert = async (
+  alertId: string | string[] | undefined
+) => {
+  try {
+    const res = await axios.put(`http://localhost:3001/alert/${alertId}`, {
+      id: alertId
+    });
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
+};

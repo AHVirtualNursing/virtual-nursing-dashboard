@@ -20,6 +20,7 @@ const DashboardAlertIcon = ({
         setPatientAlerts(alerts);
       });
     } else {
+      console.log("setting socketData for alertIcon");
       setPatientAlerts(socketData);
     }
   }, [socketData]);
