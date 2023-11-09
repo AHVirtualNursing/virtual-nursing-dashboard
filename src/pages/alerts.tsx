@@ -16,6 +16,7 @@ const Alerts = () => {
   const [nurseSearch, setNurseSearch] = useState<string>("");
   const [statusCriteria, setStatusCriteria] = useState("open");
   const [vitalCriteria, setVitalCriteria] = useState("");
+  const [selectedAlert, setSelectedAlert] = useState<AlertPatientMapping>();
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
@@ -31,14 +32,25 @@ const Alerts = () => {
             patient: res[index].name,
           })
         );
-        console.log("mapping", alertToPatientMappings);
         setAlerts(alertToPatientMappings);
       });
     });
   }, [alerts?.length]);
 
+  const handleViewAlertDetails = (alertMapping: AlertPatientMapping) => {
+    setSelectedAlert(alertMapping);
+    setShown(true);
+  };
+
   return (
     <div className="overflow-auto scrollbar p-2 bg-slate-200 w-full">
+      {shown && (
+        <AlertDetailsModal
+          pressed={shown}
+          setShown={setShown}
+          alertPatientMapping={selectedAlert}
+        />
+      )}
       <table className="table-auto border-spacing-3">
         <thead className="text-sm text-left">
           {/* ------ column headers ------ */}
@@ -129,16 +141,8 @@ const Alerts = () => {
                 <tr
                   key={index}
                   className="text-left hover:bg-blue-300"
-                  onClick={() => setShown(!shown)}
+                  onClick={() => handleViewAlertDetails(alertMapping)}
                 >
-                  {shown && (
-                    <AlertDetailsModal
-                      pressed={shown}
-                      setShown={setShown}
-                      alertPatientMapping={alertMapping}
-                    />
-                  )}
-
                   <AlertsTableRow
                     id="patient-name"
                     width="1/12"

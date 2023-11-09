@@ -10,7 +10,7 @@ type AlertPatientMapping = {
 type AlertDetailsModalProps = {
   pressed: boolean;
   setShown: Function;
-  alertPatientMapping: AlertPatientMapping;
+  alertPatientMapping: AlertPatientMapping | undefined;
 };
 
 const AlertDetailsModal = ({
@@ -33,7 +33,7 @@ const AlertDetailsModal = ({
 
   const patientName = alertPatientMapping?.patient;
   const { status, alertVitals, description, handledBy, createdAt } =
-    alertPatientMapping?.alert;
+    alertPatientMapping?.alert || {};
 
   const [open, setOpen] = useState(pressed);
   const handleClose = () => {
@@ -57,16 +57,17 @@ const AlertDetailsModal = ({
             <DetailBox title="Status:" content={status} />
             <DetailBox title="Description:" content={description} />
             <p className="font-bold underline">Abnormal Vitals</p>
-            {alertVitals.map((alert) => (
-              <div className="flex gap-x-3">
-                <p>{alert.vital}</p>
-                <p>{alert.reading}</p>
-              </div>
-            ))}
+            {alertVitals &&
+              alertVitals.map((alert) => (
+                <div className="flex gap-x-3">
+                  <p>{alert.vital}</p>
+                  <p>{alert.reading}</p>
+                </div>
+              ))}
             <DetailBox title="Nurse:" content={handledBy ? handledBy : "-"} />
             <DetailBox
               title="Time:"
-              content={createdAt.replace("T", " ").substring(0, 16)}
+              content={createdAt?.replace("T", " ").substring(0, 16)}
             />
           </div>
           <button
@@ -75,13 +76,22 @@ const AlertDetailsModal = ({
           >
             Redelegate
           </button>
+          <button
+            className="float-right p-2 mx-2 rounded-lg bg-white text-black"
+            onClick={handleClose}
+          >
+            Close
+          </button>
         </Box>
       </Modal>
     </div>
   );
 };
 
-const DetailBox = (props: { title: string; content: string }) => {
+const DetailBox = (props: {
+  title: string | undefined;
+  content: string | undefined;
+}) => {
   return (
     <div className="flex gap-2">
       <p className="font-bold underline">{props.title}</p>
