@@ -275,7 +275,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
                     <DashboardAlertIcon
                       patientId={pd.patient?._id}
                       socketData={
-                        socketPatient === pd.patient?._id
+                        socketPatient?._id === pd.patient?._id
                           ? socketAlertList
                           : null
                       }
