@@ -16,10 +16,10 @@ const BedStatusComponent = (bedProp: BedProp) => {
   const { bed } = bedProp;
   const socket = io("http://localhost:3001");
   useEffect(() => {
-    socket.emit("connectPatient", bed?.patient?._id);
-    socket.on("newFallRisk", (data) => {
-      setFallRisk(data);
-    });
+    // socket.emit("connectPatient", bed?.patient?._id);
+    // socket.on("newFallRisk", (data) => {
+    //   setFallRisk(data);
+    // });
     setFallRisk(bed?.patient?.fallRisk);
 
     return () => {

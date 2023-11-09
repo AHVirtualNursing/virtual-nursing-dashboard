@@ -109,6 +109,11 @@ const Alerts = () => {
 
           {alerts &&
             alerts
+              .sort(
+                (a, b) =>
+                  +new Date(b.alert.createdAt) - +new Date(a.alert.createdAt)
+              )
+
               .filter((alertMapping) =>
                 alertMapping.patient.toLowerCase().includes(patientSearch)
               )
