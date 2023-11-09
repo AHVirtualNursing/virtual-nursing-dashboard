@@ -256,9 +256,10 @@ export default function Patients({ selectedWard }: PatientListProps) {
           {/* ------ data rows ------*/}
           {data
             .filter((bed) =>
-              bed.patient?.name
-                .toLowerCase()
-                .includes(searchPatient || searchCondition)
+              bed.patient?.name.toLowerCase().includes(searchPatient)
+            )
+            .filter((bed) =>
+              bed.patient?.condition.toLowerCase().includes(searchCondition)
             )
             .map((pd, index) => (
               <tr className="text-left" key={pd._id}>
