@@ -9,13 +9,11 @@ interface BedProp {
   bed: SmartBed | undefined;
 }
 
-const BedStatusComponent = (bedProp: BedProp) => {
+const BedStatusComponent = ({ bed }: BedProp) => {
   const [fallRisk, setFallRisk] = useState<string | undefined>();
   const [reasonAdded, setReasonAdded] = useState<boolean>(false);
   const [inputReason, setInputReason] = useState<string>("");
   const socket = useContext(SocketContext);
-
-  const { bed } = bedProp;
 
   useEffect(() => {
     //fetch patient to set fall risk correctly
@@ -64,12 +62,12 @@ const BedStatusComponent = (bedProp: BedProp) => {
         <div id="left-rails" className="flex gap-5 justify-evenly pt-4">
           <BedRailCard
             id="upper-left"
-            info={bedProp.bed?.isLeftUpperRail}
+            info={bed?.isLeftUpperRail}
             rail="Upper Left"
           />
           <BedRailCard
             id="lower-left"
-            info={bedProp.bed?.isLeftLowerRail}
+            info={bed?.isLeftLowerRail}
             rail="Lower Left"
           />
         </div>
@@ -79,12 +77,12 @@ const BedStatusComponent = (bedProp: BedProp) => {
         <div id="right-rails" className="flex gap-5 justify-evenly pb-4">
           <BedRailCard
             id="upper-right"
-            info={bedProp.bed?.isRightUpperRail}
+            info={bed?.isRightUpperRail}
             rail="Upper Right"
           />
           <BedRailCard
             id="lower-right"
-            info={bedProp.bed?.isRightLowerRail}
+            info={bed?.isRightLowerRail}
             rail="Lower Right"
           />
         </div>
@@ -105,23 +103,21 @@ const BedStatusComponent = (bedProp: BedProp) => {
       </div>
       <div id="bed-info" className="bg-white flex-1 space-y-4 p-2 text-left">
         <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
-          Bed Position: {bedProp.bed?.bedPosition}
+          Bed Position: {bed?.bedPosition}
         </div>
         <div className="bg-slate-200 font-bold rounded-lg uppercase flex gap-x-10 px-2 py-1 items-center ">
-          <p>
-            Bed Alarm: {bedProp.bed?.isLowestPosition ? "lowest" : "not lowest"}
-          </p>
-          {!bedProp.bed?.isLowestPosition && <WarningIcon color="warning" />}
+          <p>Bed Alarm: {bed?.isLowestPosition ? "lowest" : "not lowest"}</p>
+          {!bed?.isLowestPosition && <WarningIcon color="warning" />}
         </div>
         <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
-          Brake Wheels: {bedProp.bed?.isBrakeSet ? "Locked" : "Not Locked"}
+          Brake Wheels: {bed?.isBrakeSet ? "Locked" : "Not Locked"}
         </div>
         <div className="bg-slate-200 font-bold rounded-lg uppercase flex gap-x-10 px-2 py-1 items-center ">
           {/* - when fall risk high, bed alarm not turned on, red alert, input box and confirm appears
               - when VN inputs + confirm,  red warning turns orange
               - if bed alarm ON, or fall risk drop to medium/low, warning sign and input disappear
           */}
-          <p>Bed Alarm: {bedProp.bed?.isBedAlarmOn ? "On" : "Not Turned On"}</p>
+          <p>Bed Alarm: {bed?.isBedAlarmOn ? "On" : "Not Turned On"}</p>
           <BedAlarmWarning />
         </div>
         {fallRisk === "High" && !bed?.isBedAlarmOn && (

@@ -4,7 +4,7 @@ import Image from "next/image";
 import profilePic from "../../public/profilepic.jpg";
 import { useEffect, useState } from "react";
 import { fetchBedByBedId } from "./api/smartbed_api";
-import { SmartBed } from "@/models/smartBed";
+import { SmartBed } from "@/types/smartbed";
 import VisualisationComponent from "@/components/patientOverviewTab/VisualisationComponent";
 import dynamic from "next/dynamic";
 import AlertTabComponent from "@/components/patientAlertTab/AlertTabComponent";
@@ -62,7 +62,7 @@ const patientVisualisationPage = () => {
             </Box>
             <Box textAlign={"left"}>
               <p>Condition: {selectedBed?.patient?.condition} </p>
-              <p>Additional Info: {selectedBed?.patient?.addInfo} </p>
+              {/* <p>Additional Info: {selectedBed?.patient?.addInfo} </p> */}
             </Box>
             <Box textAlign={"right"} marginRight={2}>
               <button

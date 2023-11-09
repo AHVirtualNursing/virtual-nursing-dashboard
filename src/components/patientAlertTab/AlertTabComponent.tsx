@@ -1,4 +1,4 @@
-import { Patient } from "@/models/patient";
+import { Patient } from "@/types/patient";
 import React, { useState } from "react";
 import PatientAlerts from "./PatientAlerts";
 import PatientConfigs from "./PatientConfigs";
@@ -6,7 +6,7 @@ import NotificationImportantIcon from "@mui/icons-material/NotificationImportant
 import EditNotificationsIcon from "@mui/icons-material/EditNotifications";
 
 type PropType = {
-  patient?: Patient;
+  patient: Patient | undefined;
 };
 
 const AlertTabComponent = ({ patient }: PropType) => {
