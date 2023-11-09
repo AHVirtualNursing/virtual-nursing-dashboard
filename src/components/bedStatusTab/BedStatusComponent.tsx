@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import WarningIcon from "@mui/icons-material/Warning";
 import { updateProtocolBreachReason } from "@/pages/api/smartbed_api";
 import { SmartBed } from "@/types/smartbed";
-import { io } from "socket.io-client";
+import { SocketContext } from "@/pages/layout";
+import { fetchPatientByPatientId } from "@/pages/api/patients_api";
 
 interface BedProp {
   bed: SmartBed | undefined;
@@ -12,15 +13,19 @@ const BedStatusComponent = (bedProp: BedProp) => {
   const [fallRisk, setFallRisk] = useState<string | undefined>();
   const [reasonAdded, setReasonAdded] = useState<boolean>(false);
   const [inputReason, setInputReason] = useState<string>("");
+  const socket = useContext(SocketContext);
 
   const { bed } = bedProp;
-  const socket = io("http://localhost:3001");
+
   useEffect(() => {
-    // socket.emit("connectPatient", bed?.patient?._id);
-    // socket.on("newFallRisk", (data) => {
-    //   setFallRisk(data);
-    // });
-    setFallRisk(bed?.patient?.fallRisk);
+    //fetch patient to set fall risk correctly
+    fetchPatientByPatientId(bed?.patient?._id).then((patient) =>
+      setFallRisk(patient.fallRisk)
+    );
+
+    socket.on("newFallRisk", (fallRiskValue) => {
+      setFallRisk(fallRiskValue);
+    });
 
     return () => {
       socket.off("newFallRisk");

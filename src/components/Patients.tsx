@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import { fetchBedByBedId } from "@/pages/api/smartbed_api";
 import { SmartBed } from "@/models/smartBed";
@@ -13,6 +13,8 @@ import Link from "next/link";
 import DashboardAlertIcon from "./DashboardAlertIcon";
 import { Alert } from "@/models/alert";
 import { io } from "socket.io-client";
+import { Patient } from "@/types/patient";
+import { SocketContext } from "@/pages/layout";
 
 type PatientListProps = {
   /**
@@ -29,7 +31,9 @@ export default function Patients({ selectedWard }: PatientListProps) {
   const [searchCondition, setSearchCondition] = useState<string>("");
   const [vitals, setVitals] = useState<any[]>([]);
   const { data: sessionData } = useSession();
-  const [socketData, setSocketData] = useState<Alert>();
+  const socket = useContext(SocketContext);
+  const [socketAlertList, setSocketAlertList] = useState<Alert[]>();
+  const [socketPatient, setSocketPatient] = useState<Patient>();
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
@@ -126,19 +130,19 @@ export default function Patients({ selectedWard }: PatientListProps) {
   };
 
   useEffect(() => {
-    const socket = io("http://localhost:3001");
-    const nurseId = sessionData?.user.id;
-    socket.emit("alertConnections", nurseId);
-    socket.on("alertIncoming", (data: Alert) => {
-      console.log("Data From Socket", data);
-      setSocketData(data);
-    });
-    socket.on("patientAlertDeleted", (data: Alert) => {
-      console.log("Data From Socket", data);
-      setSocketData(data);
-    });
+    const handleAlertIncoming = (data: any) => {
+      setSocketAlertList(data.alertList);
+      setSocketPatient(data.patient);
+    };
+    const handleDeleteAlert = (data: any) => {
+      setSocketAlertList(data.alertList);
+      setSocketPatient(data.patient);
+    };
+    socket.on("patientAlertAdded", handleAlertIncoming);
+    socket.on("patientAlertDeleted", handleDeleteAlert);
     return () => {
-      socket.close();
+      socket.off("patientAlertAdded", handleAlertIncoming);
+      socket.off("patientAlertDeleted", handleDeleteAlert);
     };
   }, []);
 
@@ -271,8 +275,8 @@ export default function Patients({ selectedWard }: PatientListProps) {
                     <DashboardAlertIcon
                       patientId={pd.patient?._id}
                       socketData={
-                        socketData?.patient === pd.patient?._id
-                          ? socketData
+                        socketPatient === pd.patient?._id
+                          ? socketAlertList
                           : null
                       }
                     />

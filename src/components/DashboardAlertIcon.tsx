@@ -6,7 +6,7 @@ import Badge from "@mui/material/Badge";
 
 type DashboardAlertIconProps = {
   patientId: string | undefined;
-  socketData?: Alert | null;
+  socketData?: Alert[] | null;
 };
 
 const DashboardAlertIcon = ({
@@ -15,9 +15,14 @@ const DashboardAlertIcon = ({
 }: DashboardAlertIconProps) => {
   const [patientAlerts, setPatientAlerts] = useState<Alert[]>([]);
   useEffect(() => {
-    fetchAlertsByPatientId(patientId).then((alerts) => {
-      setPatientAlerts(alerts);
-    });
+    if (socketData == null) {
+      fetchAlertsByPatientId(patientId).then((alerts) => {
+        setPatientAlerts(alerts);
+      });
+    } else {
+      // note: this might cause infinite re-render
+      setPatientAlerts(socketData);
+    }
   }, [socketData]);
 
   return (
