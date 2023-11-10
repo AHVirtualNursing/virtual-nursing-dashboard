@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 
 interface PatientProp {
   patient: Patient | undefined;
+  forDischargeReport?: boolean;
 }
 
 interface TabPanelProps {
@@ -62,7 +63,9 @@ function PatientAlerts(patientProp: PatientProp) {
     };
   }
 
-  const [currentTab, setCurrentTab] = useState(0);
+  const [currentTab, setCurrentTab] = useState(
+    patientProp.forDischargeReport ? 0 : 0
+  );
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
@@ -135,32 +138,32 @@ function PatientAlerts(patientProp: PatientProp) {
 
   return (
     <div>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
+      {!patientProp.forDischargeReport && (
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Tabs
+            value={currentTab}
+            onChange={handleChange}
+            aria-label="basic tabs example">
+            <Tab label="Open" {...a11yProps(0)} />
+            <Tab label="Handling" {...a11yProps(1)} />
+            <Tab label="Completed" {...a11yProps(2)} />
+          </Tabs>
+        </Box>
+      )}
+      <>
+        <CustomTabPanel
           value={currentTab}
-          onChange={handleChange}
-          aria-label="basic tabs example"
-        >
-          <Tab label="Open" {...a11yProps(0)} />
-          <Tab label="Handling" {...a11yProps(1)} />
-          <Tab label="Completed" {...a11yProps(2)} />
-        </Tabs>
-      </Box>
-      <CustomTabPanel
-        value={currentTab}
-        index={0}
-        status="open"
-      ></CustomTabPanel>
-      <CustomTabPanel
-        value={currentTab}
-        index={1}
-        status="handling"
-      ></CustomTabPanel>
+          index={0}
+          status="open"></CustomTabPanel>
+        <CustomTabPanel
+          value={currentTab}
+          index={1}
+          status="handling"></CustomTabPanel>
+      </>
       <CustomTabPanel
         value={currentTab}
         index={2}
-        status="complete"
-      ></CustomTabPanel>
+        status="complete"></CustomTabPanel>
     </div>
   );
 }

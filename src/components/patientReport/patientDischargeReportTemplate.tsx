@@ -1,0 +1,242 @@
+import React, { useEffect } from "react";
+import Image from "next/image";
+import { usePDF } from "react-to-pdf";
+
+import { AlertConfig } from "@/models/alertConfig";
+import { Patient } from "@/models/patient";
+import { Box, TableContainer, Table, TableRow, TableCell } from "@mui/material";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { Vital } from "@/models/vital";
+import PatientAlerts from "../patientAlertTab/PatientAlerts";
+interface PatientDischargeReportTemplate {
+  patient: Patient;
+  vitals?: Vital;
+  alertConfigs?: AlertConfig;
+}
+
+export default function PatientDischargeReportTemplate({
+  patient,
+  vitals,
+  alertConfigs,
+}: PatientDischargeReportTemplate) {
+  const { toPDF, targetRef } = usePDF({
+    filename: "discharge_report.pdf",
+  });
+
+  const colours: { [key: string]: string } = {
+    "Respiratory Rate": "rgb(255, 102, 102)",
+    "Heart Rate": "rgb(255, 178, 102)",
+    "Blood Pressure Systolic": "rgb(76, 153, 0)",
+    "Blood Pressure Diastolic": "rgb(76, 153, 0)",
+    Temperature: "rgb(102, 178, 255)",
+    "Blood Oxygen": "rgb(255, 102, 178)",
+  };
+
+  useEffect(() => {
+    toPDF();
+  }, []);
+
+  return (
+    <Box width="100%" ref={targetRef}>
+      <Image
+        src={"/VND_Banner.jpg"}
+        alt="VND Banner"
+        layout="fixed"
+        width={1000}
+        height={150}
+      />
+      <TableContainer style={{ overflow: "hidden", marginBottom: 2 }}>
+        <Table
+          style={{
+            border: "2px solid black",
+            margin: "0 24px",
+          }}>
+          <TableRow>
+            <TableCell style={{ border: "2px solid black" }}>
+              <strong>Patient Details</strong>
+            </TableCell>
+            <TableCell style={{ border: "2px solid black" }}>
+              <strong> Health Status</strong>
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell
+              style={{ borderRight: "2px solid black", verticalAlign: "top" }}>
+              <strong>Patient Name:</strong> {patient.name}
+              <br />
+              <strong>Patient NRIC:</strong> {patient.nric}
+              <br />
+              <strong>Condition:</strong> {patient.condition}
+            </TableCell>
+            <TableCell style={{ verticalAlign: "top" }}>
+              <strong>COPD:</strong> {patient.copd}
+              <br />
+              <strong>Acuity Level:</strong> {patient.acuityLevel}
+              <br />
+              <strong>O2 Intake:</strong> {patient.o2Intake}
+              <br />
+              <strong>Consciousness:</strong> {patient.consciousness}
+              <br />
+              <strong>Fall Risk:</strong> {patient.fallRisk}
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell style={{ border: "2px solid black" }} colSpan={2}>
+              <Table>
+                <TableRow>
+                  <TableCell>
+                    <strong>Vital Configuration</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Minimum Threshold</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Maximum Threshold</strong>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Respiratory Rate:</TableCell>
+                  <TableCell>{alertConfigs?.rrConfig[0]} bpm</TableCell>
+                  <TableCell>{alertConfigs?.rrConfig[1]} bpm</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Heart Rate:</TableCell>
+                  <TableCell>{alertConfigs?.hrConfig[0]} bpm</TableCell>
+                  <TableCell>{alertConfigs?.hrConfig[1]} bpm</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Blood Pressure Systolic:</TableCell>
+                  <TableCell>{alertConfigs?.bpSysConfig[0]} mmHg</TableCell>
+                  <TableCell>{alertConfigs?.bpSysConfig[1]} mmHg</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Blood Pressure Diastolic:</TableCell>
+                  <TableCell>{alertConfigs?.bpDiaConfig[0]} mmHg</TableCell>
+                  <TableCell>{alertConfigs?.bpDiaConfig[1]} mmHg</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Blood Oxygen:</TableCell>
+                  <TableCell>{alertConfigs?.spO2Config[0]}%</TableCell>
+                  <TableCell>{alertConfigs?.spO2Config[1]}%</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Temperature:</TableCell>
+                  <TableCell>{alertConfigs?.temperatureConfig[0]}°C</TableCell>
+                  <TableCell>{alertConfigs?.spO2Config[1]}°C</TableCell>
+                </TableRow>
+              </Table>
+            </TableCell>
+          </TableRow>
+          {patient.infoLogs ? (
+            <TableRow>
+              <TableCell style={{ border: "2px solid black" }} colSpan={2}>
+                <Table>
+                  <TableRow>
+                    <TableCell>
+                      <strong>Info</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Date Added</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Added By</strong>
+                    </TableCell>
+                  </TableRow>
+                  {patient.infoLogs?.map((infoLog) => (
+                    <TableRow>
+                      <TableCell>{infoLog.info}</TableCell>
+                      <TableCell>{infoLog.datetime}</TableCell>
+                      <TableCell>{infoLog.addedBy}</TableCell>
+                    </TableRow>
+                  ))}
+                </Table>
+              </TableCell>
+            </TableRow>
+          ) : null}
+        </Table>
+      </TableContainer>
+
+      {[
+        "Respiratory Rate",
+        "Heart Rate",
+        "Blood Pressure Systolic",
+        "Blood Pressure Diastolic",
+        "Temperature",
+        "Blood Oxygen",
+      ].map((chartType) => (
+        <div className="mb-16 mt-16">
+          <ResponsiveContainer width={"99%"} height={300}>
+            <LineChart
+              data={
+                chartType == "Respiratory Rate"
+                  ? vitals?.respRate.map((vital) => {
+                      return {
+                        datetime: vital.datetime.slice(0, 11),
+                        reading: vital.reading,
+                      };
+                    })
+                  : chartType == "Heart Rate"
+                  ? vitals?.heartRate.map((vital) => {
+                      return {
+                        datetime: vital.datetime.slice(0, 11),
+                        reading: vital.reading,
+                      };
+                    })
+                  : chartType == "Blood Pressure Systolic"
+                  ? vitals?.bloodPressureSys.map((vital) => {
+                      return {
+                        datetime: vital.datetime.slice(0, 11),
+                        reading: vital.reading,
+                      };
+                    })
+                  : chartType == "Blood Pressure Diastolic"
+                  ? vitals?.bloodPressureDia.map((vital) => {
+                      return {
+                        datetime: vital.datetime.slice(0, 11),
+                        reading: vital.reading,
+                      };
+                    })
+                  : chartType == "Temperature"
+                  ? vitals?.temperature.map((vital) => {
+                      return {
+                        datetime: vital.datetime.slice(0, 11),
+                        reading: vital.reading,
+                      };
+                    })
+                  : chartType == "Blood Oxygen"
+                  ? vitals?.spO2.map((vital) => {
+                      return {
+                        datetime: vital.datetime.slice(0, 11),
+                        reading: vital.reading,
+                      };
+                    })
+                  : []
+              }>
+              <Line
+                type="monotone"
+                dataKey="reading"
+                stroke={colours[chartType]}
+                strokeWidth={3}
+              />
+              <CartesianGrid stroke="#ccc" strokeDasharray="1" />
+              <XAxis dataKey="datetime"></XAxis>
+              <YAxis />
+              <Tooltip />
+            </LineChart>
+          </ResponsiveContainer>
+          <h3 className="text-center text-lg font-bold mb-2">{chartType}</h3>
+        </div>
+      ))}
+      <h2 className="mb-8">Alert History</h2>
+      <PatientAlerts patient={patient} forDischargeReport={true} />
+    </Box>
+  );
+}

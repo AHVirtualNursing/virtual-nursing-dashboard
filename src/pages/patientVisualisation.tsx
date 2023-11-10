@@ -83,13 +83,11 @@ const patientVisualisationPage = () => {
             </Box>
             <Box textAlign={"left"}>
               <p>Condition: {selectedBed?.patient?.condition} </p>
-              <p>Additional Info: {selectedBed?.patient?.addInfo} </p>
             </Box>
             <Box textAlign={"right"} marginRight={2}>
               <button
                 className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full border-none"
-                onClick={updateSelectedPatient}
-              >
+                onClick={updateSelectedPatient}>
                 Update Details
               </button>
             </Box>
@@ -97,8 +95,7 @@ const patientVisualisationPage = () => {
               <Button
                 component="label"
                 variant="contained"
-                startIcon={<CloudUpload />}
-              >
+                startIcon={<CloudUpload />}>
                 <VisuallyHiddenInput type="file" onChange={handleFileChange} />
                 {processingData ? "Processing Data..." : "Upload Data"}
               </Button>
@@ -110,8 +107,7 @@ const patientVisualisationPage = () => {
             value={currentTab}
             onChange={handleTabChange}
             centered
-            sx={{ marginBottom: 3, backgroundColor: undefined }}
-          >
+            sx={{ marginBottom: 3, backgroundColor: undefined }}>
             <Tab value="overview" label="Overview" />
             <Tab value="analytics" label="Analytics" />
             <Tab value="alerts" label="Alerts" />
@@ -122,7 +118,9 @@ const patientVisualisationPage = () => {
             <VisualisationComponent patient={selectedBed?.patient} />
           ) : currentTab === "analytics" ? (
             <PatientChart patient={selectedBed?.patient} />
-          ) : currentTab === "reports" ? <PatientReport viewType="single" patientId={patientId as string} /> : currentTab === "alerts" ? (
+          ) : currentTab === "reports" ? (
+            <PatientReport viewType="single" patientId={patientId as string} />
+          ) : currentTab === "alerts" ? (
             <AlertTabComponent patient={selectedBed?.patient} />
           ) : currentTab === "bedstatus" ? (
             <BedStatusComponent bed={selectedBed} />

@@ -650,7 +650,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
               startIcon={<FileDownloadIcon />}
               variant="contained"
               onClick={() => handleSavePdf()}>
-              Save as PDF
+              Download PDF
             </Button>
             <LoadingButton
               startIcon={<CloudUploadIcon />}
