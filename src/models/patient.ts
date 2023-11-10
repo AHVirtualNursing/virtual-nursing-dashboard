@@ -12,7 +12,6 @@ export interface Patient {
   picture?: string;
   infoLogs?: InfoLog[];
   copd?: boolean;
-  fallRiskScore: number;
   o2Intake?: string;
   consciousness?: string;
   acuityLevel?: string;

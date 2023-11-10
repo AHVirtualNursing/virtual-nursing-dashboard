@@ -252,69 +252,44 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
   const router = useRouter();
 
   useEffect(() => {
-    const updateCharts = (data: any) => {
-      const datetime = new Date(data.datetime);
-      const hours = datetime.getHours().toString().padStart(2, "0");
-      const minutes = datetime.getMinutes().toString().padStart(2, "0");
-      const seconds = datetime.getSeconds().toString().padStart(2, "0");
-      const formattedDateTime = `${hours}:${minutes}:${seconds}`;
-      if (data.heartRate) {
-        setHRData((previousData) => {
-          const newData = [
-            ...previousData,
-            {
-              datetime: formattedDateTime,
-              reading: Math.floor(data.heartRate!),
-            },
-          ].slice(-7);
-          return newData;
-        });
-      }
-      if (data.bloodPressureDia) {
-        setBpDiaData((previousData) => {
-          const newData = [
-            ...previousData,
-            {
-              datetime: formattedDateTime,
-              reading: Math.floor(data.bloodPressureDia!),
-            },
-          ].slice(-7);
-          return newData;
-        });
-      }
-      if (data.bloodPressureSys) {
-        setBpSysData((previousData) => {
-          const newData = [
-            ...previousData,
-            {
-              datetime: formattedDateTime,
-              reading: Math.floor(data.bloodPressureSys!),
-            },
-          ].slice(-7);
-          return newData;
-        });
-      }
-      if (data.spO2) {
-        setSpO2Data((previousData) => {
-          const newData = [
-            ...previousData,
-            {
-              datetime: formattedDateTime,
-              reading: Math.floor(data.spO2!),
-            },
-          ].slice(-7);
-          return newData;
-        });
+    const updateCharts = (vitalAndPatientId: any) => {
+      const data = vitalAndPatientId.vital;
+      const patientId = router.query.patientId;
+      const patientIdFromSocket = vitalAndPatientId.patient;
+      if (patientId === patientIdFromSocket) {
+        // const datetime = new Date(data.datetime);
+        // const hours = datetime.getHours().toString().padStart(2, "0");
+        // const minutes = datetime.getMinutes().toString().padStart(2, "0");
+        // const seconds = datetime.getSeconds().toString().padStart(2, "0");
+        // const formattedDateTime = `${hours}:${minutes}:${seconds}`;
+        if (data.heartRate) {
+          setHRData(data.heartRate.slice(-7));
+        }
+        if (data.bloodPressureDia) {
+          setBpDiaData(data.bloodPressureDia.slice(-7));
+        }
+        if (data.bloodPressureSys) {
+          setBpSysData(data.bloodPressureSys.slice(-7));
+        }
+        if (data.spO2) {
+          setSpO2Data(data.spO2.slice(-7));
+        }
+        if (data.respRate) {
+          setRRData(data.respRate.slice(-7));
+        }
+        if (data.temperature) {
+          setTempData(data.temperature.slice(-7));
+        }
       }
     };
 
-    const patientId = router.query.patientId;
-    socket.emit("connectDashboard", patientId);
-    socket.on("updateVitals", updateCharts);
-
+    // socket.emit("connectDashboard", patientId);
+    // socket.on("updateVitals", updateCharts);
+    socket.on("updatedVitals", updateCharts);
     return () => {
-      socket.off("updateVitals", updateCharts);
-      socket.emit("disconnectDashboard", patientId);
+      socket.off("updatedVitals", updateCharts);
+      // socket.off("updateVitals", updateCharts);
+      // socket.emit("disconnectDashboard", patientId);
     };
   }, []);
 

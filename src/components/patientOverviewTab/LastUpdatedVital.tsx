@@ -23,10 +23,10 @@ export default function LastUpdatedVital({
     <div>
       <h3>{vitals[vital][0]}</h3>
       <div className="flex items-center justify-center">
-        <h1>{data[data.length - 1].reading}</h1>
+        <h1>{data[data.length - 1]?.reading}</h1>
         <p>{vitals[vital][1]}</p>
       </div>
-      <p>Last logged at {data[data.length - 1].datetime}</p>
+      <p>Last logged at {data[data.length - 1]?.datetime}</p>
     </div>
   );
 }

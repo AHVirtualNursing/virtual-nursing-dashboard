@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { SmartBed } from "@/models/smartBed";
@@ -17,6 +17,7 @@ import NotificationImportantIcon from "@mui/icons-material/NotificationImportant
 import { VirtualNurse } from "@/models/virtualNurse";
 import { Tooltip } from "@mui/material";
 import { Ward } from "@/types/ward";
+import { SocketContext } from "@/pages/layout";
 
 export default function Wards() {
   const router = useRouter();
@@ -27,6 +28,7 @@ export default function Wards() {
   const [searchPatient, setSearchPatient] = useState<string>("");
   const [selectedWard, setSelectedWard] = useState("assigned-wards");
   const { data: sessionData } = useSession();
+  const socket = useContext(SocketContext);
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
@@ -162,6 +164,43 @@ export default function Wards() {
     }
   }, [vitals, data]);
 
+  useEffect(() => {
+    const refreshContent = (updatedBed: any) => {
+      console.log("enter");
+      setData((prevData) => {
+        console.log(prevData);
+        const index = prevData.findIndex((bed) => bed._id === updatedBed._id);
+        if (index !== -1) {
+          const updatedBeds = [...prevData];
+          updatedBeds[index] = updatedBed;
+          console.log(updatedBeds);
+          return updatedBeds;
+        }
+        return prevData;
+      });
+    };
+
+    const refreshPatientInfo = (updatedPatient: any) => {
+      console.log("enter");
+      setData((prevData) => {
+        const updatedData = prevData.map((bed) => {
+          if (bed.patient && bed.patient._id === updatedPatient._id) {
+            return { ...bed, patient: updatedPatient };
+          }
+          return bed;
+        });
+        return updatedData;
+      });
+    };
+    socket.on("updatedSmartbed", refreshContent);
+    socket.on("updatedPatient", refreshPatientInfo);
+
+    return () => {
+      socket.off("updatedSmartbed", refreshContent);
+      socket.off("updatedPatient", refreshPatientInfo);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col p-8 gap-6 w-full shadow-lg bg-slate-100">
       <div className="flex justify-between">
@@ -242,25 +281,38 @@ export default function Wards() {
                     <div>
                       <p>Fall Risk</p>
                       <div className="flex items-center justify-center">
-                        <p>High</p>
-                        <Tooltip
-                          title={<p style={{ fontSize: "16px" }}>REASON</p>}
-                          placement="top"
-                        >
-                          <NotificationImportantIcon className="fill-red-500" />
-                        </Tooltip>
+                        <p>{pd.patient?.fallRisk}</p>
+                        {pd.patient?.fallRisk === "High" &&
+                        !pd.isBedExitAlarmOn ? (
+                          <Tooltip
+                            title={
+                              <p style={{ fontSize: "16px" }}>
+                                {pd.bedAlarmProtocolBreachReason}
+                              </p>
+                            }
+                            placement="top"
+                          >
+                            <NotificationImportantIcon className="fill-red-500" />
+                          </Tooltip>
+                        ) : null}
                       </div>
                     </div>
                   ) : null}
                   {nurse?.cardLayout.news2 ? (
                     <div>
                       <p>NEWS2</p>
-                      <p>2</p>
+                      <p>
+                        {
+                          vitals[index]?.news2Score[
+                            vitals[index]?.news2Score.length - 1
+                          ].reading
+                        }
+                      </p>
                     </div>
                   ) : null}
                 </div>
               </div>
-              <BedTiles cardLayout={nurse?.cardLayout} />
+              <BedTiles cardLayout={nurse?.cardLayout} smartbed={pd} />
               <VitalTiles cardLayout={nurse?.cardLayout} data={vitals[index]} />
             </div>
           ))}
