@@ -182,7 +182,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
 
   useEffect(() => {
     const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
-    socket.emit("connectVirtualNurseForChatMessaging", sessionData?.user.id);
+    socket.emit("clientConnections", sessionData?.user.id);
     socket.on("updateVirtualNurseChat", (updatedChat: Chat) => {
       //update chats
       console.log("Received an update from bedside nurse");
