@@ -1,4 +1,4 @@
-import { Message } from "@/models/message";
+import { Message } from "@/types/message";
 import { VirtualNurse } from "@/models/virtualNurse";
 import {
   darkIndigo,

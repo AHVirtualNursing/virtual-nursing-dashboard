@@ -1,5 +1,5 @@
 import { BedSideNurse } from "@/models/bedsideNurse";
-import { Message } from "@/models/message";
+import { Message } from "@/types/message";
 import axios from "axios";
 
 export const fetchChatsForVirtualNurse = async (virtualNurseId: string) => {

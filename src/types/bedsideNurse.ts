@@ -1,20 +1,16 @@
 import { SmartBed } from "./smartbed";
+import { User } from "./user";
 import { Ward } from "./ward";
 
-export type BedSideNurse = {
+export interface BedSideNurse extends User {
   _id: string;
-  name: string;
-  smartBeds: SmartBed[];
+  smartBeds: SmartBed[] | string[];
   nurseStatus: NurseStatusEnum;
-  headNurse: BedSideNurse;
-  ward: Ward;
+  headNurse: BedSideNurse | string;
+  ward: Ward | string;
   createdAt: string;
   updatedAt: string;
-  username: string;
-  email: string;
-  password: string;
   mobilePushNotificationToken: string;
-  passwordReset: boolean;
 };
 
 export enum NurseStatusEnum {

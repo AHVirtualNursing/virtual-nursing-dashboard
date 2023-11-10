@@ -1,4 +1,4 @@
-import { Chat } from "@/models/chat";
+import { Chat } from "@/types/chat";
 import { lightIndigo } from "@/styles/colorTheme";
 import { Box } from "@mui/material";
 import { Dispatch, SetStateAction, useState } from "react";

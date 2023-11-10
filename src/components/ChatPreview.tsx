@@ -1,4 +1,4 @@
-import { Chat } from "@/models/chat";
+import { Chat } from "@/types/chat";
 import {
   darkerIndigo,
   lightIndigo,
