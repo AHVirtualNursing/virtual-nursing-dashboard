@@ -32,7 +32,7 @@ const AlertDetailsModal = ({
   };
 
   const patientName = alertPatientMapping?.patient;
-  const { status, alertVitals, description, handledBy, createdAt } =
+  const { status, alertVitals, description, handledBy, createdAt, notes } =
     alertPatientMapping?.alert || {};
 
   const [open, setOpen] = useState(pressed);
@@ -49,9 +49,9 @@ const AlertDetailsModal = ({
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          {/* <Typography id="modal-modal-title" variant="h6" component="h2">
+          <Typography id="modal-modal-title" variant="h6" component="h2">
             Alert Details
-          </Typography> */}
+          </Typography>
           <div className="space-y-6">
             <div className="flex justify-between items-center font-bold text-lg">
               <p>{patientName}</p>
@@ -65,6 +65,16 @@ const AlertDetailsModal = ({
             </div>
             <p className="text-gray-600">{description}</p>
             <p className="text-lg">Nurse: {handledBy ? handledBy : "-"}</p>
+            <p className="text-lg">
+              Notes:{" "}
+              {notes && notes.length > 0
+                ? notes.map((note) => (
+                    <ul>
+                      <li>{note.info}</li>
+                    </ul>
+                  ))
+                : "-"}
+            </p>
             <p className="text-lg">
               Time: {createdAt?.replace("T", " ").substring(0, 16)}
             </p>
@@ -91,24 +101,6 @@ const AlertDetailsModal = ({
               Close
             </button>
           </div>
-          {/* <div className="space-y-2">
-            <DetailBox title="Patient:" content={patientName} />
-            <DetailBox title="Status:" content={status} />
-            <DetailBox title="Description:" content={description} />
-            <p className="font-bold underline">Abnormal Vitals</p>
-            {alertVitals &&
-              alertVitals.map((alert) => (
-                <div className="flex gap-x-3">
-                  <p>{alert.vital}</p>
-                  <p>{alert.reading}</p>
-                </div>
-              ))}
-            <DetailBox title="Nurse:" content={handledBy ? handledBy : "-"} />
-            <DetailBox
-              title="Time:"
-              content={createdAt?.replace("T", " ").substring(0, 16)}
-            />
-          </div> */}
         </Box>
       </Modal>
     </div>

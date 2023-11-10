@@ -16,6 +16,7 @@ const Alerts = () => {
   const [nurseSearch, setNurseSearch] = useState<string>("");
   const [statusCriteria, setStatusCriteria] = useState("open");
   const [vitalCriteria, setVitalCriteria] = useState("");
+  const [alertTypeCriteria, setAlertTypeCriteria] = useState("");
   const [selectedAlert, setSelectedAlert] = useState<AlertPatientMapping>();
   const [shown, setShown] = useState(false);
 
@@ -58,6 +59,7 @@ const Alerts = () => {
             <th>Patient</th>
             <th>Status</th>
             <th>Alert Type</th>
+            <th>Vital Type</th>
             <th>Vital Measurement</th>
             <th className="px-2">Description</th>
             <th className="px-1">Bedside Nurse</th>
@@ -79,7 +81,7 @@ const Alerts = () => {
             <td id="status-filter">
               <select
                 name="status-select"
-                className="bg-white px-1 w-full"
+                className="bg-white p-1 w-full"
                 value={statusCriteria}
                 onChange={(e) => setStatusCriteria(e.target.value)}
               >
@@ -88,10 +90,25 @@ const Alerts = () => {
                 <option value="complete">complete</option>
               </select>
             </td>
+            <td id="alertType-filter">
+              <select
+                name="alertType-select"
+                className="bg-white p-1 w-full"
+                value={alertTypeCriteria}
+                onChange={(e) => {
+                  console.log(e.target.value);
+                  setAlertTypeCriteria(e.target.value);
+                }}
+              >
+                <option value="">All</option>
+                <option value="Vital">Vital</option>
+                <option value="SmartBed">SmartBed</option>
+              </select>
+            </td>
             <td id="vital-filter">
               <select
                 name="vital-select"
-                className="bg-white px-1 w-full"
+                className="bg-white p-1 w-full"
                 value={vitalCriteria}
                 onChange={(e) => setVitalCriteria(e.target.value)}
               >
@@ -103,10 +120,12 @@ const Alerts = () => {
                 <option value="Temperature">Temp</option>
               </select>
             </td>
+
             <td id="vital-reading" className="text-xs underline">
               Abnormal Reading
             </td>
             <td>{""}</td>
+
             <td id="nurse-filter">
               <input
                 type="text"
@@ -125,12 +144,14 @@ const Alerts = () => {
                 (a, b) =>
                   +new Date(b.alert.createdAt) - +new Date(a.alert.createdAt)
               )
-
               .filter((alertMapping) =>
                 alertMapping.patient.toLowerCase().includes(patientSearch)
               )
               .filter(
                 (alertMapping) => alertMapping.alert.status === statusCriteria
+              )
+              .filter((alertMapping) =>
+                alertMapping.alert.alertType.includes(alertTypeCriteria)
               )
               .filter((alertMapping) =>
                 alertMapping.alert.alertVitals.some((alertVital) =>
@@ -152,6 +173,10 @@ const Alerts = () => {
                     id="alert-status"
                     width="1/12"
                     data={alertMapping.alert.status}
+                  />
+                  <AlertsTableRow
+                    id="alert-type"
+                    data={alertMapping.alert.alertType}
                   />
                   <AlertsTableRow
                     id="abnormal-vital"

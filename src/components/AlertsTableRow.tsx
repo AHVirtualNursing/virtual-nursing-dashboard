@@ -16,7 +16,6 @@ const AlertsTableRow = ({ id, data, width }: AlertsTableRowProps) => {
         ? data.map((value) => (
             <div>
               <p>{value}</p>
-              <hr />
             </div>
           ))
         : typeof data === "object" && typeof data[0] === "number"
