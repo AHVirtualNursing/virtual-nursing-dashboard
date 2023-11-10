@@ -294,7 +294,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
                 <TableDataRow
                   id="fall-risk"
                   width="1/12"
-                  data={pd.patient?.fallRiskScore}
+                  data={pd.patient?.fallRisk}
                 />
                 <TableDataRow id="bedNum" width="1/12" data={pd.bedNum} />
                 <TableDataRow

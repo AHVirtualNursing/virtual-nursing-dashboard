@@ -52,6 +52,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
     console.log(nurseId);
     console.log("BEFORE EMIT");
     socket.emit("dvsClientConnections", nurseId);
+
     const handleAlertIncoming = (data: any) => {
       console.log(data);
       console.log(data.patient);
@@ -68,11 +69,19 @@ export default function layout({ children }: { children: React.ReactNode }) {
       }
     };
 
+    const dischargePatientToast = (data: any) => {
+      console.log("toasting discharge patient");
+      const message = `${data.name} has been discharged.`;
+      toast.info(<AlertToast message={message} />);
+    };
+
     socket.on("alertIncoming", handleAlertIncoming);
+    socket.on("dischargePatient", dischargePatientToast);
 
     // Clean up the event listener when the component unmounts
     return () => {
       socket.off("alertIncoming", handleAlertIncoming);
+      socket.off("dischargePatient", dischargePatientToast);
     };
   }, []);
 

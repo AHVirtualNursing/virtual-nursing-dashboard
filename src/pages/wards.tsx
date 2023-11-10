@@ -13,11 +13,15 @@ import profilePic from "../../public/profilepic.jpg";
 import VitalTiles from "@/components/VitalTiles";
 import TileCustomisationModal from "@/components/TileCustomisationModal";
 import BedTiles from "@/components/BedTiles";
-import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import { VirtualNurse } from "@/models/virtualNurse";
 import { Tooltip } from "@mui/material";
 import { Ward } from "@/types/ward";
 import { SocketContext } from "@/pages/layout";
+import { Alert } from "@/models/alert";
+import { Patient } from "@/models/patient";
+import DashboardAlertIcon from "@/components/DashboardAlertIcon";
+import HotelIcon from "@mui/icons-material/Hotel";
 
 export default function Wards() {
   const router = useRouter();
@@ -29,6 +33,8 @@ export default function Wards() {
   const [selectedWard, setSelectedWard] = useState("assigned-wards");
   const { data: sessionData } = useSession();
   const socket = useContext(SocketContext);
+  const [socketAlertList, setSocketAlertList] = useState<Alert[]>();
+  const [socketPatient, setSocketPatient] = useState<Patient>();
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
@@ -48,6 +54,7 @@ export default function Wards() {
       );
     }
   };
+
   const fetchPatientVitals = async () => {
     let patientVitalsArr: any[] = [];
     for (const bedData of data) {
@@ -136,7 +143,11 @@ export default function Wards() {
       smartBedIds.map((id) => promises.push(fetchBedByBedId(id)));
       Promise.all(promises).then((res) => {
         // console.log("Smart Beds assigned to VN", res);
-        setData(res.filter((sb) => sb.ward && sb.patient));
+        setData(
+          res.filter(
+            (sb) => sb.ward && sb.patient && sb.bedStatus === "occupied"
+          )
+        );
       });
     });
     fetchVirtualNurseByNurseId(sessionData?.user.id).then((res) => {
@@ -192,12 +203,58 @@ export default function Wards() {
         return updatedData;
       });
     };
+
+    const refreshPatientVitals = (updatedVitals: any) => {
+      const vitalObj = updatedVitals.vital;
+      const patientId = updatedVitals.patient;
+      setData((prevData) => {
+        const updatedData = prevData.map((bed) => {
+          if (bed.patient && bed.patient._id === patientId) {
+            return { ...bed, vital: vitalObj };
+          }
+          return bed;
+        });
+        return updatedData;
+      });
+    };
+
+    const discharge = (patient: any) => {
+      setData((prevData) => {
+        const updatedData = prevData.map((bed) => {
+          if (bed.patient && bed.patient._id === patient._id) {
+            // set the patient bedstatus to vacant and also set the bed patient to be null
+            // return { ...bed };
+            return { ...bed, bedStatus: "vacant", patient: undefined };
+          }
+          return bed;
+        });
+        return updatedData;
+      });
+    };
+
+    const handleAlertIncoming = (data: any) => {
+      setSocketAlertList(data.alertList);
+      setSocketPatient(data.patient);
+    };
+
+    const handleDeleteAlert = (data: any) => {
+      setSocketAlertList(data.alertList);
+      setSocketPatient(data.patient);
+    };
+
     socket.on("updatedSmartbed", refreshContent);
     socket.on("updatedPatient", refreshPatientInfo);
-
+    socket.on("updatedVitals", refreshPatientVitals);
+    socket.on("dischargePatient", discharge);
+    socket.on("patientAlertAdded", handleAlertIncoming);
+    socket.on("patientAlertDeleted", handleDeleteAlert);
     return () => {
       socket.off("updatedSmartbed", refreshContent);
       socket.off("updatedPatient", refreshPatientInfo);
+      socket.off("updatedVitals", refreshPatientVitals);
+      socket.off("dischargePatient", discharge);
+      socket.off("patientAlertAdded", handleAlertIncoming);
+      socket.off("patientAlertDeleted", handleDeleteAlert);
     };
   }, []);
 
@@ -264,6 +321,7 @@ export default function Wards() {
             <div
               className="bg-white rounded-2xl p-4 shadow-lg hover:cursor-pointer hover:bg-blue-100"
               onClick={() => viewPatientVisualisation(pd.patient?._id, pd._id)}
+              key={pd._id}
             >
               <div className="flex items-start justify-start">
                 <div className="w-1/2 flex items-start justify-start">
@@ -277,6 +335,17 @@ export default function Wards() {
                   </div>
                 </div>
                 <div className="w-1/2 flex items-start justify-around">
+                  <DashboardAlertIcon
+                    patientId={pd.patient?._id}
+                    socketData={
+                      socketPatient?._id === pd.patient?._id
+                        ? socketAlertList
+                        : null
+                    }
+                  />
+                  {!pd.isBedExitAlarmOn && !pd.isPatientOnBed ? (
+                    <HotelIcon style={{ color: "red" }} />
+                  ) : null}
                   {nurse?.cardLayout.fallRisk ? (
                     <div>
                       <p>Fall Risk</p>
@@ -292,7 +361,7 @@ export default function Wards() {
                             }
                             placement="top"
                           >
-                            <NotificationImportantIcon className="fill-red-500" />
+                            <ReportProblemIcon className="fill-red-500" />
                           </Tooltip>
                         ) : null}
                       </div>

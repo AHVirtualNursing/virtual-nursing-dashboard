@@ -83,48 +83,38 @@ function BedTiles({ cardLayout, smartbed }: layoutProp) {
       {cardLayout?.warnings ? (
         <div className="flex-1 flex flex-col py-2 px-4">
           <h3>Bed Warnings</h3>
-          <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
-            <div className="flex items-center">
-              <p>
-                {smartbed?.isBedExitAlarmOn
-                  ? "Bed Exit Alarm On"
-                  : "Bed Exit Alarm Off"}
-              </p>
-              {smartbed?.isBedExitAlarmOn ? (
-                <CheckCircle className="fill-emerald-600" />
-              ) : (
+          {!smartbed?.isBedExitAlarmOn ? (
+            <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
+              <div className="flex items-center">
+                <p className="p-2">Bed exit alarm off.</p>
                 <Cancel className="fill-red-500" />
-              )}
+              </div>
             </div>
-          </div>
+          ) : null}
 
-          <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
-            <div className="flex items-center">
-              <p>
-                {smartbed?.isLowestPosition
-                  ? "Bed at lowest position"
-                  : "Bed not at lowest position"}
-              </p>
-              {smartbed?.isLowestPosition ? (
-                <CheckCircle className="fill-emerald-600" />
-              ) : (
+          {!smartbed?.isLowestPosition ? (
+            <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
+              <div className="flex items-center">
+                <p className="p-2">Bed not at lowest position.</p>
                 <Cancel className="fill-red-500" />
-              )}
+              </div>
             </div>
-          </div>
+          ) : null}
 
-          <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
-            <div className="flex items-center">
-              <p>
-                {smartbed?.isBrakeSet ? "Brake is set" : "Brake is not set"}
-              </p>
-              {smartbed?.isBrakeSet ? (
-                <CheckCircle className="fill-emerald-600" />
-              ) : (
+          {!smartbed?.isBrakeSet ? (
+            <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
+              <div className="flex items-center">
+                <p className="p-2">Brake is not set.</p>
                 <Cancel className="fill-red-500" />
-              )}
+              </div>
             </div>
-          </div>
+          ) : null}
+
+          {smartbed?.isBedExitAlarmOn &&
+          smartbed?.isLowestPosition &&
+          smartbed?.isBrakeSet ? (
+            <p>No warnings</p>
+          ) : null}
         </div>
       ) : null}
     </div>
