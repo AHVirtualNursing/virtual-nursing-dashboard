@@ -28,10 +28,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
-    console.log("SOCKET USEEFFECT");
-    console.log(nurseId);
-    console.log("BEFORE EMIT");
-    socket.emit("dvsClientConnections", nurseId);
+    socket.emit("clientConnections", nurseId);
     const handleAlertIncoming = (data: any) => {
       console.log(data);
       console.log(data.patient);
