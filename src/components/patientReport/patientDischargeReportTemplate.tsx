@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import Image from "next/image";
 import { usePDF } from "react-to-pdf";
-
 import { AlertConfig } from "@/models/alertConfig";
 import { Patient } from "@/models/patient";
 import { Box, TableContainer, Table, TableRow, TableCell } from "@mui/material";
@@ -130,7 +129,7 @@ export default function PatientDischargeReportTemplate({
                 <TableRow>
                   <TableCell>Temperature:</TableCell>
                   <TableCell>{alertConfigs?.temperatureConfig[0]}°C</TableCell>
-                  <TableCell>{alertConfigs?.spO2Config[1]}°C</TableCell>
+                  <TableCell>{alertConfigs?.temperatureConfig[1]}°C</TableCell>
                 </TableRow>
               </Table>
             </TableCell>
