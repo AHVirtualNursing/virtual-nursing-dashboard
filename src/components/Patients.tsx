@@ -1,17 +1,17 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import { fetchBedByBedId } from "@/pages/api/smartbed_api";
-import { SmartBed } from "@/models/smartBed";
+import { SmartBed } from "@/types/smartbed";
 import { useRouter } from "next/navigation";
 import TableSubHeader from "./TableSubHeader";
 import autoAnimate from "@formkit/auto-animate";
 import { useSession } from "next-auth/react";
 import { fetchWardsByVirtualNurse } from "@/pages/api/nurse_api";
 import TableDataRow from "./TableDataRow";
-import { Ward } from "@/models/ward";
+import { Ward } from "@/types/ward";
 import Link from "next/link";
 import DashboardAlertIcon from "./DashboardAlertIcon";
-import { Alert } from "@/models/alert";
+import { Alert } from "@/types/alert";
 import { io } from "socket.io-client";
 import { Patient } from "@/types/patient";
 import { SocketContext } from "@/pages/layout";
@@ -304,7 +304,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
                 <TableDataRow
                   id="fall-risk"
                   width="1/12"
-                  data={pd.patient?.fallRiskScore}
+                  data={pd.patient?.fallRisk}
                 />
                 <TableDataRow id="bedNum" width="1/12" data={pd.bedNum} />
                 <TableDataRow

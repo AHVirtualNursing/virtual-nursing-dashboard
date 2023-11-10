@@ -21,7 +21,7 @@ export type Patient = {
   alerts: Alert[];
   alertConfig: AlertConfig[];
   reminders: Reminder[];
-  vital: Vital;
+  vital: string;
   reports: Report[];
   order: string[];
 };

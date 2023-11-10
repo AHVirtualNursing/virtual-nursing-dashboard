@@ -4,6 +4,10 @@ import { fetchPatientByPatientId } from "./api/patients_api";
 import { Alert } from "@/types/alert";
 import AlertsTableRow from "@/components/AlertsTableRow";
 import AlertDetailsModal from "@/components/AlertDetailsModal";
+import { useSession } from "next-auth/react";
+import { fetchWardsByVirtualNurse } from "./api/nurse_api";
+import { fetchAlertsByWardId } from "./api/wards_api";
+import { Ward } from "@/types/ward";
 
 type AlertPatientMapping = {
   alert: Alert;
@@ -18,25 +22,48 @@ const Alerts = () => {
   const [vitalCriteria, setVitalCriteria] = useState("");
   const [alertTypeCriteria, setAlertTypeCriteria] = useState("");
   const [selectedAlert, setSelectedAlert] = useState<AlertPatientMapping>();
+  const [selectedWard, setSelectedWard] = useState<string>("assigned-wards");
   const [shown, setShown] = useState(false);
+  const [wards, setWards] = useState<Ward[]>([]);
+  const { data: sessionData } = useSession();
 
+  // get wards assigned to virtual nurse
+  // then get alerts for each ward
+  // for each alert, map the alert to the patient
   useEffect(() => {
-    fetchAllAlerts().then((alertsList) => {
-      const patientIds = alertsList.data.map((alert: Alert) => alert.patient);
-      let promises = patientIds.map((id: string) =>
-        fetchPatientByPatientId(id)
-      );
-      Promise.all(promises).then((res) => {
-        const alertToPatientMappings = alertsList.data.map(
-          (alert: Alert, index: number) => ({
-            alert: alert,
-            patient: res[index].name,
-          })
+    fetchWardsByVirtualNurse(sessionData?.user.id).then((wards) => {
+      setWards(wards);
+      let wardsToView: Ward[] = [];
+      let promises: Promise<Alert>[] = [];
+      if (selectedWard === "assigned-wards") {
+        wardsToView = wards;
+      } else {
+        wardsToView = wards.filter(
+          (ward: Ward) => ward.wardNum === selectedWard
         );
-        setAlerts(alertToPatientMappings);
+      }
+      wardsToView.map((ward) => promises.push(fetchAlertsByWardId(ward._id)));
+      Promise.all(promises).then((res: any) => {
+        let alertsList: Alert[] = [];
+        for (const alertArr of res) {
+          alertsList.push(...alertArr);
+        }
+        const patientIds = alertsList.map((alert: Alert) => alert.patient);
+        let patientPromises = patientIds.map((id: string) =>
+          fetchPatientByPatientId(id)
+        );
+        Promise.all(patientPromises).then((res) => {
+          const alertToPatientMappings = alertsList.map(
+            (alert: Alert, index: number) => ({
+              alert: alert,
+              patient: res[index].name,
+            })
+          );
+          setAlerts(alertToPatientMappings);
+        });
       });
     });
-  }, [alerts?.length]);
+  }, [alerts?.length, selectedWard]);
 
   const handleViewAlertDetails = (alertMapping: AlertPatientMapping) => {
     setSelectedAlert(alertMapping);
@@ -52,6 +79,28 @@ const Alerts = () => {
           alertPatientMapping={selectedAlert}
         />
       )}
+      <div className="gap-x-3 flex justify-start items-center">
+        <label
+          htmlFor="alertWardFilter"
+          className="text-sm font-medium text-gray-900"
+        >
+          Wards
+        </label>
+        <select
+          name="alertWardFilter"
+          id="alert-ward-filter"
+          value={selectedWard}
+          onChange={(e) => {
+            setSelectedWard(e.target.value);
+          }}
+          className="p-2 bg-gray-50 rounded-lg border border-gray-300 text-gray-900 text-sm"
+        >
+          <option value="assigned-wards">Assigned Wards</option>
+          {wards.map((ward) => (
+            <option value={`${ward.wardNum}`}>Ward {ward.wardNum}</option>
+          ))}
+        </select>
+      </div>
       <table className="table-auto border-spacing-3">
         <thead className="text-sm text-left">
           {/* ------ column headers ------ */}
@@ -96,7 +145,6 @@ const Alerts = () => {
                 className="bg-white p-1 w-full"
                 value={alertTypeCriteria}
                 onChange={(e) => {
-                  console.log(e.target.value);
                   setAlertTypeCriteria(e.target.value);
                 }}
               >
