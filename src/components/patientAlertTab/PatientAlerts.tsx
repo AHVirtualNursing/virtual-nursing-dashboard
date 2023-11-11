@@ -73,10 +73,8 @@ function PatientAlerts(patientProp: PatientProp) {
 
   function getAlerts(status: string) {
     const listOfAlerts: GridRowModel[] = [];
-    console.log(patientAlerts);
     if (patientAlerts !== undefined) {
       for (let i = 0; i < patientAlerts.length; i++) {
-        console.log(patientAlerts[i]);
         if (patientAlerts[i].status == status) {
           listOfAlerts.push({
             status: patientAlerts[i].status,
@@ -86,7 +84,6 @@ function PatientAlerts(patientProp: PatientProp) {
         }
       }
     }
-    console.log(listOfAlerts);
     return listOfAlerts.map((alert, index) => ({
       id: index + 1,
       ...alert,

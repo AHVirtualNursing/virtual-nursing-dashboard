@@ -1,8 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { usePDF } from "react-to-pdf";
-import { AlertConfig } from "@/models/alertConfig";
-import { Patient } from "@/models/patient";
 import { Box, TableContainer, Table, TableRow, TableCell } from "@mui/material";
 import {
   CartesianGrid,
@@ -13,22 +10,52 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { AlertConfig } from "@/models/alertConfig";
+import { Patient } from "@/models/patient";
 import { Vital } from "@/models/vital";
 import PatientAlerts from "../patientAlertTab/PatientAlerts";
-interface PatientDischargeReportTemplate {
-  patient: Patient;
-  vitals?: Vital;
-  alertConfigs?: AlertConfig;
+import { fetchPatientByPatientId } from "@/pages/api/patients_api";
+import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
+import { callFetchAlertConfigByIdApi } from "@/pages/api/alert_config_api";
+interface PatientDischargeReportProps {
+  patientId: string;
+  vitalId: string;
+  alertConfigId: string;
 }
 
-export default function PatientDischargeReportTemplate({
-  patient,
-  vitals,
-  alertConfigs,
-}: PatientDischargeReportTemplate) {
-  const { toPDF, targetRef } = usePDF({
-    filename: "discharge_report.pdf",
-  });
+export default function PatientDischargeReport({
+  patientId,
+  vitalId,
+  alertConfigId,
+}: PatientDischargeReportProps) {
+  const [patient, setPatient] = useState<Patient>();
+  const [vitals, setVitals] = useState<Vital>();
+  const [alertConfigs, setAlertConfigs] = useState<AlertConfig>();
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchPatient = async () => {
+    const patient = await fetchPatientByPatientId(patientId);
+    setPatient(patient);
+  };
+
+  const fetchVitals = async () => {
+    const vitals = await fetchVitalByVitalId(vitalId);
+    setVitals(vitals);
+  };
+
+  const fetchAlertConfig = async () => {
+    const alertConfigs = await callFetchAlertConfigByIdApi(alertConfigId);
+    setAlertConfigs(alertConfigs);
+  };
+
+  const fetchData = async() => {
+    await fetchPatient();
+    await fetchVitals();
+    await fetchAlertConfig(); 
+  }
 
   const colours: { [key: string]: string } = {
     "Respiratory Rate": "rgb(255, 102, 102)",
@@ -39,12 +66,8 @@ export default function PatientDischargeReportTemplate({
     "Blood Oxygen": "rgb(255, 102, 178)",
   };
 
-  useEffect(() => {
-    toPDF();
-  }, []);
-
   return (
-    <Box width="100%" ref={targetRef}>
+    <Box width="100%">
       <Image
         src={"/VND_Banner.jpg"}
         alt="VND Banner"
@@ -69,22 +92,22 @@ export default function PatientDischargeReportTemplate({
           <TableRow>
             <TableCell
               style={{ borderRight: "2px solid black", verticalAlign: "top" }}>
-              <strong>Patient Name:</strong> {patient.name}
+              <strong>Patient Name:</strong> {patient?.name}
               <br />
-              <strong>Patient NRIC:</strong> {patient.nric}
+              <strong>Patient NRIC:</strong> {patient?.nric}
               <br />
-              <strong>Condition:</strong> {patient.condition}
+              <strong>Condition:</strong> {patient?.condition}
             </TableCell>
             <TableCell style={{ verticalAlign: "top" }}>
-              <strong>COPD:</strong> {patient.copd}
+              <strong>COPD:</strong> {patient?.copd}
               <br />
-              <strong>Acuity Level:</strong> {patient.acuityLevel}
+              <strong>Acuity Level:</strong> {patient?.acuityLevel}
               <br />
-              <strong>O2 Intake:</strong> {patient.o2Intake}
+              <strong>O2 Intake:</strong> {patient?.o2Intake}
               <br />
-              <strong>Consciousness:</strong> {patient.consciousness}
+              <strong>Consciousness:</strong> {patient?.consciousness}
               <br />
-              <strong>Fall Risk:</strong> {patient.fallRisk}
+              <strong>Fall Risk:</strong> {patient?.fallRisk}
             </TableCell>
           </TableRow>
           <TableRow>
@@ -134,7 +157,7 @@ export default function PatientDischargeReportTemplate({
               </Table>
             </TableCell>
           </TableRow>
-          {patient.infoLogs ? (
+          {patient?.infoLogs ? (
             <TableRow>
               <TableCell style={{ border: "2px solid black" }} colSpan={2}>
                 <Table>
@@ -149,7 +172,7 @@ export default function PatientDischargeReportTemplate({
                       <strong>Added By</strong>
                     </TableCell>
                   </TableRow>
-                  {patient.infoLogs?.map((infoLog) => (
+                  {patient?.infoLogs?.map((infoLog) => (
                     <TableRow>
                       <TableCell>{infoLog.info}</TableCell>
                       <TableCell>{infoLog.datetime}</TableCell>
