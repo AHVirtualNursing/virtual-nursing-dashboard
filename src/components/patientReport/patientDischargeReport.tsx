@@ -72,14 +72,15 @@ export default function PatientDischargeReport({
         src={"/VND_Banner.jpg"}
         alt="VND Banner"
         layout="fixed"
-        width={1000}
-        height={150}
+        width={1300}
+        height={200}
       />
       <TableContainer style={{ overflow: "hidden", marginBottom: 2 }}>
         <Table
           style={{
             border: "2px solid black",
             margin: "0 24px",
+            width: "95%",
           }}>
           <TableRow>
             <TableCell style={{ border: "2px solid black" }}>
