@@ -19,8 +19,8 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import CloseIcon from "@mui/icons-material/Close";
-import { useEffect, useRef, useState } from "react";
-import { VirtualNurse } from "@/models/virtualNurse";
+import { useContext, useEffect, useRef, useState } from "react";
+import { VirtualNurse } from "@/types/virtualNurse";
 import { fetchVirtualNurseByNurseId } from "@/pages/api/nurse_api";
 import { useSession } from "next-auth/react";
 import { FormControl, MenuItem } from "@mui/material";
@@ -35,20 +35,19 @@ import {
   reopenChat,
   updateMessageContent,
 } from "@/pages/api/chat_api";
-import { BedSideNurse } from "@/models/bedsideNurse";
-import { SmartBed } from "@/models/smartBed";
+import { BedSideNurse } from "@/types/bedsideNurse";
+import { SmartBed } from "@/types/smartbed";
 import { fetchBedsByWardId } from "@/pages/api/wards_api";
 import DoneIcon from "@mui/icons-material/Done";
 import { Chat } from "@/types/chat";
-import { Message } from "@/types/message";
+import { Message } from "@/types/chat";
 import ChatBubble from "./ChatBubble";
 import EditIcon from "@mui/icons-material/Edit";
 import Search from "./ChatSearch";
 import Image from "next/image";
-import { io } from "socket.io-client";
-import { Vital } from "@/models/vital";
 import { getVitalByPatientId } from "@/pages/api/patients_api";
-import { Patient } from "@/models/patient";
+import { Patient } from "@/types/patient";
+import { SocketContext } from "@/pages/layout";
 
 type ChatBoxModalProps = {
   open: boolean;
@@ -56,6 +55,7 @@ type ChatBoxModalProps = {
 };
 
 const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
+  const socket = useContext(SocketContext);
   const [selectedChat, setSelectedChat] = useState<Chat>();
   const [chats, setChats] = useState<Chat[]>([]);
   const [archivedAndUnarchivedChats, setArchivedAndUnarchivedChats] = useState<
@@ -84,7 +84,8 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isAddingPatientToChat, setIsAddingPatientToChat] = useState(false);
   const handleOpenSharingPatientToChat = () => {
-    const totalAssignedBeds = selectedChat?.bedsideNurse.smartBeds as any[];
+    const bedSideNurse = selectedChat?.bedsideNurse as BedSideNurse;
+    const totalAssignedBeds = bedSideNurse.smartBeds as any[];
     const assignedBeds = bedsWithPatientsData!.filter((bed) => {
       const idx = totalAssignedBeds?.indexOf(bed._id);
       return idx >= 0;
@@ -181,8 +182,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
   }, []);
 
   useEffect(() => {
-    const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
-    socket.emit("clientConnections", sessionData?.user.id);
+    console.log("Start receiving updates from BedSide Nurse Chat");
     socket.on("updateVirtualNurseChat", (updatedChat: Chat) => {
       //update chats
       console.log("Received an update from bedside nurse");
@@ -193,11 +193,8 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
           return prevState;
         }
       });
-      getChatsForVirtualNurse(updatedChat.virtualNurse);
+      getChatsForVirtualNurse(updatedChat.virtualNurse as VirtualNurse);
     });
-    return () => {
-      socket.close();
-    };
   }, []);
 
   const getChatsForVirtualNurse = async (nurse: VirtualNurse | undefined) => {
@@ -252,7 +249,6 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
           (chat) => chat._id !== updatedChat._id
         );
         setChats([...updatedChats, updatedChat]);
-        const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
         socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
       });
     });
@@ -273,7 +269,6 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       const updatedChats = chats.filter((chat) => chat._id !== updatedChat._id);
       setChats([...updatedChats, updatedChat]);
 
-      const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
       socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
 
       //reset
@@ -302,7 +297,6 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       setSelectedChat(updatedChat);
 
       //Send to websocket
-      const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
       socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
 
       handleCloseEditButton();
@@ -345,7 +339,6 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       setChats([...updatedChats, updatedChat]);
 
       //Send to websocket
-      const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV as string);
       socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
     });
   };
@@ -353,7 +346,8 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
   const handleCreateChat = () => {
     //check for existing chat
     archivedAndUnarchivedChats.forEach((chat) => {
-      if (chat.bedsideNurse._id === selectedBedsideNurseId) {
+      const bedSideNurse = chat.bedsideNurse as BedSideNurse;
+      if (bedSideNurse._id === selectedBedsideNurseId) {
         reopenChat(chat._id).then((reopenedChat) => {
           if (reopenedChat === null) return;
           setSelectedChat(chat);
@@ -416,7 +410,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       const newMsg: Message = {
         _id: "123",
         content: "Please check on patient.",
-        createdAt: new Date(Date.now()),
+        createdAt: new Date(Date.now()).toLocaleString(),
         createdBy: "123",
       };
       return newMsg;
@@ -429,7 +423,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       const newMsg: Message = {
         _id: "123",
         content: "Please check on patient.",
-        createdAt: new Date(Date.now()),
+        createdAt: new Date(Date.now()).toLocaleString(),
         createdBy: "123",
       };
       return newMsg;
@@ -485,7 +479,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       _id: "123",
       patient: chosenBeds[0]!.patient,
       content: patientVitalsMsg,
-      createdAt: new Date(Date.now()),
+      createdAt: new Date(Date.now()).toLocaleString(),
       createdBy: virtualNurse!._id,
     };
     return newMsg;
@@ -587,7 +581,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                       fontSize: "22px",
                     }}
                   >
-                    {selectedChat?.bedsideNurse.name}
+                    {(selectedChat?.bedsideNurse as BedSideNurse)?.name}
                   </Typography>
                 </Box>
                 <Box
@@ -815,7 +809,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
               {bedsWithPatientsData?.map((bedWithPatient) => {
                 return (
                   <MenuItem key={bedWithPatient._id} value={bedWithPatient._id}>
-                    {bedWithPatient?.patient?.name}
+                    {(bedWithPatient?.patient as Patient)?.name}
                   </MenuItem>
                 );
               })}
@@ -907,8 +901,9 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
               marginBottom: "20px",
             }}
           >
-            Patients below are assigned to {selectedChat?.bedsideNurse.name},
-            select one to share vitals.
+            Patients below are assigned to{" "}
+            {(selectedChat?.bedsideNurse as BedSideNurse)?.name}, select one to
+            share vitals.
           </Typography>
           <Typography
             sx={{
@@ -930,7 +925,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
               {assignedBedsToSelectedChatBedsideNurse?.map((bedWithPatient) => {
                 return (
                   <MenuItem key={bedWithPatient._id} value={bedWithPatient._id}>
-                    {bedWithPatient?.patient?.name}
+                    {(bedWithPatient?.patient as Patient)?.name}
                   </MenuItem>
                 );
               })}
