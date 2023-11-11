@@ -5,6 +5,7 @@ import { Report } from "./report";
 import { Vital } from "./vital";
 
 export interface Patient {
+  _id: string;
   name: string;
   nric: string;
   picture: string;
