@@ -144,7 +144,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
       socket.off("patientAlertAdded", handleAlertIncoming);
       socket.off("patientAlertDeleted", handleDeleteAlert);
     };
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     fetchWardsByVirtualNurse(sessionData?.user.id).then((wards) => {
@@ -171,7 +171,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
         );
       });
     });
-  }, [selectedWard]);
+  }, [selectedWard, sessionData?.user.id]);
 
   // fetching vitals immediately after beds are populated
   useEffect(() => {

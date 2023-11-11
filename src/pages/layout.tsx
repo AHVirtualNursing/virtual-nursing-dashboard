@@ -17,7 +17,7 @@ const SocketProvider = ({ children }: any) => {
   );
 };
 
-export default function layout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   const { data: sessionData } = useSession();
   const nurseId = sessionData?.user.id;
 
@@ -40,7 +40,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
     return () => {
       socket.off("alertIncoming", handleAlertIncoming);
     };
-  }, []);
+  }, [nurseId]);
 
   return (
     <SocketProvider>
