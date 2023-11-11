@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchWardsByVirtualNurse } from "./api/nurse_api";
-import { Ward } from "@/models/ward";
+import { Ward } from "@/types/ward";
 import AlertsSummary from "@/components/AlertsSummary";
 import PatientSummary from "@/components/PatientSummary";
 
@@ -51,7 +51,9 @@ export default function Dashboard() {
         >
           <option value="assigned-wards">Assigned Wards</option>
           {wards.map((ward) => (
-            <option value={`${ward.wardNum}`}>Ward {ward.wardNum}</option>
+            <option key={ward._id} value={`${ward.wardNum}`}>
+              Ward {ward.wardNum}
+            </option>
           ))}
         </select>
 
@@ -74,7 +76,10 @@ export default function Dashboard() {
           selectedWard={selectedOption}
           selectedTime={selectedTime}
         />
-        <PatientSummary />
+        <PatientSummary
+          selectedWard={selectedOption}
+          selectedTime={selectedTime}
+        />
       </div>
       <div className="bg-white rounded-2xl h-4/6 p-3 shadow-lg">
         <Patients selectedWard={selectedOption} />
