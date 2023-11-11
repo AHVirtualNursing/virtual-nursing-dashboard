@@ -24,7 +24,7 @@ export default function Header() {
 
   return (
     // header has height of 64px
-    <div className="flex align-middle justify-between p-2 border-solid border-0 border-b-2 top-0 sticky bg-white border-gray-300 h-16">
+    <div className="flex align-middle justify-between p-2 border-solid border-0 border-b-2 top-0 sticky bg-[url(/banner6.png)] bg-cover bg-no-repeat border-gray-300 h-16">
       <div className={styles.imageContainer}>
         <Image
           src={"/VND_Logo.png"}
