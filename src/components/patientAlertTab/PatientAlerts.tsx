@@ -1,168 +1,156 @@
-import { Alert } from "@/types/alert";
+import { Alert, AlertVitals } from "@/types/alert";
 import { Patient } from "@/types/patient";
 import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
-import { Box, Grid, Tab, Tabs, Typography, styled } from "@mui/material";
-import { DataGrid, GridRowModel } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
+import AlertsTableRow from "../AlertsTableRow";
 
 interface PatientProp {
   patient: Patient | undefined;
 }
 
-interface TabPanelProps {
-  status: string;
-  index: number;
-  value: number;
-}
-
-function PatientAlerts(patientProp: PatientProp) {
-  const [patientAlerts, setPatientAlerts] = useState<Alert[]>();
+const PatientAlerts = (patientProp: PatientProp) => {
+  const [statusCriteria, setStatusCriteria] = useState("open");
+  const [alertTypeCriteria, setAlertTypeCriteria] = useState("");
+  const [vitalCriteria, setVitalCriteria] = useState("");
+  const [nurseSearch, setNurseSearch] = useState("");
+  const [alerts, setAlerts] = useState<Alert[]>([]);
 
   useEffect(() => {
-    fetchAlertsByPatientId(patientProp.patient?._id).then((res) =>
-      setPatientAlerts(res)
-    );
+    fetchAlertsByPatientId(patientProp.patient?._id).then((res) => {
+      console.log(res);
+      setAlerts(res);
+    });
   }, [patientProp.patient?._id]);
 
-  const alertColumns = [
-    { field: "id", headerName: "ID", flex: 1 },
-    { field: "status", headerName: "Status", flex: 1 },
-    { field: "description", headerName: "Description", flex: 8 },
-    { field: "notes", headerName: "Notes", flex: 8 },
-  ];
-
-  const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
-    "& .alert-open": {
-      backgroundColor: "pink",
-      "&:hover": {
-        cursor: "pointer",
-        backgroundColor: "pink",
-      },
-    },
-    "& .alert-handling": {
-      backgroundColor: "#FFA829",
-      "&:hover": {
-        cursor: "pointer",
-        backgroundColor: "#FFA829",
-      },
-    },
-    "& .alert-complete": {
-      backgroundColor: "lightgreen",
-      "&:hover": {
-        cursor: "pointer",
-        backgroundColor: "lightgreen",
-      },
-    },
-  }));
-
-  function a11yProps(index: number) {
-    return {
-      id: `simple-tab-${index}`,
-      "aria-controls": `simple-tabpanel-${index}`,
-    };
-  }
-
-  const [currentTab, setCurrentTab] = useState(0);
-
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setCurrentTab(newValue);
-  };
-
-  function getAlerts(status: string) {
-    const listOfAlerts: GridRowModel[] = [];
-    console.log(patientAlerts);
-    if (patientAlerts !== undefined) {
-      for (let i = 0; i < patientAlerts.length; i++) {
-        console.log(patientAlerts[i]);
-        if (patientAlerts[i].status == status) {
-          listOfAlerts.push({
-            status: patientAlerts[i].status,
-            description: patientAlerts[i].description,
-            notes: patientAlerts[i].notes,
-          });
-        }
-      }
-    }
-    console.log(listOfAlerts);
-    return listOfAlerts.map((alert, index) => ({
-      id: index + 1,
-      ...alert,
-    }));
-  }
-
-  function CustomTabPanel(props: TabPanelProps) {
-    const { status, value, index, ...other } = props;
-
-    return (
-      <Box>
-        {value === index && (
-          <Box>
-            <Grid item xs={6} style={{ flex: 1 }}>
-              {patientAlerts?.length != undefined &&
-              getAlerts(status).length > 0 ? (
-                <Box>
-                  <StyledDataGrid
-                    aria-label="Alerts"
-                    columns={alertColumns}
-                    rows={getAlerts(status)}
-                    hideFooter
-                    disableRowSelectionOnClick
-                    getRowClassName={(params) => `alert-${params.row.status}`}
-                    sx={{
-                      "& .MuiDataGrid-cellContent": {
-                        whiteSpace: "normal !important",
-                        wordWrap: "break-word !important",
-                      },
-                      "& .MuiDataGrid-cell:focus": {
-                        outline: "none",
-                      },
-                    }}
-                  />
-                </Box>
-              ) : (
-                <div>
-                  <Typography marginTop={2} variant="body1">
-                    No {status} alerts
-                  </Typography>
-                </div>
-              )}
-            </Grid>
-          </Box>
-        )}
-      </Box>
-    );
-  }
-
   return (
-    <div>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
-          value={currentTab}
-          onChange={handleChange}
-          aria-label="basic tabs example"
-        >
-          <Tab label="Open" {...a11yProps(0)} />
-          <Tab label="Handling" {...a11yProps(1)} />
-          <Tab label="Completed" {...a11yProps(2)} />
-        </Tabs>
-      </Box>
-      <CustomTabPanel
-        value={currentTab}
-        index={0}
-        status="open"
-      ></CustomTabPanel>
-      <CustomTabPanel
-        value={currentTab}
-        index={1}
-        status="handling"
-      ></CustomTabPanel>
-      <CustomTabPanel
-        value={currentTab}
-        index={2}
-        status="complete"
-      ></CustomTabPanel>
+    <div className="overflow-auto scrollbar p-2 bg-slate-200 w-full">
+      <table className="table-auto border-spacing-3">
+        <thead className="text-sm text-left">
+          {/* ------ column headers ------ */}
+          <tr>
+            <th>Status</th>
+            <th>Alert Type</th>
+            <th>Vital Type</th>
+            <th>Vital Measurement</th>
+            <th className="px-2">Description</th>
+            <th className="px-1">Bedside Nurse</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr id="subheaders" className="text-left">
+            <td id="status-filter">
+              <select
+                name="status-select"
+                className="bg-white p-1 w-full"
+                value={statusCriteria}
+                onChange={(e) => setStatusCriteria(e.target.value)}
+              >
+                <option value="open">open</option>
+                <option value="handling">handling</option>
+                <option value="complete">complete</option>
+              </select>
+            </td>
+            <td id="alertType-filter">
+              <select
+                name="alertType-select"
+                className="bg-white p-1 w-full"
+                value={alertTypeCriteria}
+                onChange={(e) => {
+                  setAlertTypeCriteria(e.target.value);
+                }}
+              >
+                <option value="">All</option>
+                <option value="Vital">Vital</option>
+                <option value="SmartBed">SmartBed</option>
+              </select>
+            </td>
+            <td id="vital-filter">
+              <select
+                name="vital-select"
+                className="bg-white p-1 w-full"
+                value={vitalCriteria}
+                onChange={(e) => setVitalCriteria(e.target.value)}
+              >
+                <option value="">All</option>
+                <option value="Heart Rate">HR</option>
+                <option value="Blood Pressure">BP</option>
+                <option value="Respiratory Rate">RR</option>
+                <option value="SPO2">SPO2</option>
+                <option value="Temperature">Temp</option>
+              </select>
+            </td>
+
+            <td id="vital-reading" className="text-xs underline">
+              Abnormal Reading
+            </td>
+            <td>{""}</td>
+
+            <td id="nurse-filter">
+              <input
+                type="text"
+                className="placeholder:italic placeholder:text-slate-400 w-2/3 rounded-md placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
+                placeholder="Search"
+                value={nurseSearch}
+                onChange={(e) => setNurseSearch(e.target.value)}
+              />
+            </td>
+            <td></td>
+          </tr>
+
+          {alerts &&
+            alerts
+              .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
+              .filter((alert) => alert.status === statusCriteria)
+              .filter((alert) => alert.alertType.includes(alertTypeCriteria))
+              .filter((alert) =>
+                alert.alertVitals.some((alertVital) =>
+                  (alertVital as AlertVitals).vital.includes(vitalCriteria)
+                )
+              )
+              .map((alert, index) => (
+                <tr
+                  key={index}
+                  className="text-left hover:bg-blue-200 cursor-pointer"
+                >
+                  <AlertsTableRow
+                    id="alert-status"
+                    width="1/12"
+                    data={alert.status}
+                  />
+                  <AlertsTableRow id="alert-type" data={alert.alertType} />
+                  <AlertsTableRow
+                    id="abnormal-vital"
+                    data={alert.alertVitals.map(
+                      (value) => (value as AlertVitals).vital
+                    )}
+                  />
+                  <AlertsTableRow
+                    id="abnormal-vital-reading"
+                    data={alert.alertVitals.map(
+                      (value) => (value as AlertVitals).reading
+                    )}
+                  />
+                  <AlertsTableRow
+                    id="alert-description"
+                    data={alert.description}
+                  />
+                  <AlertsTableRow
+                    id="handling-nurse"
+                    width="1/12"
+                    data={alert.handledBy?.addedBy}
+                  />
+                  <AlertsTableRow
+                    id="alert-datetime"
+                    data={alert.createdAt.replace("T", " ").substring(0, 16)}
+                  />
+                </tr>
+              ))}
+        </tbody>
+      </table>
     </div>
   );
-}
+};
 
 export default PatientAlerts;
