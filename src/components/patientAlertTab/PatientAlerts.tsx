@@ -1,5 +1,5 @@
-import { Alert } from "@/models/alert";
-import { Patient } from "@/models/patient";
+import { Alert } from "@/types/alert";
+import { Patient } from "@/types/patient";
 import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
 import { Box, Grid, Tab, Tabs, Typography, styled } from "@mui/material";
 import { DataGrid, GridRowModel } from "@mui/x-data-grid";

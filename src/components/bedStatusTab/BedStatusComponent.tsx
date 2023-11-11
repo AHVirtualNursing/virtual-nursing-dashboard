@@ -1,4 +1,4 @@
-import { SmartBed } from "@/models/smartBed";
+import { SmartBed } from "@/types/smartbed";
 import React, { useState } from "react";
 import WarningIcon from "@mui/icons-material/Warning";
 import { updateProtocolBreachReason } from "@/pages/api/smartbed_api";

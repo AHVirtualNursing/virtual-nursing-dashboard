@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
-import { Alert } from "@/models/alert";
+import { Alert } from "@/types/alert";
 import Badge from "@mui/material/Badge";
 
 type DashboardAlertIconProps = {

@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { Patient } from "@/models/patient";
+import { Patient } from "@/types/patient";
 import { updatePatientLayoutByPatientId } from "@/pages/api/patients_api";
 import { useRouter } from "next/router";
-import { Vital } from "@/models/vital";
+import { Vital } from "@/types/vital";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import LastUpdatedVital from "./LastUpdatedVital";
 import {
@@ -213,7 +213,11 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
 
   useEffect(() => {
     if (patient !== undefined) {
-      fetchVitalByVitalId(patient.vital).then((res) => setPatientVitals(res));
+      const vitalId =
+        typeof patient?.vital === "string"
+          ? patient?.vital
+          : patient?.vital?._id;
+      fetchVitalByVitalId(vitalId).then((res) => setPatientVitals(res));
     }
   }, [patient?.vital]);
 

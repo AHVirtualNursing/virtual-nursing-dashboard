@@ -14,7 +14,7 @@ import {
 import zoomPlugin from "chartjs-plugin-zoom";
 import annotationPlugin from "chartjs-plugin-annotation";
 import { usePDF } from "react-to-pdf";
-import { Patient } from "@/models/patient";
+import { Patient } from "@/types/patient";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import {
   Box,
@@ -124,7 +124,9 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
   }, []);
 
   const fetchVitalData = async () => {
-    const res = await fetchVitalByVitalId(patient?.vital);
+    const vitalId =
+      typeof patient?.vital === "string" ? patient?.vital : patient?.vital?._id;
+    const res = await fetchVitalByVitalId(vitalId);
     setVitals(res);
   };
 
@@ -321,7 +323,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           <FormGroup id="vitals" sx={{ flexDirection: "row" }}>
             <FormLabel
               sx={{ display: "flex", alignItems: "center", marginRight: 2 }}
-              component="legend">
+              component="legend"
+            >
               Vitals
             </FormLabel>
             <FormControlLabel
@@ -378,7 +381,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
               <Button
                 className="ml-auto"
                 startIcon={<FileDownloadIcon />}
-                onClick={handleShowSavePdfModal}>
+                onClick={handleShowSavePdfModal}
+              >
                 Save As PDF
               </Button>
             </div>
@@ -388,7 +392,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           <FormGroup id="indicators" sx={{ flexDirection: "row" }}>
             <FormLabel
               sx={{ display: "flex", alignItems: "center", marginRight: 2 }}
-              component="legend">
+              component="legend"
+            >
               Indicators
             </FormLabel>
             <FormControlLabel
@@ -463,7 +468,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           value={selectedTimeRange}
           exclusive
           onChange={handleSelectedTimeRangeChange}
-          aria-label="text alignment">
+          aria-label="text alignment"
+        >
           <ToggleButton value="12H" aria-label="left aligned">
             12H
           </ToggleButton>
@@ -484,7 +490,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
               selectedTimeRange.match(
                 /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}),(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/g
               ) != null
-            }>
+            }
+          >
             Custom
           </ToggleButton>
         </ToggleButtonGroup>
@@ -494,7 +501,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
       </Box>
       <Modal
         open={showCustomDateRangeModal}
-        onClose={handleShowCustomDateRangeModal}>
+        onClose={handleShowCustomDateRangeModal}
+      >
         <Box sx={ModalBoxStyle}>
           <Typography variant="h6" component="h2" sx={{ marginBottom: 2 }}>
             Select Date Range
@@ -538,7 +546,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           <Grid item xs={12} sx={{ marginTop: 2 }}>
             <Button
               variant="contained"
-              onClick={() => handleUpdateCustomDateRange()}>
+              onClick={() => handleUpdateCustomDateRange()}
+            >
               Set Range
             </Button>
           </Grid>

@@ -12,7 +12,7 @@ import { ModalBoxStyle } from "@/styles/StyleTemplates";
 import { updateVirtualNurseCardLayoutByNurseId } from "@/pages/api/nurse_api";
 import { useSession } from "next-auth/react";
 
-interface layout {
+interface CardLayout {
   [key: string]: boolean;
   allVitals: boolean;
   hr: boolean;
@@ -29,7 +29,7 @@ interface layout {
 }
 
 interface layoutProp {
-  cardLayout: layout | undefined;
+  cardLayout: CardLayout | undefined;
   setNurse: Function;
 }
 
@@ -37,7 +37,7 @@ function TileCustomisationModal({ cardLayout, setNurse }: layoutProp) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const [currLayout, setCurrLayout] = useState(cardLayout as layout);
+  const [currLayout, setCurrLayout] = useState(cardLayout as CardLayout);
   const { data: sessionData } = useSession();
 
   useEffect(() => {

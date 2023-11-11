@@ -1,9 +1,9 @@
 import React from "react";
 import bed from "../../public/bed_stock.png";
 import { Cancel, CheckCircle, Man } from "@mui/icons-material";
-import { SmartBed } from "@/models/smartBed";
+import { SmartBed } from "@/types/smartbed";
 
-interface layout {
+interface CardLayout {
   [key: string]: boolean;
   allVitals: boolean;
   hr: boolean;
@@ -20,7 +20,7 @@ interface layout {
 }
 
 interface layoutProp {
-  cardLayout: layout | undefined;
+  cardLayout: CardLayout | undefined;
   smartbed: SmartBed | undefined;
 }
 

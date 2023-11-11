@@ -1,12 +1,12 @@
-import { Vital } from "@/models/vital";
+import { Vital } from "@/types/vital";
 import React from "react";
 
 type VitalProps = {
   data: Vital;
-  cardLayout: layout | undefined;
+  cardLayout: CardLayout | undefined;
 };
 
-interface layout {
+interface CardLayout {
   [key: string]: boolean;
   allVitals: boolean;
   hr: boolean;

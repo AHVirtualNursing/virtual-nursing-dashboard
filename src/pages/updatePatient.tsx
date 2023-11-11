@@ -15,9 +15,9 @@ import styles from "@/styles/Dashboard.module.css";
 import { Inter } from "next/font/google";
 import router, { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { SmartBed } from "@/models/smartBed";
+import { SmartBed } from "@/types/smartbed";
 import axios from "axios";
-import { Patient } from "@/models/patient";
+import { Patient } from "@/types/patient";
 import {
   fetchPatientByPatientId,
   updatePatientConditionByPatientId,

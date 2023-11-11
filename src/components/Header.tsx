@@ -5,7 +5,7 @@ import { signOut, useSession } from "next-auth/react";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ChangePasswordModal from "./ChangePasswordModal";
 import { useEffect, useState } from "react";
-import { VirtualNurse } from "@/models/virtualNurse";
+import { VirtualNurse } from "@/types/virtualNurse";
 import { fetchVirtualNurseByNurseId } from "@/pages/api/nurse_api";
 import { Inter } from "next/font/google";
 

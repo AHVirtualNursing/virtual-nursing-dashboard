@@ -8,6 +8,7 @@ export interface VirtualNurse extends User {
 }
 
 export interface CardLayout {
+  [key: string]: boolean;
   allVitals: boolean;
   hr: boolean;
   rr: boolean;
