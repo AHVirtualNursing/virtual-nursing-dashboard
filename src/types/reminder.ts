@@ -1,10 +1,11 @@
 import { Patient } from "./patient";
 
-export type Reminder = {
+export interface Reminder {
   _id: string;
   content: string;
   isComplete: boolean;
   createdBy: string;
-  patient: Patient;
+  patient: Patient | string;
   picture?: string;
+  interval: number;
 };

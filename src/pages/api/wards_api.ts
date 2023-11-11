@@ -9,9 +9,7 @@ export const fetchAllWards = async () => {
   }
 };
 
-export const fetchBedsByWardId = async (
-  wardId: string | string[] | undefined
-) => {
+export const fetchBedsByWardId = async (wardId: string) => {
   try {
     const res = await axios.get(
       `http://localhost:3001/ward/${wardId}/smartbeds`

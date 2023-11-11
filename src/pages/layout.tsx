@@ -28,8 +28,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
-    socket.emit("dvsClientConnections", nurseId);
+    socket.emit("clientConnections", nurseId);
     const handleAlertIncoming = (data: any) => {
+      console.log(data);
+      console.log(data.patient);
+      console.log(data.alert);
       const message = `${data.patient.name}: ${data.alert.description}`;
       toast.error(<CustomToast message={message} />);
     };

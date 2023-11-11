@@ -8,8 +8,8 @@ const vitals: { [key: string]: string[] } = {
   hr: ["Heart Rate", "bpm"],
   bpSys: ["Blood Pressure Systolic", "mmHg"],
   bpDia: ["Blood Pressure Diastolic", "mmHg"],
-  tp: ["Temperature", "°C"],
-  o2: ["SpO2", "%"],
+  temp: ["Temperature", "°C"],
+  spo2: ["SpO2", "%"],
 };
 
 export default function LastUpdatedVital({

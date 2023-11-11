@@ -19,8 +19,8 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import CloseIcon from "@mui/icons-material/Close";
-import { useEffect, useRef, useState } from "react";
-import { VirtualNurse } from "@/models/virtualNurse";
+import { useContext, useEffect, useRef, useState } from "react";
+import { VirtualNurse } from "@/types/virtualNurse";
 import { fetchVirtualNurseByNurseId } from "@/pages/api/nurse_api";
 import { useSession } from "next-auth/react";
 import { FormControl, MenuItem } from "@mui/material";
@@ -32,17 +32,22 @@ import {
   deleteMessageFromChat,
   fetchBedsideNursesByBedId,
   fetchChatsForVirtualNurse,
+  reopenChat,
   updateMessageContent,
 } from "@/pages/api/chat_api";
-import { BedSideNurse } from "@/models/bedsideNurse";
-import { SmartBed } from "@/models/smartBed";
+import { BedSideNurse } from "@/types/bedsideNurse";
+import { SmartBed } from "@/types/smartbed";
 import { fetchBedsByWardId } from "@/pages/api/wards_api";
 import DoneIcon from "@mui/icons-material/Done";
-import { Chat } from "@/models/chat";
-import { Message } from "@/models/message";
+import { Chat } from "@/types/chat";
+import { Message } from "@/types/chat";
 import ChatBubble from "./ChatBubble";
 import EditIcon from "@mui/icons-material/Edit";
 import Search from "./ChatSearch";
+import Image from "next/image";
+import { getVitalByPatientId } from "@/pages/api/patients_api";
+import { Patient } from "@/types/patient";
+import { SocketContext } from "@/pages/layout";
 
 type ChatBoxModalProps = {
   open: boolean;
@@ -50,14 +55,23 @@ type ChatBoxModalProps = {
 };
 
 const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
+  const socket = useContext(SocketContext);
   const [selectedChat, setSelectedChat] = useState<Chat>();
   const [chats, setChats] = useState<Chat[]>([]);
+  const [archivedAndUnarchivedChats, setArchivedAndUnarchivedChats] = useState<
+    Chat[]
+  >([]);
   const [hoverCreateButton, setHoverCreateButton] = useState(false);
   const [textMessage, setTextMessage] = useState("");
   const { data: sessionData } = useSession();
   const [virtualNurse, setVirtualNurse] = useState<VirtualNurse>();
   const [openCreateChat, setOpenCreateChat] = useState(false);
-  const handleCloseCreateChat = () => setOpenCreateChat(false);
+  const handleCloseCreateChat = () => {
+    setOpenCreateChat(false);
+    setSelectedBedWithPatientId("");
+    setSelectedBedsideNurseId("");
+    setBedsideNursesForSelectedPatient([]);
+  };
   const handleOpenCreateChat = () => setOpenCreateChat(true);
   const [selectedBedWithPatientId, setSelectedBedWithPatientId] = useState("");
   const [selectedBedsideNurseId, setSelectedBedsideNurseId] = useState("");
@@ -70,7 +84,8 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isAddingPatientToChat, setIsAddingPatientToChat] = useState(false);
   const handleOpenSharingPatientToChat = () => {
-    const totalAssignedBeds = selectedChat?.bedsideNurse.smartBeds as any[];
+    const bedSideNurse = selectedChat?.bedsideNurse as BedSideNurse;
+    const totalAssignedBeds = bedSideNurse.smartBeds as any[];
     const assignedBeds = bedsWithPatientsData!.filter((bed) => {
       const idx = totalAssignedBeds?.indexOf(bed._id);
       return idx >= 0;
@@ -84,6 +99,18 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
     setAssignedBedsToSelectedChatBedsideNurse([]);
     setIsAddingPatientToChat(false);
   };
+
+  //This is for image loading and handling for full size
+  const [imageUrl, setImageUrl] = useState<string>();
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageFulLScreenVisible, setImageFullScreenVisible] = useState(false);
+  const showImageFullScreenModal = (imageUrl: string) => {
+    setImageUrl(imageUrl);
+    setImageFullScreenVisible(true);
+  };
+  const hideImageFullScreenModal = () => setImageFullScreenVisible(false);
+  const [imageWidth, setImageWidth] = useState(0);
+  const [imageHeight, setImageHeight] = useState(0);
 
   //This is to get the assigned patients that intersects bedside nurse and virtual nurse
   const [
@@ -129,23 +156,66 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
 
   useEffect(() => {
     if (shareToSelectedChatBedWithPatientId !== "") {
-      setPatientPreviewMessage(createPatientPreviewMessage());
+      createPatientPreviewMessage().then((msg) => {
+        setPatientPreviewMessage(msg);
+      });
     }
   }, [shareToSelectedChatBedWithPatientId]);
+
+  useEffect(() => {
+    const calculateDimensions = () => {
+      const screenHeight = window.innerHeight * 0.9;
+      const screenWidth = (screenHeight / 4) * 3;
+      setImageWidth(screenWidth);
+      setImageHeight(screenHeight);
+    };
+
+    calculateDimensions();
+
+    // Add event listener for window resize
+    window.addEventListener("resize", calculateDimensions);
+
+    // Remove event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", calculateDimensions);
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log("Start receiving updates from BedSide Nurse Chat");
+    socket.on("updateVirtualNurseChat", (updatedChat: Chat) => {
+      //update chats
+      console.log("Received an update from bedside nurse");
+      setSelectedChat((prevState) => {
+        if (prevState?._id === updatedChat._id) {
+          return updatedChat;
+        } else {
+          return prevState;
+        }
+      });
+      getChatsForVirtualNurse(updatedChat.virtualNurse as VirtualNurse);
+    });
+  }, []);
 
   const getChatsForVirtualNurse = async (nurse: VirtualNurse | undefined) => {
     if (nurse === undefined) return;
     const chatsRes: Chat[] = await fetchChatsForVirtualNurse(nurse!._id);
 
     if (chatsRes === undefined) return;
-    setChats([...chatsRes]);
+
+    const unarchivedChats = chatsRes.filter((chat) => !chat.isArchived);
+    setChats([...unarchivedChats]);
+    setArchivedAndUnarchivedChats([...chatsRes]);
   };
 
   const getPatients = async (virtualNurse: any) => {
-    let beds: SmartBed[] = await fetchBedsByWardId(virtualNurse.wards);
-
-    beds = beds?.filter(
-      (bed) => bed.patient !== undefined && bed.patient !== null
+    let beds: SmartBed[] = [];
+    for (const ward of virtualNurse.wards) {
+      const smartbeds: SmartBed[] = await fetchBedsByWardId(ward);
+      beds.push(...smartbeds);
+    }
+    beds = beds.filter(
+      (bed) => bed.patient !== undefined || bed.patient !== null
     );
 
     setBedsWithPatientsData(beds);
@@ -168,28 +238,34 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
     if (patientPreviewMessage === undefined || selectedChat === undefined)
       return;
 
-    addNewPatientMessageToChat(
-      selectedChat._id,
-      patientPreviewMessage,
-      virtualNurse!._id
-    ).then((updatedChat) => {
-      console.log("UPDATED CHAT", updatedChat);
-      if (updatedChat === undefined) return;
-      //capture selected Chat
-      setSelectedChat(updatedChat);
+    createPatientPreviewMessage().then((msg) => {
+      const content = msg.content;
+      addNewPatientMessageToChat(
+        selectedChat._id,
+        patientPreviewMessage,
+        virtualNurse!._id,
+        content
+      ).then((updatedChat) => {
+        if (updatedChat === undefined) return;
+        setSelectedChat(updatedChat);
+        const updatedChats = chats.filter(
+          (chat) => chat._id !== updatedChat._id
+        );
+        setChats([...updatedChats, updatedChat]);
 
-      //update chats
-      const updatedChats = chats.filter((chat) => chat._id !== updatedChat._id);
-      setChats([...updatedChats, updatedChat]);
+        updatedChat.messages.sort(
+          (a: Message, b: Message) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
 
-      //Send to websocket
+        socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
+      });
     });
   };
 
   const handleSendMessage = () => {
     if (textMessage === "") return;
     if (selectedChat === undefined) return;
-    //capture textMessage
     const trimmedTextMessage = textMessage.trim();
     addNewMessageToChat(
       selectedChat._id,
@@ -197,14 +273,17 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       virtualNurse!._id
     ).then((updatedChat) => {
       if (updatedChat === undefined) return;
-      //capture selected Chat
       setSelectedChat(updatedChat);
 
-      //update chats
       const updatedChats = chats.filter((chat) => chat._id !== updatedChat._id);
       setChats([...updatedChats, updatedChat]);
 
-      //Send to websocket
+      updatedChat.messages.sort(
+        (a: Message, b: Message) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
 
       //reset
       setTextMessage("");
@@ -230,6 +309,15 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       const updatedChats = chats.filter((chat) => chat._id !== updatedChat._id);
       setChats([...updatedChats, updatedChat]);
       setSelectedChat(updatedChat);
+
+      //Send to websocket
+      updatedChat.messages.sort(
+        (a: Message, b: Message) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
+
       handleCloseEditButton();
     });
   };
@@ -268,20 +356,43 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       //update chats
       const updatedChats = chats.filter((chat) => chat._id !== updatedChat._id);
       setChats([...updatedChats, updatedChat]);
+
+      //Send to websocket
+      updatedChat.messages.sort(
+        (a: Message, b: Message) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
     });
   };
 
   const handleCreateChat = () => {
     //check for existing chat
-    chats.forEach((chat) => {
-      if (chat.bedsideNurse._id === selectedBedsideNurseId) {
+    for (const chat of chats) {
+      const bedSideNurse = chat.bedsideNurse as BedSideNurse;
+      if (bedSideNurse._id === selectedBedsideNurseId) {
         setSelectedChat(chat);
         handleCloseCreateChat();
         setSelectedBedWithPatientId("");
         setSelectedBedsideNurseId("");
         return;
       }
-    });
+    }
+    for (const chat of archivedAndUnarchivedChats) {
+      const bedSideNurse = chat.bedsideNurse as BedSideNurse;
+      if (bedSideNurse._id === selectedBedsideNurseId) {
+        reopenChat(chat._id).then((reopenedChat) => {
+          if (reopenedChat === null) return;
+          setSelectedChat(chat);
+          setChats([...chats, reopenedChat]);
+          handleCloseCreateChat();
+          setSelectedBedWithPatientId("");
+          setSelectedBedsideNurseId("");
+          return;
+        });
+      }
+    }
 
     //new chat
     createChat(virtualNurse!._id, selectedBedsideNurseId).then((newChat) => {
@@ -328,12 +439,12 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
     setTextMessage(event.target.value);
   };
 
-  const createPatientPreviewMessage = (): Message => {
+  const createPatientPreviewMessage = async (): Promise<Message> => {
     if (bedsWithPatientsData === undefined || virtualNurse === undefined) {
       const newMsg: Message = {
         _id: "123",
-        content: "",
-        createdAt: new Date(Date.now()),
+        content: "Please check on patient.",
+        createdAt: new Date(Date.now()).toLocaleString(),
         createdBy: "123",
       };
       return newMsg;
@@ -345,18 +456,64 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
     if (chosenBeds.length === 0) {
       const newMsg: Message = {
         _id: "123",
-        content: "",
-        createdAt: new Date(Date.now()),
+        content: "Please check on patient.",
+        createdAt: new Date(Date.now()).toLocaleString(),
         createdBy: "123",
       };
       return newMsg;
     }
 
+    const patient = chosenBeds[0]!.patient as Patient;
+    let patientVitalsMsg = "Please check on patient.";
+    const vital = await getVitalByPatientId(patient._id);
+    if (vital !== null) {
+      const respRate =
+        vital?.respRate && vital?.respRate[vital?.respRate.length - 1]?.reading
+          ? vital?.respRate[vital?.respRate.length - 1].reading
+          : "NA";
+      const temp =
+        vital?.temperature &&
+        vital?.temperature[vital?.temperature.length - 1]?.reading
+          ? vital?.temperature[vital?.temperature.length - 1].reading
+          : "NA";
+      const heartRate =
+        vital?.heartRate &&
+        vital?.heartRate[vital?.heartRate.length - 1]?.reading
+          ? vital?.heartRate[vital?.heartRate.length - 1].reading
+          : "NA";
+      const bpSys =
+        vital?.bloodPressureSys &&
+        vital?.bloodPressureSys[vital?.bloodPressureSys.length - 1]?.reading
+          ? vital?.bloodPressureSys[vital?.bloodPressureSys.length - 1].reading
+          : "NA";
+      const bpDia =
+        vital?.bloodPressureDia &&
+        vital?.bloodPressureDia[vital?.bloodPressureDia.length - 1]?.reading
+          ? vital?.bloodPressureDia[vital?.bloodPressureDia.length - 1].reading
+          : "NA";
+      const spO2 =
+        vital?.spO2 && vital?.spO2[vital?.spO2.length - 1]?.reading
+          ? vital?.spO2[vital?.spO2.length - 1].reading
+          : "NA";
+      const news2 =
+        vital?.news2Score &&
+        vital?.news2Score[vital?.news2Score.length - 1]?.reading
+          ? vital?.news2Score[vital?.news2Score.length - 1].reading
+          : "NA";
+
+      patientVitalsMsg = "Virtual Nurse shared a Patient vitals with you.";
+      patientVitalsMsg += "\nRR: " + respRate;
+      patientVitalsMsg += "\nTemp: " + temp;
+      patientVitalsMsg += "\nHR: " + heartRate;
+      patientVitalsMsg += "\nBP Sys/Dia: " + bpSys + "/" + bpDia;
+      patientVitalsMsg += "\nNews2: " + news2;
+    }
+
     const newMsg: Message = {
       _id: "123",
       patient: chosenBeds[0]!.patient,
-      content: "",
-      createdAt: new Date(Date.now()),
+      content: patientVitalsMsg,
+      createdAt: new Date(Date.now()).toLocaleString(),
       createdBy: virtualNurse!._id,
     };
     return newMsg;
@@ -458,7 +615,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                       fontSize: "22px",
                     }}
                   >
-                    {selectedChat?.bedsideNurse.name}
+                    {(selectedChat?.bedsideNurse as BedSideNurse)?.name}
                   </Typography>
                 </Box>
                 <Box
@@ -490,6 +647,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                           virtualNurse={virtualNurse}
                           handleDeleteMessage={handleDeleteMessage}
                           handleEditMessage={handleEditMessage}
+                          showImageFullScreenModal={showImageFullScreenModal}
                         />
                       );
                     })}
@@ -685,7 +843,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
               {bedsWithPatientsData?.map((bedWithPatient) => {
                 return (
                   <MenuItem key={bedWithPatient._id} value={bedWithPatient._id}>
-                    {bedWithPatient?.patient?.name}
+                    {(bedWithPatient?.patient as Patient)?.name}
                   </MenuItem>
                 );
               })}
@@ -777,8 +935,9 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
               marginBottom: "20px",
             }}
           >
-            Patients below are assigned to {selectedChat?.bedsideNurse.name},
-            select one to share vitals.
+            Patients below are assigned to{" "}
+            {(selectedChat?.bedsideNurse as BedSideNurse)?.name}, select one to
+            share vitals.
           </Typography>
           <Typography
             sx={{
@@ -800,7 +959,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
               {assignedBedsToSelectedChatBedsideNurse?.map((bedWithPatient) => {
                 return (
                   <MenuItem key={bedWithPatient._id} value={bedWithPatient._id}>
-                    {bedWithPatient?.patient?.name}
+                    {(bedWithPatient?.patient as Patient)?.name}
                   </MenuItem>
                 );
               })}
@@ -840,6 +999,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                   handleDeleteMessage={() => {}}
                   handleEditMessage={() => {}}
                   enableActionsUponRightClick={false}
+                  showImageFullScreenModal={showImageFullScreenModal}
                 />
               )}
             </Box>
@@ -859,6 +1019,53 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
           >
             Share
           </Button>
+        </Box>
+      </Modal>
+      <Modal
+        open={imageFulLScreenVisible}
+        onClose={hideImageFullScreenModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            marginLeft: "auto",
+            marginRight: "auto",
+            marginTop: "20px",
+            width: imageWidth,
+            height: imageHeight,
+            bgcolor: lightIndigo,
+            borderRadius: 5,
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
+            border: "none",
+            outline: "none",
+            padding: "20px",
+            overflowY: "scroll",
+            msOverflowStyle: "none",
+            scrollbarWidth: "none",
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+          }}
+        >
+          {imageLoading && (
+            <>
+              <Typography>Loading...</Typography>
+            </>
+          )}
+          {imageUrl && (
+            <Image
+              onLoadStart={() => setImageLoading(true)}
+              onLoad={() => setImageLoading(false)}
+              src={imageUrl}
+              alt="Image"
+              width={imageWidth}
+              height={imageHeight}
+              style={{ borderRadius: "10px" }}
+            />
+          )}
         </Box>
       </Modal>
     </>

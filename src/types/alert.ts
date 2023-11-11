@@ -1,27 +1,11 @@
-export type Alert = {
-  status: string;
-  description: string;
-  notes: NoteLog[];
-  patient: string;
-  handledBy: string;
-  followUps: FollowUpLog[];
-  alertVitals: AlertVitals[];
-  alertType: string;
-  createdAt: string;
-};
+import { Patient } from "./patient";
 
-export type AlertVitals = {
+export interface AlertVitals {
   reading: number;
   vital: string;
-};
+}
 
-export type NoteLog = {
-  info: string;
-  datetime: string;
-  addedBy: string;
-};
-
-export type FollowUpLog = {
+export interface FollowUpLog {
   respRate: number;
   heartRate: number;
   bloodPressureSys: number;
@@ -30,4 +14,23 @@ export type FollowUpLog = {
   temperature: number;
   datetime: string;
   addedBy: string;
-};
+}
+
+export interface NoteLog {
+  info: string;
+  datetime: string;
+  addedBy: string;
+}
+
+export interface Alert {
+  status: string;
+  description: string;
+  notes: NoteLog[];
+  patient: string | Patient;
+  handledBy: NoteLog;
+  followUps: FollowUpLog[];
+  alertVitals: AlertVitals[] | string[];
+  alertType: string;
+  redelegate: boolean;
+  createdAt: string;
+}

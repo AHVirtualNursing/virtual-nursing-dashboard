@@ -2,26 +2,36 @@ import { Box, Button, Tab, Tabs } from "@mui/material";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import profilePic from "../../public/profilepic.jpg";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/types/smartbed";
 import VisualisationComponent from "@/components/patientOverviewTab/VisualisationComponent";
 import dynamic from "next/dynamic";
+import PatientReport from "@/components/patientReport/patientReport";
 import AlertTabComponent from "@/components/patientAlertTab/AlertTabComponent";
 import BedStatusComponent from "@/components/bedStatusTab/BedStatusComponent";
+import { CloudUpload } from "@mui/icons-material";
+import { VisuallyHiddenInput } from "@/styles/Components";
+import { callUploadAndParseMockDataFromS3Api } from "./api/s3_api";
 const PatientChart = dynamic(
   () => import("@/components/patientAnalyticsChart/patientAnalyticsChart"),
   { ssr: false }
 );
+import autoAnimate from "@formkit/auto-animate";
 
 const patientVisualisationPage = () => {
   const router = useRouter();
   console.log("router query", router.query);
-  const { bedId, viewAlerts } = router.query;
+  const { patientId, bedId, viewAlerts } = router.query;
   const [selectedBed, setSelectedBed] = useState<SmartBed>();
   const [currentTab, setCurrentTab] = useState(
     viewAlerts === "true" ? "alerts" : "overview"
   );
+  const parent = useRef(null);
+  useEffect(() => {
+    parent.current && autoAnimate(parent.current);
+  }, [parent]);
+  const [processingData, setProcessingData] = useState(false);
 
   useEffect(() => {
     fetchBedByBedId(bedId).then((res) => setSelectedBed(res));
@@ -35,11 +45,22 @@ const patientVisualisationPage = () => {
     router.push("/updatePatient?patientId=" + selectedBed?.patient?._id);
   }
 
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] as File | undefined;
+
+    if (file) {
+      callUploadAndParseMockDataFromS3Api(file, patientId as string);
+      setProcessingData(true);
+    } else {
+      setProcessingData(false);
+    }
+  };
+
   return (
     <div className="flex flex-col p-8 gap-8 bg-slate-100 w-full shadow-lg">
       <Box>
         <div className="flex bg-white mb-8 rounded-2xl shadow-lg">
-          <Box sx={{ padding: "20px" }}>
+          <Box className="p-4 text-center">
             <Image
               style={{
                 width: "40%",
@@ -72,9 +93,19 @@ const patientVisualisationPage = () => {
                 Update Details
               </button>
             </Box>
+            <Box textAlign={"right"} marginRight={2} marginTop={2}>
+              <Button
+                component="label"
+                variant="contained"
+                startIcon={<CloudUpload />}
+              >
+                <VisuallyHiddenInput type="file" onChange={handleFileChange} />
+                {processingData ? "Processing Data..." : "Upload Data"}
+              </Button>
+            </Box>
           </Box>
         </div>
-        <div className="bg-white rounded-2xl shadow-lg">
+        <div className="bg-white rounded-2xl shadow-lg" ref={parent}>
           <Tabs
             value={currentTab}
             onChange={handleTabChange}

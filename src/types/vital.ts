@@ -1,4 +1,4 @@
-export type Vital = {
+export interface Vital {
   respRate: VitalsReading[];
   heartRate: VitalsReading[];
   bloodPressureSys: VitalsReading[];
@@ -6,9 +6,9 @@ export type Vital = {
   spO2: VitalsReading[];
   news2Score: VitalsReading[];
   temperature: VitalsReading[];
-};
+}
 
-export type VitalsReading = {
+export interface VitalsReading {
   reading: number;
   datetime: string;
-};
+}

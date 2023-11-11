@@ -1,3 +1,4 @@
+import { Vital } from "@/models/vital";
 import axios from "axios";
 import { Layout, Layouts } from "react-grid-layout";
 
@@ -50,11 +51,11 @@ export const updatePatientConditionByPatientId = async (
 
 export const updatePatientLayoutByPatientId = async (
   patientId: string | string[] | undefined,
-  layout: Layouts
+  order: string[]
 ) => {
   try {
     const res = await axios.put(`http://localhost:3001/patient/${patientId}`, {
-      layout: layout,
+      order: order,
     });
     return res;
   } catch (error) {
@@ -78,3 +79,21 @@ export const createNewPatient = async (
     console.error(error);
   }
 };
+
+export const getVitalByPatientId = async (
+  patientId: string
+): Promise<Vital | null> => {
+  var vital: Vital | null = null;
+  try {
+    const response = await fetch(`http://localhost:3001/patient/${patientId}/vital`, {
+      method: "GET",
+      headers: { "Content-type": "application/json" },
+    });
+    const json = await response.json();
+    vital = json;
+  } catch (error) {
+    console.error(error);
+  }
+
+  return vital;
+}
