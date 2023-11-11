@@ -37,7 +37,7 @@ const AlertsSummary = ({ selectedWard, selectedTime }: AlertsSummaryProps) => {
   ];
 
   return (
-    <div className="flex flex-col w-1/3 p-4 gap-y-3">
+    <div className="flex flex-col w-1/2 p-4 gap-y-3">
       <h3 className="text-left">Alerts Summary</h3>
       <div className="h-full flex gap-x-5">
         <div className="w-1/4 rounded-md bg-pink-200 flex items-center justify-center p-3">

@@ -85,7 +85,7 @@ const PatientSummary = ({
   }, [selectedWard, sessionData?.user.id]);
 
   return (
-    <div className="flex flex-col w-2/3 h-full p-4 gap-y-3">
+    <div className="flex flex-col w-1/2 h-full p-4 gap-y-3">
       <h3 className="text-left">Patients Summary</h3>
       <div className="flex">
         <PieChart title="Fall Risks" width={300} height={200}>
@@ -96,9 +96,9 @@ const PatientSummary = ({
             cy="50%"
             labelLine={false}
             label={(entry) =>
-              entry.value === 0 ? "" : entry.name + ": " + entry.value
+              entry.value === 0 ? "" : entry.name + ", " + entry.value
             }
-            outerRadius={80}
+            outerRadius={60}
             dataKey="value"
           >
             {fallRiskData.map((entry, index) => (
@@ -109,17 +109,18 @@ const PatientSummary = ({
             ))}
           </Pie>
         </PieChart>
+
         <PieChart title="Acuity Levels" width={300} height={200}>
           <Pie
             isAnimationActive={false}
             data={acuityData}
-            cx="60%"
+            cx="50%"
             cy="50%"
             labelLine={false}
             label={(entry) =>
-              entry.value === 0 ? "" : entry.name + ": " + entry.value
+              entry.value === 0 ? "" : entry.name + ", " + entry.value
             }
-            outerRadius={80}
+            outerRadius={60}
             dataKey="value"
           >
             {acuityData.map((entry, index) => (
