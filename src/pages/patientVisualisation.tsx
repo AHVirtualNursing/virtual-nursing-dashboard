@@ -18,6 +18,8 @@ const PatientChart = dynamic(
   { ssr: false }
 );
 import autoAnimate from "@formkit/auto-animate";
+import { Patient } from "@/types/patient";
+import { Ward } from "@/types/ward";
 
 const patientVisualisationPage = () => {
   const router = useRouter();
@@ -42,7 +44,9 @@ const patientVisualisationPage = () => {
   };
 
   function updateSelectedPatient() {
-    router.push("/updatePatient?patientId=" + selectedBed?.patient?._id);
+    router.push(
+      "/updatePatient?patientId=" + (selectedBed?.patient as Patient)?._id
+    );
   }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -71,19 +75,19 @@ const patientVisualisationPage = () => {
               alt="Picture of Patient"
             />
             <h3>
-              {selectedBed?.patient?.name} ({selectedBed?.patient?.nric})
+              {(selectedBed?.patient as Patient)?.name} (
+              {(selectedBed?.patient as Patient)?.nric})
             </h3>
           </Box>
           <Box style={{ width: "100%" }}>
             <Box display={"flex"} sx={{ paddingTop: "20px" }}>
               <p>
-                Ward: {selectedBed?.ward.wardNum}, Room: {selectedBed?.roomNum},
-                Bed: {selectedBed?.bedNum}
+                Ward: {(selectedBed?.ward as Ward)?.wardNum}, Room:{" "}
+                {selectedBed?.roomNum}, Bed: {selectedBed?.bedNum}
               </p>
             </Box>
             <Box textAlign={"left"}>
-              <p>Condition: {selectedBed?.patient?.condition} </p>
-              {/* <p>Additional Info: {selectedBed?.patient?.addInfo} </p> */}
+              <p>Condition: {(selectedBed?.patient as Patient)?.condition} </p>
             </Box>
             <Box textAlign={"right"} marginRight={2}>
               <button
@@ -119,11 +123,11 @@ const patientVisualisationPage = () => {
             <Tab value="bedstatus" label="Bed Status" />
           </Tabs>
           {currentTab === "overview" ? (
-            <VisualisationComponent patient={selectedBed?.patient} />
+            <VisualisationComponent patient={selectedBed?.patient as Patient} />
           ) : currentTab === "analytics" ? (
-            <PatientChart patient={selectedBed?.patient} />
+            <PatientChart patient={selectedBed?.patient as Patient} />
           ) : currentTab === "reports" ? null : currentTab === "alerts" ? (
-            <AlertTabComponent patient={selectedBed?.patient} />
+            <AlertTabComponent patient={selectedBed?.patient as Patient} />
           ) : currentTab === "bedstatus" ? (
             <BedStatusComponent bed={selectedBed} />
           ) : null}

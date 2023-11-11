@@ -63,9 +63,11 @@ export default function Patients({ selectedWard }: PatientListProps) {
   const fetchPatientVitals = async () => {
     let patientVitalsArr: any[] = [];
     for (const bedData of data) {
-      let patientVitals = bedData.patient?.vital;
+      let patientVitals = (bedData.patient as Patient)?.vital;
       if (patientVitals) {
-        const res = await fetchVitalByVitalId(patientVitals);
+        const vitalId =
+          typeof patientVitals === "string" ? patientVitals : patientVitals._id;
+        const res = await fetchVitalByVitalId(vitalId);
         patientVitalsArr.push(res);
       } else {
         patientVitalsArr.push(undefined);
@@ -259,22 +261,30 @@ export default function Patients({ selectedWard }: PatientListProps) {
           {/* ------ data rows ------*/}
           {data
             .filter((bed) =>
-              bed.patient?.name.toLowerCase().includes(searchPatient)
+              (bed.patient as Patient).name
+                .toLowerCase()
+                .includes(searchPatient)
             )
             .filter((bed) =>
-              bed.patient?.condition.toLowerCase().includes(searchCondition)
+              (bed.patient as Patient).condition
+                .toLowerCase()
+                .includes(searchCondition)
             )
             .map((pd, index) => (
               <tr className="text-left" key={pd._id}>
                 <td className="w-1/12 text-center">
                   <Link
-                    href={`/patientVisualisation?patientId=${pd.patient?._id}&bedId=${pd._id}&viewAlerts=true`}
-                    as={`/patientVisualisation?patientId=${pd.patient?._id}&bedId=${pd._id}`}
+                    href={`/patientVisualisation?patientId=${
+                      (pd.patient as Patient)?._id
+                    }&bedId=${pd._id}&viewAlerts=true`}
+                    as={`/patientVisualisation?patientId=${
+                      (pd.patient as Patient)?._id
+                    }&bedId=${pd._id}`}
                   >
                     <DashboardAlertIcon
-                      patientId={pd.patient?._id}
+                      patientId={(pd.patient as Patient)?._id}
                       socketData={
-                        socketPatient?._id === pd.patient?._id
+                        socketPatient?._id === (pd.patient as Patient)?._id
                           ? socketAlertList
                           : null
                       }
@@ -285,31 +295,34 @@ export default function Patients({ selectedWard }: PatientListProps) {
                   id="patientName"
                   className="text-sm p-2 w-1/8 border-solid border-0 border-l border-slate-400 hover:cursor-pointer hover:bg-blue-100 hover:rounded-lg"
                   onClick={() =>
-                    viewPatientVisualisation(pd.patient?._id, pd._id)
+                    viewPatientVisualisation(
+                      (pd.patient as Patient)?._id,
+                      pd._id
+                    )
                   }
                 >
-                  {pd.patient?.name}
+                  {(pd.patient as Patient)?.name}
                 </td>
                 <TableDataRow
                   id="patientCondition"
                   width="1/8"
-                  data={pd.patient?.condition}
+                  data={(pd.patient as Patient)?.condition}
                 />
                 <TableDataRow
                   id="acuity"
                   width="1/12"
-                  data={pd.patient?.acuityLevel}
+                  data={(pd.patient as Patient)?.acuityLevel}
                 />
                 <TableDataRow
                   id="fall-risk"
                   width="1/12"
-                  data={pd.patient?.fallRisk}
+                  data={(pd.patient as Patient)?.fallRisk}
                 />
                 <TableDataRow id="bedNum" width="1/12" data={pd.bedNum} />
                 <TableDataRow
                   id="wardNum"
                   width="1/12"
-                  data={pd.ward.wardNum}
+                  data={(pd.ward as Ward)?.wardNum}
                 />
                 <TableDataRow
                   id="right-upper-rail"

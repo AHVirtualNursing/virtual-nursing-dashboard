@@ -1,4 +1,4 @@
-import { Vital } from "@/models/vital";
+import { Vital } from "@/types/vital";
 import axios from "axios";
 import { Layout, Layouts } from "react-grid-layout";
 

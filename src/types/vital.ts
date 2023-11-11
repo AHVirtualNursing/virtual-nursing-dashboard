@@ -1,4 +1,5 @@
 export interface Vital {
+  _id: string;
   respRate: VitalsReading[];
   heartRate: VitalsReading[];
   bloodPressureSys: VitalsReading[];

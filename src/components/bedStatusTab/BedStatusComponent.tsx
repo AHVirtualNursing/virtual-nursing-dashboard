@@ -38,7 +38,7 @@ const BedStatusComponent = ({ bed }: BedProp) => {
   const BedAlarmWarning = () => {
     return (
       fallRisk === "High" &&
-      !bed?.isBedAlarmOn && (
+      !bed?.isBedExitAlarmOn && (
         <WarningIcon color={reasonAdded ? "warning" : "error"} />
       )
     );
@@ -47,7 +47,7 @@ const BedStatusComponent = ({ bed }: BedProp) => {
   const ConfirmButton = () => {
     return (
       fallRisk === "High" &&
-      !bed?.isBedAlarmOn &&
+      !bed?.isBedExitAlarmOn &&
       reasonAdded === false && (
         <button className="float-right p-1" onClick={handleConfirm}>
           Confirm
@@ -117,10 +117,10 @@ const BedStatusComponent = ({ bed }: BedProp) => {
               - when VN inputs + confirm,  red warning turns orange
               - if bed alarm ON, or fall risk drop to medium/low, warning sign and input disappear
           */}
-          <p>Bed Alarm: {bed?.isBedAlarmOn ? "On" : "Not Turned On"}</p>
+          <p>Bed Alarm: {bed?.isBedExitAlarmOn ? "On" : "Not Turned On"}</p>
           <BedAlarmWarning />
         </div>
-        {fallRisk === "High" && !bed?.isBedAlarmOn && (
+        {fallRisk === "High" && !bed?.isBedExitAlarmOn && (
           <textarea
             value={inputReason}
             name="reason-input"

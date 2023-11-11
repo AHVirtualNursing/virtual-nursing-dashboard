@@ -3,7 +3,7 @@ import LockResetIcon from "@mui/icons-material/LockReset";
 import { callChangePasswordApi } from "@/pages/api/user";
 import { Typography, Box, TextField, Button, Modal } from "@mui/material";
 import { signOut, useSession } from "next-auth/react";
-import { VirtualNurse } from "@/models/virtualNurse";
+import { VirtualNurse } from "@/types/virtualNurse";
 import { fetchVirtualNurseByNurseId } from "@/pages/api/nurse_api";
 import { ModalBoxStyle } from "@/styles/StyleTemplates";
 
