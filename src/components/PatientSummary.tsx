@@ -67,11 +67,11 @@ const PatientSummary = ({
           if (bed.bedStatus !== "occupied") continue;
           const { patient } = bed;
 
-          const num1 = fallRisks.get(patient?.fallRisk);
-          fallRisks.set(patient?.fallRisk, num1 + 1);
+          const num1 = fallRisks.get((patient as Patient)?.fallRisk);
+          fallRisks.set((patient as Patient)?.fallRisk, num1 + 1);
 
-          const num2 = acuityLevels.get(patient?.acuityLevel);
-          acuityLevels.set(patient?.acuityLevel, num2 + 1);
+          const num2 = acuityLevels.get((patient as Patient)?.acuityLevel);
+          acuityLevels.set((patient as Patient)?.acuityLevel, num2 + 1);
         }
 
         setFallRiskData(

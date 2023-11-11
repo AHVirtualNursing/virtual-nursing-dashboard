@@ -40,7 +40,7 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
       setRr(rrConfig);
       setTemp(temperatureConfig);
     });
-  }, []);
+  }, [patient?._id]);
 
   useEffect(() => {
     if (saved) {
@@ -53,13 +53,14 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
 
   function handleSaveConfigs() {
     const alertConfig = {
-      _id: patient?._id,
+      _id: (patient as Patient)._id,
       rrConfig: rr,
       hrConfig: heartRate,
       bpSysConfig: systolic,
       bpDiaConfig: diastolic,
       spO2Config: spo2,
       temperatureConfig: temp,
+      createdAt: "",
     };
     updateAlertConfig(defaultConfigId, alertConfig).then((res) =>
       console.log("Updated Alert Config", res)

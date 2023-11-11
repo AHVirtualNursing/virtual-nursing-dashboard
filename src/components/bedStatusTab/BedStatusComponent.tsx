@@ -4,6 +4,7 @@ import { updateProtocolBreachReason } from "@/pages/api/smartbed_api";
 import { SmartBed } from "@/types/smartbed";
 import { SocketContext } from "@/pages/layout";
 import { fetchPatientByPatientId } from "@/pages/api/patients_api";
+import { Patient } from "@/types/patient";
 
 interface BedProp {
   bed: SmartBed | undefined;
@@ -17,7 +18,7 @@ const BedStatusComponent = ({ bed }: BedProp) => {
 
   useEffect(() => {
     //fetch patient to set fall risk correctly
-    fetchPatientByPatientId(bed?.patient?._id).then((patient) =>
+    fetchPatientByPatientId((bed?.patient as Patient)?._id).then((patient) =>
       setFallRisk(patient.fallRisk)
     );
 
@@ -28,7 +29,7 @@ const BedStatusComponent = ({ bed }: BedProp) => {
     return () => {
       socket.off("newFallRisk");
     };
-  }, []);
+  }, [bed?.patient, socket]);
 
   const handleConfirm = () => {
     setReasonAdded(true);
@@ -72,7 +73,13 @@ const BedStatusComponent = ({ bed }: BedProp) => {
           />
         </div>
 
-        <img src="/bed_stock.png" alt="Patient lying in bed" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/bed_stock.png"
+          alt="Patient lying in bed"
+          loading="lazy"
+          decoding="async"
+        />
 
         <div id="right-rails" className="flex gap-5 justify-evenly pb-4">
           <BedRailCard

@@ -23,7 +23,7 @@ const DashboardAlertIcon = ({
       console.log("setting socketData for alertIcon");
       setPatientAlerts(socketData);
     }
-  }, [socketData]);
+  }, [socketData, patientId]);
 
   return (
     <div id="iconBadgeContainer" className="relative">

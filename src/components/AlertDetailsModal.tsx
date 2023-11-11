@@ -1,4 +1,4 @@
-import { Alert } from "@/types/alert";
+import { Alert, AlertVitals } from "@/types/alert";
 import { Box, Modal, Typography } from "@mui/material";
 import React, { useState } from "react";
 
@@ -64,15 +64,13 @@ const AlertDetailsModal = ({
               </p>
             </div>
             <p className="text-gray-600">{description}</p>
-            <p className="text-lg">Nurse: {handledBy ? handledBy : "-"}</p>
+            <p className="text-lg">
+              Nurse: {handledBy ? handledBy.addedBy : "-"}
+            </p>
             <p className="text-lg">
               Notes:{" "}
               {notes && notes.length > 0
-                ? notes.map((note) => (
-                    <ul>
-                      <li>{note.info}</li>
-                    </ul>
-                  ))
+                ? notes.map((note, index) => <p key={index}>{note.info}</p>)
                 : "-"}
             </p>
             <p className="text-lg">
@@ -81,10 +79,15 @@ const AlertDetailsModal = ({
             <div className="space-y-4 text-md">
               <h4>Abnormal Vitals</h4>
               {alertVitals &&
-                alertVitals.map((alert) => (
-                  <div className="flex gap-x-10 border-solid border-0 border-b-2 p-3">
-                    <p>{alert.vital}</p>
-                    <p className="font-bold">{alert.reading}</p>
+                alertVitals.map((alert, index) => (
+                  <div
+                    key={index}
+                    className="flex gap-x-10 border-solid border-0 border-b-2 p-3"
+                  >
+                    <p>{(alert as AlertVitals).vital}</p>
+                    <p className="font-bold">
+                      {(alert as AlertVitals).reading}
+                    </p>
                   </div>
                 ))}
             </div>
@@ -103,18 +106,6 @@ const AlertDetailsModal = ({
           </div>
         </Box>
       </Modal>
-    </div>
-  );
-};
-
-const DetailBox = (props: {
-  title: string | undefined;
-  content: string | undefined;
-}) => {
-  return (
-    <div className="flex gap-2">
-      <p className="font-bold underline">{props.title}</p>
-      <p>{props.content}</p>
     </div>
   );
 };

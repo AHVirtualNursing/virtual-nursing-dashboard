@@ -2,7 +2,6 @@ import React from "react";
 import GroupIcon from "@mui/icons-material/Group";
 import BedIcon from "@mui/icons-material/Bed";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
-import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
 import Link from "next/link";
 import { ChatBox } from "./ChatBox";
 
@@ -23,11 +22,6 @@ export default function Sidebar() {
         name={"Alerts"}
         icon={<NotificationsActiveIcon style={{ color: "white" }} />}
         dest={"alerts"}
-      />
-      <SidebarTab
-        name={"Configs"}
-        icon={<SettingsSuggestIcon style={{ color: "white" }} />}
-        dest={"configs"}
       />
       <ChatBox />
     </div>

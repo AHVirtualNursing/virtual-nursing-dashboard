@@ -14,7 +14,7 @@ export default function ChangePasswordModal() {
     fetchVirtualNurseByNurseId(sessionData?.user.id).then((res) => {
       setNurse(res.data);
     });
-  }, []);
+  }, [sessionData?.user.id]);
 
   useEffect(() => {
     if (nurse !== undefined) {
@@ -24,7 +24,7 @@ export default function ChangePasswordModal() {
         setOpen(true);
       }
     }
-  });
+  }, [nurse]);
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
