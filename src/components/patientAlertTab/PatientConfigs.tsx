@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import RangeSlider from "../RangeSlider";
-import { Patient } from "@/models/patient";
+import { Patient } from "@/types/patient";
 import {
   fetchAlertConfigByPatientId,
   updateAlertConfig,

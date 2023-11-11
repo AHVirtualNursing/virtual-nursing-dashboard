@@ -7,6 +7,7 @@ import { Socket, io } from "socket.io-client";
 import { useSession } from "next-auth/react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { redelegateAlert } from "./api/alerts_api";
 
 const inter = Inter({ subsets: ["latin"] });
 const socket = io("http://localhost:3001");
@@ -21,11 +22,30 @@ export default function layout({ children }: { children: React.ReactNode }) {
   const { data: sessionData } = useSession();
   const nurseId = sessionData?.user.id;
 
-  const CustomToast = ({ message }: any) => (
+  const AlertToast = ({ message }: any) => (
     <div>
       <p>{message}</p>
     </div>
   );
+
+  const RedelegatedToast = ({ message, alertId }: any) => {
+    const handleRedelegateClick = () => {
+      redelegateAlert(alertId)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
+
+    return (
+      <div>
+        <p>{message}</p>
+        <button onClick={handleRedelegateClick}>Redelegate</button>
+      </div>
+    );
+  };
 
   useEffect(() => {
     socket.emit("clientConnections", nurseId);
@@ -33,15 +53,31 @@ export default function layout({ children }: { children: React.ReactNode }) {
       console.log(data);
       console.log(data.patient);
       console.log(data.alert);
-      const message = `${data.patient.name}: ${data.alert.description}`;
-      toast.error(<CustomToast message={message} />);
+      if (data.alert.redelegate) {
+        const message = `${data.patient.name}: ${data.alert.description}`;
+        toast.error(
+          <RedelegatedToast message={message} alertId={data.alert._id} />
+        );
+        // call api to redelegate alert :D
+      } else {
+        const message = `${data.patient.name}: ${data.alert.description}`;
+        toast.warning(<AlertToast message={message} />);
+      }
+    };
+
+    const dischargePatientToast = (data: any) => {
+      console.log("toasting discharge patient");
+      const message = `${data.name} has been discharged.`;
+      toast.info(<AlertToast message={message} />);
     };
 
     socket.on("alertIncoming", handleAlertIncoming);
+    socket.on("dischargePatient", dischargePatientToast);
 
     // Clean up the event listener when the component unmounts
     return () => {
       socket.off("alertIncoming", handleAlertIncoming);
+      socket.off("dischargePatient", dischargePatientToast);
     };
   }, []);
 

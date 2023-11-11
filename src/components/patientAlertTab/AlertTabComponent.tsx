@@ -1,4 +1,4 @@
-import { Patient } from "@/models/patient";
+import { Patient } from "@/types/patient";
 import React, { useState } from "react";
 import PatientAlerts from "./PatientAlerts";
 import PatientConfigs from "./PatientConfigs";

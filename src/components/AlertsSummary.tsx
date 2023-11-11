@@ -1,4 +1,4 @@
-import { Alert } from "@/models/alert";
+import { Alert } from "@/types/alert";
 import { fetchAllAlerts } from "@/pages/api/alerts_api";
 import React, { useEffect, useState } from "react";
 import { BarChart, Bar, ResponsiveContainer, XAxis, YAxis } from "recharts";

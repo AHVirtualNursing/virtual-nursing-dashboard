@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { SmartBed } from "@/models/smartBed";
+import { SmartBed } from "@/types/smartbed";
 import { fetchVitalByVitalId } from "./api/vitals_api";
 import {
   fetchVirtualNurseByNurseId,
@@ -13,10 +13,15 @@ import profilePic from "../../public/profilepic.jpg";
 import VitalTiles from "@/components/VitalTiles";
 import TileCustomisationModal from "@/components/TileCustomisationModal";
 import BedTiles from "@/components/BedTiles";
-import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
-import { VirtualNurse } from "@/models/virtualNurse";
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
+import { VirtualNurse } from "@/types/virtualNurse";
 import { Tooltip } from "@mui/material";
 import { Ward } from "@/types/ward";
+import { SocketContext } from "@/pages/layout";
+import { Alert } from "@/types/alert";
+import { Patient } from "@/types/patient";
+import DashboardAlertIcon from "@/components/DashboardAlertIcon";
+import HotelIcon from "@mui/icons-material/Hotel";
 
 export default function Wards() {
   const router = useRouter();
@@ -27,6 +32,9 @@ export default function Wards() {
   const [searchPatient, setSearchPatient] = useState<string>("");
   const [selectedWard, setSelectedWard] = useState("assigned-wards");
   const { data: sessionData } = useSession();
+  const socket = useContext(SocketContext);
+  const [socketAlertList, setSocketAlertList] = useState<Alert[]>();
+  const [socketPatient, setSocketPatient] = useState<Patient>();
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
@@ -36,6 +44,7 @@ export default function Wards() {
   useEffect(() => {
     parent.current && autoAnimate(parent.current);
   }, [parent]);
+
   const viewPatientVisualisation = (
     patientId: string | undefined,
     bedId: string
@@ -46,12 +55,15 @@ export default function Wards() {
       );
     }
   };
+
   const fetchPatientVitals = async () => {
     let patientVitalsArr: any[] = [];
     for (const bedData of data) {
-      let patientVitals = bedData.patient?.vital;
+      let patientVitals = (bedData.patient as Patient)?.vital;
       if (patientVitals) {
-        const res = await fetchVitalByVitalId(patientVitals);
+        const vitalId =
+          typeof patientVitals === "string" ? patientVitals : patientVitals._id;
+        const res = await fetchVitalByVitalId(vitalId);
         patientVitalsArr.push(res);
       } else {
         patientVitalsArr.push(undefined);
@@ -133,8 +145,11 @@ export default function Wards() {
       }
       smartBedIds.map((id) => promises.push(fetchBedByBedId(id)));
       Promise.all(promises).then((res) => {
-        // console.log("Smart Beds assigned to VN", res);
-        setData(res.filter((sb) => sb.ward && sb.patient));
+        setData(
+          res.filter(
+            (sb) => sb.ward && sb.patient && sb.bedStatus === "occupied"
+          )
+        );
       });
     });
     fetchVirtualNurseByNurseId(sessionData?.user.id).then((res) => {
@@ -142,25 +157,95 @@ export default function Wards() {
     });
   }, [selectedWard]);
 
-  // fetching vitals immediately after beds are populated
   useEffect(() => {
-    // console.log("first");
     if (data.length > 0) {
       fetchPatientVitals();
     }
   }, [data]);
 
   useEffect(() => {
-    // console.log("fetch vitals interval use effect");
-    if (data.length > 0) {
-      const interval = setInterval(() => {
-        fetchPatientVitals();
-      }, 60000);
-      return () => {
-        clearInterval(interval);
-      };
-    }
-  }, [vitals, data]);
+    const refreshContent = (updatedBed: any) => {
+      console.log("enter");
+      setData((prevData) => {
+        console.log(prevData);
+        const index = prevData.findIndex((bed) => bed._id === updatedBed._id);
+        if (index !== -1) {
+          const updatedBeds = [...prevData];
+          updatedBeds[index] = updatedBed;
+          console.log(updatedBeds);
+          return updatedBeds;
+        }
+        return prevData;
+      });
+    };
+
+    const refreshPatientInfo = (updatedPatient: any) => {
+      console.log("enter");
+      setData((prevData) => {
+        const updatedData = prevData.map((bed) => {
+          if (
+            bed.patient &&
+            (bed.patient as Patient)?._id === updatedPatient._id
+          ) {
+            return { ...bed, patient: updatedPatient };
+          }
+          return bed;
+        });
+        return updatedData;
+      });
+    };
+
+    const refreshPatientVitals = (updatedVitals: any) => {
+      const vitalObj = updatedVitals.vital;
+      const patientId = updatedVitals.patient;
+      setData((prevData) => {
+        const updatedData = prevData.map((bed) => {
+          if (bed.patient && (bed.patient as Patient)?._id === patientId) {
+            return { ...bed, vital: vitalObj };
+          }
+          return bed;
+        });
+        return updatedData;
+      });
+    };
+
+    const discharge = (patient: any) => {
+      setData((prevData) => {
+        const updatedData = prevData.map((bed) => {
+          if (bed.patient && (bed.patient as Patient)?._id === patient._id) {
+            return { ...bed, bedStatus: "vacant", patient: undefined };
+          }
+          return bed;
+        });
+        return updatedData;
+      });
+    };
+
+    const handleAlertIncoming = (data: any) => {
+      setSocketAlertList(data.alertList);
+      setSocketPatient(data.patient);
+    };
+
+    const handleDeleteAlert = (data: any) => {
+      setSocketAlertList(data.alertList);
+      setSocketPatient(data.patient);
+    };
+
+    socket.on("updatedSmartbed", refreshContent);
+    socket.on("updatedPatient", refreshPatientInfo);
+    socket.on("updatedVitals", refreshPatientVitals);
+    socket.on("dischargePatient", discharge);
+    socket.on("patientAlertAdded", handleAlertIncoming);
+    socket.on("patientAlertDeleted", handleDeleteAlert);
+    return () => {
+      socket.off("updatedSmartbed", refreshContent);
+      socket.off("updatedPatient", refreshPatientInfo);
+      socket.off("updatedVitals", refreshPatientVitals);
+      socket.off("dischargePatient", discharge);
+      socket.off("patientAlertAdded", handleAlertIncoming);
+      socket.off("patientAlertDeleted", handleDeleteAlert);
+    };
+  }, []);
 
   return (
     <div className="flex flex-col p-8 gap-6 w-full shadow-lg bg-slate-100">
@@ -219,48 +304,75 @@ export default function Wards() {
       <div className="grid grid-cols-2 gap-4 flex" ref={parent}>
         {data
           .filter((bed) =>
-            bed.patient?.name.toLowerCase().includes(searchPatient)
+            (bed.patient as Patient)?.name.toLowerCase().includes(searchPatient)
           )
           .map((pd, index) => (
             <div
               className="bg-white rounded-2xl p-4 shadow-lg hover:cursor-pointer hover:bg-blue-100"
-              onClick={() => viewPatientVisualisation(pd.patient?._id, pd._id)}
+              onClick={() =>
+                viewPatientVisualisation((pd.patient as Patient)?._id, pd._id)
+              }
+              key={pd._id}
             >
               <div className="flex items-start justify-start">
                 <div className="w-1/2 flex items-start justify-start">
                   <img width={60} src={profilePic.src} />
                   <div className="text-left px-4">
-                    <h3>{pd.patient?.name}</h3>
+                    <h3>{(pd.patient as Patient)?.name}</h3>
                     <p>
-                      Ward: {pd.ward.wardNum} Bed: {pd.bedNum}
+                      Ward: {(pd.ward as Ward)?.wardNum} Bed: {pd.bedNum}
                     </p>
                     {nurse?.cardLayout.weight ? <p>Weight: 69kg</p> : null}
                   </div>
                 </div>
                 <div className="w-1/2 flex items-start justify-around">
+                  <DashboardAlertIcon
+                    patientId={(pd.patient as Patient)?._id}
+                    socketData={
+                      socketPatient?._id === (pd.patient as Patient)?._id
+                        ? socketAlertList
+                        : null
+                    }
+                  />
+                  {!pd.isBedExitAlarmOn && !pd.isPatientOnBed ? (
+                    <HotelIcon style={{ color: "red" }} />
+                  ) : null}
                   {nurse?.cardLayout.fallRisk ? (
                     <div>
                       <p>Fall Risk</p>
                       <div className="flex items-center justify-center">
-                        <p>High</p>
-                        <Tooltip
-                          title={<p style={{ fontSize: "16px" }}>REASON</p>}
-                          placement="top"
-                        >
-                          <NotificationImportantIcon className="fill-red-500" />
-                        </Tooltip>
+                        <p>{(pd.patient as Patient)?.fallRisk}</p>
+                        {(pd.patient as Patient)?.fallRisk === "High" &&
+                        !pd.isBedExitAlarmOn ? (
+                          <Tooltip
+                            title={
+                              <p style={{ fontSize: "16px" }}>
+                                {pd.bedAlarmProtocolBreachReason}
+                              </p>
+                            }
+                            placement="top"
+                          >
+                            <ReportProblemIcon className="fill-red-500" />
+                          </Tooltip>
+                        ) : null}
                       </div>
                     </div>
                   ) : null}
                   {nurse?.cardLayout.news2 ? (
                     <div>
                       <p>NEWS2</p>
-                      <p>2</p>
+                      <p>
+                        {
+                          vitals[index]?.news2Score[
+                            vitals[index]?.news2Score.length - 1
+                          ]?.reading
+                        }
+                      </p>
                     </div>
                   ) : null}
                 </div>
               </div>
-              <BedTiles cardLayout={nurse?.cardLayout} />
+              <BedTiles cardLayout={nurse?.cardLayout} smartbed={pd} />
               <VitalTiles cardLayout={nurse?.cardLayout} data={vitals[index]} />
             </div>
           ))}

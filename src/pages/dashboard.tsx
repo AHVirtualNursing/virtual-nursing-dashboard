@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchWardsByVirtualNurse } from "./api/nurse_api";
-import { Ward } from "@/models/ward";
+import { Ward } from "@/types/ward";
 import AlertsSummary from "@/components/AlertsSummary";
 import PatientSummary from "@/components/PatientSummary";
 
