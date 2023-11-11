@@ -1,8 +1,9 @@
-import { Chat } from "@/models/chat";
+import { Chat } from "@/types/chat";
 import { lightIndigo } from "@/styles/colorTheme";
 import { Box } from "@mui/material";
 import { Dispatch, SetStateAction, useState } from "react";
 import ChatPreview from "./ChatPreview";
+import { BedSideNurse } from "@/types/bedsideNurse";
 
 type SearchProps = {
   selectedChat: Chat | undefined;
@@ -69,17 +70,17 @@ const Search = ({ selectedChat, setSelectedChat, chats, handleDeleteChat }: Sear
             .filter((chat) => {
               if (searchNurse === "") return true;
 
-              const chatName = chat.bedsideNurse.name.toUpperCase();
+              const chatName = (chat.bedsideNurse  as BedSideNurse)?.name.toUpperCase();
               const query = searchNurse.toUpperCase();
               return chatName.indexOf(query) > -1;
             })
             .map((chat) => {
               return (
                 <ChatPreview
-                  key={chat.bedsideNurse.name}
+                  key={(chat.bedsideNurse as BedSideNurse)?.name}
                   chat={chat}
                   isSelected={
-                    selectedChat?.bedsideNurse.name === chat.bedsideNurse.name
+                    (selectedChat?.bedsideNurse as BedSideNurse)?.name === (chat.bedsideNurse as BedSideNurse)?.name
                   }
                   onClickChatPreview={() => {
                     setSelectedChat(chat);

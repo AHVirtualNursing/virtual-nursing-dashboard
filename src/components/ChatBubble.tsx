@@ -1,5 +1,5 @@
-import { Message } from "@/models/message";
-import { VirtualNurse } from "@/models/virtualNurse";
+import { Message } from "@/types/chat";
+import { VirtualNurse } from "@/types/virtualNurse";
 import {
   darkIndigo,
   lighterIndigo,
@@ -12,6 +12,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { getFileByPresignedURL } from "@/pages/api/chat_api";
 import Image from "next/image";
+import { Patient } from "@/types/patient";
+import { Alert } from "@/types/alert";
 
 type ChatBubbleProps = {
   message: Message | undefined;
@@ -38,8 +40,8 @@ const ChatBubble = ({
   const [patientImageLoading, setPatientImageLoading] = useState(false);
 
   useEffect(() => {
-    if (message?.patient && message.patient.picture && imageUri === undefined) {
-      getFileByPresignedURL(message.patient.picture).then((url) => {
+    if (message?.patient && (message.patient as Patient).picture && imageUri === undefined) {
+      getFileByPresignedURL((message.patient as Patient).picture).then((url) => {
         if (url === null) return "";
         setImageUri(url);
       });
@@ -195,7 +197,7 @@ const ChatBubble = ({
                     Patient
                   </Typography>
                   <Typography sx={{ whiteSpace: "pre-line", fontSize: "20px" }}>
-                    {message?.patient?.name}
+                    {(message?.patient as Patient)?.name}
                   </Typography>
                 </Box>
               </Box>
@@ -204,13 +206,7 @@ const ChatBubble = ({
                 Condition
               </Typography>
               <Typography style={{ whiteSpace: "pre-line" }}>
-                {message?.patient?.condition}
-              </Typography>
-              <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
-                NEWS2 Score
-              </Typography>
-              <Typography style={{ whiteSpace: "pre-line" }}>
-                {message?.patient?.news2Score}
+                {(message?.patient as Patient)?.condition}
               </Typography>
               <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
                 Content
@@ -260,30 +256,30 @@ const ChatBubble = ({
                 Description
               </Typography>
               <Typography style={{ whiteSpace: "pre-line" }}>
-                {message.alert?.description}
+                {(message.alert as Alert)?.description}
               </Typography>
               <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
                 Status
               </Typography>
               <Typography style={{ whiteSpace: "pre-line" }}>
-                {message?.alert!.status.substring(0, 1).toUpperCase() +
-                  message?.alert!.status.substring(1)}
+                {(message?.alert as Alert)!.status.substring(0, 1).toUpperCase() +
+                  (message?.alert as Alert)!.status.substring(1)}
               </Typography>
               <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
                 Patient
               </Typography>
               <Typography style={{ whiteSpace: "pre-line" }}>
-                {message?.alert?.patient.name}
+                {((message?.alert as Alert)?.patient as Patient).name}
               </Typography>
               <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
                 Created On
               </Typography>
               <Typography style={{ whiteSpace: "pre-line" }}>
                 {new Date(
-                  message?.alert?.createdAt as string
+                  (message?.alert as Alert)?.createdAt as string
                 ).toLocaleDateString()}{" "}
                 {new Date(
-                  message?.alert?.createdAt as string
+                  (message?.alert as Alert)?.createdAt as string
                 ).toLocaleTimeString()}
               </Typography>
             </Box>

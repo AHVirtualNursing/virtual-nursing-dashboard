@@ -2,7 +2,7 @@ import { BedSideNurse } from "./bedsideNurse";
 import { Patient } from "./patient";
 import { Ward } from "./ward";
 
-export type SmartBed = {
+export interface SmartBed {
   _id: string;
   name: string;
   roomNum: string;
@@ -15,11 +15,12 @@ export type SmartBed = {
   isRightLowerRail: boolean;
   isLeftLowerRail: boolean;
   isLowestPosition: boolean;
-  isBedAlarmOn: boolean;
+  isBedExitAlarmOn: boolean;
+  isPatientOnBed: boolean;
   createdAt: string;
   updatedAt: string;
   bedAlarmProtocolBreachReason?: string;
-  ward: Ward;
-  nurses?: BedSideNurse[];
-  patient?: Patient;
+  ward?: Ward | string;
+  nurses?: BedSideNurse[] | string[];
+  patient?: Patient | string;
 };
