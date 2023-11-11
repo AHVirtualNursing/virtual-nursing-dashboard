@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchAllAlerts } from "./api/alerts_api";
 import { fetchPatientByPatientId } from "./api/patients_api";
-import { Alert } from "@/types/alert";
+import { Alert, AlertVitals } from "@/types/alert";
 import AlertsTableRow from "@/components/AlertsTableRow";
 import AlertDetailsModal from "@/components/AlertDetailsModal";
 import { useSession } from "next-auth/react";
@@ -48,7 +48,9 @@ const Alerts = () => {
         for (const alertArr of res) {
           alertsList.push(...alertArr);
         }
-        const patientIds = alertsList.map((alert: Alert) => alert.patient);
+        const patientIds = alertsList.map(
+          (alert: Alert) => alert.patient as string
+        );
         let patientPromises = patientIds.map((id: string) =>
           fetchPatientByPatientId(id)
         );
@@ -63,7 +65,7 @@ const Alerts = () => {
         });
       });
     });
-  }, [alerts?.length, selectedWard]);
+  }, [alerts?.length, selectedWard, sessionData?.user.id]);
 
   const handleViewAlertDetails = (alertMapping: AlertPatientMapping) => {
     setSelectedAlert(alertMapping);
@@ -97,7 +99,9 @@ const Alerts = () => {
         >
           <option value="assigned-wards">Assigned Wards</option>
           {wards.map((ward) => (
-            <option value={`${ward.wardNum}`}>Ward {ward.wardNum}</option>
+            <option key={ward._id} value={`${ward.wardNum}`}>
+              Ward {ward.wardNum}
+            </option>
           ))}
         </select>
       </div>
@@ -203,7 +207,7 @@ const Alerts = () => {
               )
               .filter((alertMapping) =>
                 alertMapping.alert.alertVitals.some((alertVital) =>
-                  alertVital.vital.includes(vitalCriteria)
+                  (alertVital as AlertVitals).vital.includes(vitalCriteria)
                 )
               )
               .map((alertMapping, index) => (
@@ -229,13 +233,13 @@ const Alerts = () => {
                   <AlertsTableRow
                     id="abnormal-vital"
                     data={alertMapping.alert.alertVitals.map(
-                      (value) => value.vital
+                      (value) => (value as AlertVitals).vital
                     )}
                   />
                   <AlertsTableRow
                     id="abnormal-vital-reading"
                     data={alertMapping.alert.alertVitals.map(
-                      (value) => value.reading
+                      (value) => (value as AlertVitals).reading
                     )}
                   />
                   <AlertsTableRow
@@ -245,7 +249,7 @@ const Alerts = () => {
                   <AlertsTableRow
                     id="handling-nurse"
                     width="1/12"
-                    data={alertMapping.alert.handledBy}
+                    data={alertMapping.alert.handledBy.addedBy}
                   />
                   <AlertsTableRow
                     id="alert-datetime"
