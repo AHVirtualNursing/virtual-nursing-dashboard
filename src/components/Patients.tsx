@@ -131,6 +131,63 @@ export default function Patients({ selectedWard }: PatientListProps) {
   };
 
   useEffect(() => {
+    const refreshContent = (updatedBed: any) => {
+      console.log("enter");
+      setData((prevData) => {
+        console.log(prevData);
+        const index = prevData.findIndex((bed) => bed._id === updatedBed._id);
+        if (index !== -1) {
+          const updatedBeds = [...prevData];
+          updatedBeds[index] = updatedBed;
+          console.log(updatedBeds);
+          return updatedBeds;
+        }
+        return prevData;
+      });
+    };
+
+    const refreshPatientInfo = (updatedPatient: any) => {
+      console.log("enter");
+      setData((prevData) => {
+        const updatedData = prevData.map((bed) => {
+          if (
+            bed.patient &&
+            (bed.patient as Patient)?._id === updatedPatient._id
+          ) {
+            return { ...bed, patient: updatedPatient };
+          }
+          return bed;
+        });
+        return updatedData;
+      });
+    };
+
+    const refreshPatientVitals = (updatedVitals: any) => {
+      const vitalObj = updatedVitals.vital;
+      const patientId = updatedVitals.patient;
+      setData((prevData) => {
+        const updatedData = prevData.map((bed) => {
+          if (bed.patient && (bed.patient as Patient)?._id === patientId) {
+            return { ...bed, vital: vitalObj };
+          }
+          return bed;
+        });
+        return updatedData;
+      });
+    };
+
+    const discharge = (patient: any) => {
+      setData((prevData) => {
+        const updatedData = prevData.map((bed) => {
+          if (bed.patient && (bed.patient as Patient)?._id === patient._id) {
+            return { ...bed, bedStatus: "vacant", patient: undefined };
+          }
+          return bed;
+        });
+        return updatedData;
+      });
+    };
+
     const handleAlertIncoming = (data: any) => {
       setSocketAlertList(data.alertList);
       setSocketPatient(data.patient);
@@ -139,9 +196,18 @@ export default function Patients({ selectedWard }: PatientListProps) {
       setSocketAlertList(data.alertList);
       setSocketPatient(data.patient);
     };
+
+    socket.on("updatedSmartbed", refreshContent);
+    socket.on("updatedPatient", refreshPatientInfo);
+    socket.on("updatedVitals", refreshPatientVitals);
+    socket.on("dischargePatient", discharge);
     socket.on("patientAlertAdded", handleAlertIncoming);
     socket.on("patientAlertDeleted", handleDeleteAlert);
     return () => {
+      socket.off("updatedSmartbed", refreshContent);
+      socket.off("updatedPatient", refreshPatientInfo);
+      socket.off("updatedVitals", refreshPatientVitals);
+      socket.off("dischargePatient", discharge);
       socket.off("patientAlertAdded", handleAlertIncoming);
       socket.off("patientAlertDeleted", handleDeleteAlert);
     };
@@ -165,30 +231,20 @@ export default function Patients({ selectedWard }: PatientListProps) {
       }
       smartBedIds.map((id) => promises.push(fetchBedByBedId(id)));
       Promise.all(promises).then((res) => {
-        setData(res.filter((sb) => sb.ward && sb.patient));
+        setData(
+          res.filter(
+            (sb) => sb.ward && sb.patient && sb.bedStatus === "occupied"
+          )
+        );
       });
     });
   }, [selectedWard]);
 
-  // fetching vitals immediately after beds are populated
   useEffect(() => {
-    // console.log("first");
     if (data.length > 0) {
       fetchPatientVitals();
     }
   }, [data]);
-
-  useEffect(() => {
-    // console.log("fetch vitals interval use effect");
-    if (data.length > 0) {
-      const interval = setInterval(() => {
-        fetchPatientVitals();
-      }, 60000);
-      return () => {
-        clearInterval(interval);
-      };
-    }
-  }, [vitals, data]);
 
   return (
     <div className="h-full overflow-auto scrollbar">

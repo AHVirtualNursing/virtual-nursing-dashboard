@@ -44,6 +44,7 @@ export default function Wards() {
   useEffect(() => {
     parent.current && autoAnimate(parent.current);
   }, [parent]);
+
   const viewPatientVisualisation = (
     patientId: string | undefined,
     bedId: string
@@ -144,7 +145,6 @@ export default function Wards() {
       }
       smartBedIds.map((id) => promises.push(fetchBedByBedId(id)));
       Promise.all(promises).then((res) => {
-        // console.log("Smart Beds assigned to VN", res);
         setData(
           res.filter(
             (sb) => sb.ward && sb.patient && sb.bedStatus === "occupied"
@@ -157,25 +157,11 @@ export default function Wards() {
     });
   }, [selectedWard]);
 
-  // fetching vitals immediately after beds are populated
   useEffect(() => {
-    // console.log("first");
     if (data.length > 0) {
       fetchPatientVitals();
     }
   }, [data]);
-
-  useEffect(() => {
-    // console.log("fetch vitals interval use effect");
-    if (data.length > 0) {
-      const interval = setInterval(() => {
-        fetchPatientVitals();
-      }, 60000);
-      return () => {
-        clearInterval(interval);
-      };
-    }
-  }, [vitals, data]);
 
   useEffect(() => {
     const refreshContent = (updatedBed: any) => {
@@ -379,7 +365,7 @@ export default function Wards() {
                         {
                           vitals[index]?.news2Score[
                             vitals[index]?.news2Score.length - 1
-                          ].reading
+                          ]?.reading
                         }
                       </p>
                     </div>
