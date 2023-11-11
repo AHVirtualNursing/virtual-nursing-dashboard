@@ -209,10 +209,13 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
   };
 
   const getPatients = async (virtualNurse: any) => {
-    let beds: SmartBed[] = await fetchBedsByWardId(virtualNurse.wards);
-
-    beds = beds?.filter(
-      (bed) => bed.patient !== undefined && bed.patient !== null
+    let beds: SmartBed[] = [];
+    for (const ward of virtualNurse.wards) {
+      const smartbeds: SmartBed[] = await fetchBedsByWardId(ward);
+      beds.push(...smartbeds);
+    }
+    beds = beds.filter(
+      (bed) => bed.patient !== undefined || bed.patient !== null
     );
 
     setBedsWithPatientsData(beds);
@@ -249,6 +252,12 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
           (chat) => chat._id !== updatedChat._id
         );
         setChats([...updatedChats, updatedChat]);
+
+        updatedChat.messages.sort(
+          (a: Message, b: Message) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
         socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
       });
     });
@@ -268,6 +277,11 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
 
       const updatedChats = chats.filter((chat) => chat._id !== updatedChat._id);
       setChats([...updatedChats, updatedChat]);
+
+      updatedChat.messages.sort(
+        (a: Message, b: Message) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
 
       socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
 
@@ -297,6 +311,11 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       setSelectedChat(updatedChat);
 
       //Send to websocket
+      updatedChat.messages.sort(
+        (a: Message, b: Message) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
       socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
 
       handleCloseEditButton();
@@ -339,13 +358,28 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       setChats([...updatedChats, updatedChat]);
 
       //Send to websocket
+      updatedChat.messages.sort(
+        (a: Message, b: Message) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
       socket.emit("virtualToBedsideNurseChatUpdate", updatedChat);
     });
   };
 
   const handleCreateChat = () => {
     //check for existing chat
-    archivedAndUnarchivedChats.forEach((chat) => {
+    for (const chat of chats) {
+      const bedSideNurse = chat.bedsideNurse as BedSideNurse;
+      if (bedSideNurse._id === selectedBedsideNurseId) {
+        setSelectedChat(chat);
+        handleCloseCreateChat();
+        setSelectedBedWithPatientId("");
+        setSelectedBedsideNurseId("");
+        return;
+      }
+    }
+    for (const chat of archivedAndUnarchivedChats) {
       const bedSideNurse = chat.bedsideNurse as BedSideNurse;
       if (bedSideNurse._id === selectedBedsideNurseId) {
         reopenChat(chat._id).then((reopenedChat) => {
@@ -358,7 +392,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
           return;
         });
       }
-    });
+    }
 
     //new chat
     createChat(virtualNurse!._id, selectedBedsideNurseId).then((newChat) => {
