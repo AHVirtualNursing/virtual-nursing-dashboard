@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { fetchWardsByVirtualNurse } from "./api/nurse_api";
 import { fetchAlertsByWardId } from "./api/wards_api";
 import { Ward } from "@/types/ward";
+import AlertsTable from "@/components/AlertsTable";
 
 type AlertPatientMapping = {
   alert: Alert;
@@ -17,7 +18,7 @@ const Alerts = () => {
   const [alerts, setAlerts] = useState<AlertPatientMapping[]>();
   const [patientSearch, setPatientSearch] = useState<string>("");
   const [nurseSearch, setNurseSearch] = useState<string>("");
-  const [statusCriteria, setStatusCriteria] = useState("open");
+  const [statusCriteria, setStatusCriteria] = useState("");
   const [vitalCriteria, setVitalCriteria] = useState("");
   const [alertTypeCriteria, setAlertTypeCriteria] = useState("");
   const [selectedAlert, setSelectedAlert] = useState<AlertPatientMapping>();
@@ -73,7 +74,8 @@ const Alerts = () => {
 
   return (
     <div className="bg-slate-100 p-6 w-full">
-      <div className="overflow-auto scrollbar bg-white rounded-lg shadow-lg p-4 h-auto max-h-[700px]">
+      {/* <AlertsTable alerts={alerts} /> */}
+      <div className="overflow-auto scrollbar bg-white rounded-lg shadow-lg p-4 h-auto max-h-[700px] space-y-3">
         {shown && (
           <AlertDetailsModal
             pressed={shown}
@@ -105,23 +107,22 @@ const Alerts = () => {
             ))}
           </select>
         </div>
-        <table className="table-auto border-spacing-3">
-          <thead className="text-sm text-left">
-            {/* ------ column headers ------ */}
+
+        <table className="table-auto md:table-fixed border-collapse w-full">
+          <thead className="text-sm bg-slate-100">
             <tr>
-              <th>Patient</th>
-              <th>Status</th>
-              <th>Alert Type</th>
-              <th>Vital Type</th>
-              <th>Vital Measurement</th>
-              <th className="px-2">Description</th>
-              <th className="px-1">Bedside Nurse</th>
-              <th>Time</th>
+              <TableHeader title="Patient" />
+              <TableHeader title="Status" />
+              <TableHeader title="Alert Type" />
+              <TableHeader title="Vital Type" colspan={2} />
+              <TableHeader title="Description" />
+              <TableHeader title="Bedside Nurse" />
+              <TableHeader title="Time" />
             </tr>
           </thead>
 
           <tbody>
-            <tr id="subheaders" className="text-left">
+            <tr id="subheaders">
               <td id="patient-filter">
                 <input
                   type="text"
@@ -134,19 +135,20 @@ const Alerts = () => {
               <td id="status-filter">
                 <select
                   name="status-select"
-                  className="bg-white p-1 w-full"
+                  className="bg-white p-1 rounded-lg w-auto"
                   value={statusCriteria}
                   onChange={(e) => setStatusCriteria(e.target.value)}
                 >
-                  <option value="open">open</option>
-                  <option value="handling">handling</option>
-                  <option value="complete">complete</option>
+                  <option value="">All</option>
+                  <option value="open">Open</option>
+                  <option value="handling">Handling</option>
+                  <option value="complete">Complete</option>
                 </select>
               </td>
               <td id="alertType-filter">
                 <select
                   name="alertType-select"
-                  className="bg-white p-1 w-full"
+                  className="bg-white p-1 w-auto rounded-lg"
                   value={alertTypeCriteria}
                   onChange={(e) => {
                     setAlertTypeCriteria(e.target.value);
@@ -160,11 +162,11 @@ const Alerts = () => {
               <td id="vital-filter">
                 <select
                   name="vital-select"
-                  className="bg-white p-1 w-full"
+                  className="bg-white p-1 w-auto rounded-lg"
                   value={vitalCriteria}
                   onChange={(e) => setVitalCriteria(e.target.value)}
                 >
-                  <option value="">All</option>
+                  <option value="">All Vitals</option>
                   <option value="Heart Rate">HR</option>
                   <option value="Blood Pressure">BP</option>
                   <option value="Respiratory Rate">RR</option>
@@ -173,8 +175,8 @@ const Alerts = () => {
                 </select>
               </td>
 
-              <td id="vital-reading" className="text-xs underline">
-                Abnormal Reading
+              <td id="vital-reading" className="text-sm underline">
+                Reading
               </td>
               <td>{""}</td>
 
@@ -199,8 +201,10 @@ const Alerts = () => {
                 .filter((alertMapping) =>
                   alertMapping.patient.toLowerCase().includes(patientSearch)
                 )
-                .filter(
-                  (alertMapping) => alertMapping.alert.status === statusCriteria
+                .filter((alertMapping) =>
+                  alertMapping.alert.status
+                    .toLowerCase()
+                    .includes(statusCriteria)
                 )
                 .filter((alertMapping) =>
                   alertMapping.alert.alertType.includes(alertTypeCriteria)
@@ -213,19 +217,27 @@ const Alerts = () => {
                 .map((alertMapping, index) => (
                   <tr
                     key={index}
-                    className="text-left hover:bg-blue-200 cursor-pointer"
                     onClick={() => handleViewAlertDetails(alertMapping)}
                   >
                     <AlertsTableRow
                       id="patient-name"
-                      width="1/12"
                       data={alertMapping.patient}
                     />
-                    <AlertsTableRow
-                      id="alert-status"
-                      width="1/12"
-                      data={alertMapping.alert.status}
-                    />
+                    <td
+                      className={`text-sm border-solid border-0 border-b border-slate-400`}
+                    >
+                      <button
+                        className={`${
+                          alertMapping.alert.status === "open"
+                            ? "bg-red-400"
+                            : alertMapping.alert.status === "handling"
+                            ? "bg-orange-400"
+                            : "bg-green-400"
+                        } text-white py-1 px-3 rounded-lg w-auto uppercase pointer-events-none`}
+                      >
+                        {alertMapping.alert.status}
+                      </button>
+                    </td>
                     <AlertsTableRow
                       id="alert-type"
                       data={alertMapping.alert.alertType}
@@ -249,7 +261,7 @@ const Alerts = () => {
                     <AlertsTableRow
                       id="handling-nurse"
                       width="1/12"
-                      data={alertMapping.alert.handledBy?.addedBy}
+                      data={alertMapping.alert.notes[0]?.addedBy}
                     />
                     <AlertsTableRow
                       id="alert-datetime"
@@ -263,6 +275,23 @@ const Alerts = () => {
         </table>
       </div>
     </div>
+  );
+};
+
+const TableHeader = ({
+  title,
+  colspan,
+}: {
+  title: string;
+  colspan?: number;
+}) => {
+  return (
+    <th
+      className="p-2 uppercase text-xs font-bold"
+      colSpan={colspan ? colspan : 1}
+    >
+      {title}
+    </th>
   );
 };
 

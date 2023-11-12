@@ -154,7 +154,7 @@ const BedRailCard = ({ id, info, rail }: BedRailCardProps) => {
     <div
       id={id}
       className={`${
-        info ? "bg-green-400" : "bg-orange-400"
+        info ? "bg-emerald-400" : "bg-red-400"
       } rounded-lg py-3 px-10`}
     >
       <p>{rail}</p>
