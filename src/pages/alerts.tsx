@@ -8,6 +8,7 @@ import { fetchWardsByVirtualNurse } from "./api/nurse_api";
 import { fetchAlertsByWardId } from "./api/wards_api";
 import { Ward } from "@/types/ward";
 import AlertsTable from "@/components/AlertsTable";
+import SelectFilter from "@/components/SelectFilter";
 
 type AlertPatientMapping = {
   alert: Alert;
@@ -22,7 +23,7 @@ const Alerts = () => {
   const [vitalCriteria, setVitalCriteria] = useState("");
   const [alertTypeCriteria, setAlertTypeCriteria] = useState("");
   const [selectedAlert, setSelectedAlert] = useState<AlertPatientMapping>();
-  const [selectedWard, setSelectedWard] = useState<string>("assigned-wards");
+  const [selectedWard, setSelectedWard] = useState<string>("");
   const [shown, setShown] = useState(false);
   const [wards, setWards] = useState<Ward[]>([]);
   const { data: sessionData } = useSession();
@@ -35,7 +36,7 @@ const Alerts = () => {
       setWards(wards);
       let wardsToView: Ward[] = [];
       let promises: Promise<Alert>[] = [];
-      if (selectedWard === "assigned-wards") {
+      if (selectedWard === "") {
         wardsToView = wards;
       } else {
         wardsToView = wards.filter(
@@ -90,22 +91,12 @@ const Alerts = () => {
           >
             Wards
           </label>
-          <select
+          <SelectFilter
             name="alertWardFilter"
-            id="alert-ward-filter"
-            value={selectedWard}
-            onChange={(e) => {
-              setSelectedWard(e.target.value);
-            }}
-            className="p-2 bg-gray-50 rounded-lg border border-gray-300 text-gray-900 text-sm"
-          >
-            <option value="assigned-wards">Assigned Wards</option>
-            {wards.map((ward) => (
-              <option key={ward._id} value={`${ward.wardNum}`}>
-                Ward {ward.wardNum}
-              </option>
-            ))}
-          </select>
+            inTable={false}
+            changeSelectedOption={setSelectedWard}
+            options={["all"].concat(wards.map((ward) => ward.wardNum))}
+          />
         </div>
 
         <table className="table-auto md:table-fixed border-collapse w-full">
@@ -133,46 +124,35 @@ const Alerts = () => {
                 />
               </td>
               <td id="status-filter">
-                <select
-                  name="status-select"
-                  className="bg-white p-1 rounded-lg w-auto"
-                  value={statusCriteria}
-                  onChange={(e) => setStatusCriteria(e.target.value)}
-                >
-                  <option value="">All</option>
-                  <option value="open">Open</option>
-                  <option value="handling">Handling</option>
-                  <option value="complete">Complete</option>
-                </select>
+                <SelectFilter
+                  name="statusSelect"
+                  options={["all", "open", "handling", "complete"]}
+                  changeSelectedOption={setStatusCriteria}
+                  inTable={true}
+                />
               </td>
               <td id="alertType-filter">
-                <select
-                  name="alertType-select"
-                  className="bg-white p-1 w-auto rounded-lg"
-                  value={alertTypeCriteria}
-                  onChange={(e) => {
-                    setAlertTypeCriteria(e.target.value);
-                  }}
-                >
-                  <option value="">All</option>
-                  <option value="Vital">Vital</option>
-                  <option value="SmartBed">SmartBed</option>
-                </select>
+                <SelectFilter
+                  name="alertTypeSelect"
+                  options={["all", "vital", "smartbed"]}
+                  changeSelectedOption={setAlertTypeCriteria}
+                  inTable={true}
+                />
               </td>
               <td id="vital-filter">
-                <select
-                  name="vital-select"
-                  className="bg-white p-1 w-auto rounded-lg"
-                  value={vitalCriteria}
-                  onChange={(e) => setVitalCriteria(e.target.value)}
-                >
-                  <option value="">All Vitals</option>
-                  <option value="Heart Rate">HR</option>
-                  <option value="Blood Pressure">BP</option>
-                  <option value="Respiratory Rate">RR</option>
-                  <option value="SPO2">SPO2</option>
-                  <option value="Temperature">Temp</option>
-                </select>
+                <SelectFilter
+                  name="vitalFilter"
+                  options={[
+                    "all vitals",
+                    "heart rate",
+                    "blood pressure",
+                    "respiratory rate",
+                    "spo2",
+                    "temperature",
+                  ]}
+                  changeSelectedOption={setVitalCriteria}
+                  inTable={true}
+                />
               </td>
 
               <td id="vital-reading" className="text-sm underline">
@@ -207,11 +187,15 @@ const Alerts = () => {
                     .includes(statusCriteria)
                 )
                 .filter((alertMapping) =>
-                  alertMapping.alert.alertType.includes(alertTypeCriteria)
+                  alertMapping.alert.alertType
+                    .toLowerCase()
+                    .includes(alertTypeCriteria)
                 )
                 .filter((alertMapping) =>
                   alertMapping.alert.alertVitals.some((alertVital) =>
-                    (alertVital as AlertVitals).vital.includes(vitalCriteria)
+                    (alertVital as AlertVitals).vital
+                      .toLowerCase()
+                      .includes(vitalCriteria)
                   )
                 )
                 .map((alertMapping, index) => (

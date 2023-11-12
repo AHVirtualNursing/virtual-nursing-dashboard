@@ -47,7 +47,7 @@ const PatientSummary = ({
 
     fetchWardsByVirtualNurse(sessionData?.user.id).then((wards) => {
       let wardsToView = [];
-      if (selectedWard === "assigned-wards") {
+      if (selectedWard === "") {
         wardsToView = wards;
       } else {
         wardsToView = wards.filter(

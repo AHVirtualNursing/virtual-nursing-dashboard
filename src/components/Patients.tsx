@@ -16,6 +16,7 @@ import { Patient } from "@/types/patient";
 import HotelIcon from "@mui/icons-material/Hotel";
 import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
 import { SocketContext } from "@/pages/layout";
+import SelectFilter from "./SelectFilter";
 
 type PatientListProps = {
   /**
@@ -30,6 +31,8 @@ export default function Patients({ selectedWard }: PatientListProps) {
   const [data, setData] = useState<SmartBed[]>([]);
   const [searchPatient, setSearchPatient] = useState<string>("");
   const [searchCondition, setSearchCondition] = useState<string>("");
+  const [selectedAcuity, setSelectedAcuity] = useState<string>("");
+  const [selectedFallRisk, setSelectedFallRisk] = useState<string>("");
   const [vitals, setVitals] = useState<any[]>([]);
   const [alerts, setAlerts] = useState<any[]>([]);
   const { data: sessionData } = useSession();
@@ -230,7 +233,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
       let promises: Promise<SmartBed>[] = [];
       let wardsToView = [];
       let smartBedIds = [];
-      if (selectedWard === "assigned-wards") {
+      if (selectedWard === "") {
         wardsToView = wards;
       } else {
         wardsToView = wards.filter(
@@ -305,8 +308,24 @@ export default function Patients({ selectedWard }: PatientListProps) {
                 onChange={handleConditionSearch}
               />
             </td>
-            <TableSubHeader subheaderText="" />
-            <TableSubHeader subheaderText="" />
+            <td className="px-1">
+              <SelectFilter
+                name="acuitySelect"
+                inTable={true}
+                options={["all", "l1", "l2", "l3"]}
+                changeSelectedOption={setSelectedAcuity}
+                customStyle="w-full mt-0"
+              />
+            </td>
+            <td>
+              <SelectFilter
+                name="fallRiskSelect"
+                inTable={true}
+                options={["all", "low", "medium", "high"]}
+                changeSelectedOption={setSelectedFallRisk}
+                customStyle="mt-0"
+              />
+            </td>
             <TableSubHeader subheaderText="Bed No." />
             <TableSubHeader subheaderText="Ward No." />
             <TableSubHeader subheaderText="Right Upper" />
@@ -333,6 +352,16 @@ export default function Patients({ selectedWard }: PatientListProps) {
               (bed.patient as Patient).condition
                 .toLowerCase()
                 .includes(searchCondition)
+            )
+            .filter((bed) =>
+              (bed.patient as Patient).fallRisk
+                .toLowerCase()
+                .includes(selectedFallRisk)
+            )
+            .filter((bed) =>
+              (bed.patient as Patient).acuityLevel
+                .toLowerCase()
+                .includes(selectedAcuity)
             )
             .map((pd, index) => (
               <tr className="text-left" key={pd._id}>
