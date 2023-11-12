@@ -101,15 +101,15 @@ const BedStatusComponent = ({ bed }: BedProp) => {
           id="legend-green"
           className="flex gap-2 justify-center items-center text-sm p-3"
         >
-          <div className="bg-green-400 w-4 h-4"></div>
-          <p>Rail Up / Patient Present</p>
+          <div className="bg-emerald-400 w-4 h-4"></div>
+          <p>Rail Up</p>
         </div>
         <div
           id="legend-orange"
           className="flex gap-2 justify-center items-center text-sm p-2"
         >
           <div className="bg-orange-400 w-4 h-4"></div>
-          <p>Rail Down / Patient Absent</p>
+          <p>Rail Down</p>
         </div>
       </div>
       <div id="bed-info" className="bg-white flex-1 space-y-4 p-2 text-left">
