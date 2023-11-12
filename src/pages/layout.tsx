@@ -18,7 +18,7 @@ const SocketProvider = ({ children }: any) => {
   );
 };
 
-export default function layout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   const { data: sessionData } = useSession();
   const nurseId = sessionData?.user.id;
 
@@ -79,7 +79,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
       socket.off("alertIncoming", handleAlertIncoming);
       socket.off("dischargePatient", dischargePatientToast);
     };
-  }, []);
+  }, [nurseId]);
 
   return (
     <SocketProvider>
@@ -92,7 +92,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
         </Head>
         <ToastContainer
           position="bottom-right"
-          autoClose={5000}
+          autoClose={false}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick

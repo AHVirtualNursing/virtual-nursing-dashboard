@@ -30,6 +30,8 @@ function BedTiles({ cardLayout, smartbed }: layoutProp) {
       {cardLayout?.rail ? (
         <div className="flex-1 py-2 px-4">
           <div className="flex text-center">
+            {/* <div className="bg-red-400"></div>
+            <div className="bg-emerald-400"></div> */}
             <div
               className={`flex-1 bg-${
                 smartbed?.isLeftUpperRail ? "emerald" : "red"

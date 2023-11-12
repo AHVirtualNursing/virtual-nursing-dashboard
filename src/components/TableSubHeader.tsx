@@ -7,7 +7,9 @@ export default function TableSubHeader({
 }) {
   return (
     <>
-      <td className="text-xs underline break-words px-2">{subheaderText}</td>
+      <td className="text-xs underline text-left break-words px-2">
+        {subheaderText}
+      </td>
     </>
   );
 }

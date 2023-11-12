@@ -15,22 +15,27 @@ import TileCustomisationModal from "@/components/TileCustomisationModal";
 import BedTiles from "@/components/BedTiles";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import { VirtualNurse } from "@/types/virtualNurse";
-import { Tooltip } from "@mui/material";
+import { Link, Tooltip } from "@mui/material";
 import { Ward } from "@/types/ward";
 import { SocketContext } from "@/pages/layout";
 import { Alert } from "@/types/alert";
 import { Patient } from "@/types/patient";
 import DashboardAlertIcon from "@/components/DashboardAlertIcon";
-import HotelIcon from "@mui/icons-material/Hotel";
+import { fetchAlertsByPatientId } from "./api/patients_api";
+import GridViewIcon from "@mui/icons-material/GridView";
+import ListIcon from "@mui/icons-material/List";
 
 export default function Wards() {
   const router = useRouter();
   const [data, setData] = useState<SmartBed[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
   const [vitals, setVitals] = useState<any[]>([]);
+  const [alerts, setAlerts] = useState<any[]>([]);
   const [nurse, setNurse] = useState<VirtualNurse>();
   const [searchPatient, setSearchPatient] = useState<string>("");
   const [selectedWard, setSelectedWard] = useState("assigned-wards");
+  const [showVitalAlerts, setShowVitalAlerts] = useState("all-status");
+  const [showBedAlerts, setShowBedAlerts] = useState("all-status");
   const { data: sessionData } = useSession();
   const socket = useContext(SocketContext);
   const [socketAlertList, setSocketAlertList] = useState<Alert[]>();
@@ -58,6 +63,7 @@ export default function Wards() {
 
   const fetchPatientVitals = async () => {
     let patientVitalsArr: any[] = [];
+    let patientAlertsArr: any[] = [];
     for (const bedData of data) {
       let patientVitals = (bedData.patient as Patient)?.vital;
       if (patientVitals) {
@@ -68,50 +74,53 @@ export default function Wards() {
       } else {
         patientVitalsArr.push(undefined);
       }
+      const res = await fetchAlertsByPatientId(
+        (bedData.patient as Patient)._id
+      );
+      const vitalAlerts = res.filter(
+        (alert: Alert) => alert.alertType === "Vital"
+      );
+      const bedAlerts = res.filter(
+        (alert: Alert) => alert.alertType === "SmartBed"
+      );
+      const lastVitalEntryStatus =
+        vitalAlerts[vitalAlerts.length - 1]?.status || "none";
+      const lastBedEntryStatus =
+        bedAlerts[bedAlerts.length - 1]?.status || "none";
+      patientAlertsArr.push([lastVitalEntryStatus, lastBedEntryStatus]);
     }
+
     const combined = data.map((bedData, index) => ({
       bed: bedData,
       vital: patientVitalsArr[index],
+      alerts: patientAlertsArr[index],
     }));
-    combined.sort((vital1, vital2) => {
-      if (vital1.vital === undefined && vital2.vital === undefined) {
-        return 0;
-      } else if (vital1.vital === undefined) {
-        return 1;
-      } else if (vital2.vital === undefined) {
+
+    combined.sort((bed1, bed2) => {
+      const countOpenBed1 =
+        bed1.alerts?.filter((x: string) => x === "open").length || 0;
+      const countOpenBed2 =
+        bed2.alerts?.filter((x: string) => x === "open").length || 0;
+      const countHandlingBed1 =
+        bed1.alerts?.filter((x: string) => x === "handling").length || 0;
+      const countHandlingBed2 =
+        bed2.alerts?.filter((x: string) => x === "handling").length || 0;
+
+      if (countOpenBed1 > countOpenBed2) {
         return -1;
+      } else if (countOpenBed1 < countOpenBed2) {
+        return 1;
+      } else if (countHandlingBed1 > countHandlingBed2) {
+        return -1;
+      } else if (countHandlingBed1 < countHandlingBed2) {
+        return 1;
       } else {
-        if (
-          (vital1.vital.heartRate === undefined ||
-            vital1.vital.heartRate.length == 0) &&
-          (vital2.vital.heartRate === undefined ||
-            vital2.vital.heartRate.length == 0)
-        ) {
-          return 0;
-        } else if (
-          vital1.vital.heartRate === undefined ||
-          vital1.vital.heartRate.length == 0
-        ) {
-          return 1;
-        } else if (
-          vital2.vital.heartRate === undefined ||
-          vital2.vital.heartRate.length == 0
-        ) {
-          return -1;
-        } else {
-          return (
-            Math.round(
-              vital2.vital.heartRate[vital2.vital.heartRate.length - 1].reading
-            ) -
-            Math.round(
-              vital1.vital.heartRate[vital1.vital.heartRate.length - 1].reading
-            )
-          );
-        }
+        return 0;
       }
     });
     const sortedBeds = combined.map((x) => x.bed);
     const sortedVitals = combined.map((x) => x.vital);
+    const sortedAlerts = combined.map((x) => x.alerts);
     if (
       sortedBeds.length !== data.length ||
       !sortedBeds.every((element, index) => element === data[index])
@@ -123,6 +132,12 @@ export default function Wards() {
       !sortedVitals.every((element, index) => element === vitals[index])
     ) {
       setVitals(sortedVitals);
+    }
+    if (
+      sortedAlerts.length !== alerts.length ||
+      !sortedAlerts.every((element, index) => element === alerts[index])
+    ) {
+      setAlerts(sortedAlerts);
     }
   };
 
@@ -156,6 +171,8 @@ export default function Wards() {
       setNurse(res.data);
     });
   }, [selectedWard]);
+
+  useEffect(() => {}, [showVitalAlerts, showBedAlerts]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -259,7 +276,17 @@ export default function Wards() {
         </button>
       </div>
       <div className="gap-x-3 flex justify-between items-center">
-        <div>
+        <div className="flex items-center">
+          <div className="pr-5">
+            <Link href="/dashboard">
+              <button className="p-0 m-0 cursor-pointer">
+                <ListIcon />
+              </button>
+            </Link>
+            <button disabled className="m-0 p-0">
+              <GridViewIcon />
+            </button>
+          </div>
           <label
             htmlFor="ward-select"
             className="text-sm font-medium text-gray-900"
@@ -294,6 +321,46 @@ export default function Wards() {
             {wards.map((ward) => (
               <option value={`${ward.wardNum}`}>Ward {ward.wardNum}</option>
             ))}
+          </select>
+          <label
+            htmlFor="vital-alerts-select"
+            className="text-sm font-medium text-gray-900"
+          >
+            Vital Alerts
+          </label>
+          <select
+            name="vitalAlertsSelect"
+            id="vital-alerts-select"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1 mx-2"
+            value={showVitalAlerts}
+            onChange={(e) => {
+              console.log("selected option", e.target.value);
+              setShowVitalAlerts(e.target.value);
+            }}
+          >
+            <option value="all-status">All</option>
+            <option value="open">Open</option>
+            <option value="handling">Handling</option>
+          </select>
+          <label
+            htmlFor="bed-alerts-select"
+            className="text-sm font-medium text-gray-900"
+          >
+            Bed Alerts
+          </label>
+          <select
+            name="bedAlertsSelect"
+            id="bed-alerts-select"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1 mx-2"
+            value={showBedAlerts}
+            onChange={(e) => {
+              console.log("selected option", e.target.value);
+              setShowBedAlerts(e.target.value);
+            }}
+          >
+            <option value="all-status">All</option>
+            <option value="open">Open</option>
+            <option value="handling">Handling</option>
           </select>
         </div>
         <TileCustomisationModal
@@ -334,9 +401,6 @@ export default function Wards() {
                         : null
                     }
                   />
-                  {!pd.isBedExitAlarmOn && !pd.isPatientOnBed ? (
-                    <HotelIcon style={{ color: "red" }} />
-                  ) : null}
                   {nurse?.cardLayout.fallRisk ? (
                     <div>
                       <p>Fall Risk</p>

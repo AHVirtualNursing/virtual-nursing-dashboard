@@ -11,9 +11,11 @@ import TableDataRow from "./TableDataRow";
 import { Ward } from "@/types/ward";
 import Link from "next/link";
 import DashboardAlertIcon from "./DashboardAlertIcon";
-import { SocketContext } from "@/pages/layout";
 import { Alert } from "@/types/alert";
 import { Patient } from "@/types/patient";
+import HotelIcon from "@mui/icons-material/Hotel";
+import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
+import { SocketContext } from "@/pages/layout";
 
 type PatientListProps = {
   /**
@@ -29,6 +31,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
   const [searchPatient, setSearchPatient] = useState<string>("");
   const [searchCondition, setSearchCondition] = useState<string>("");
   const [vitals, setVitals] = useState<any[]>([]);
+  const [alerts, setAlerts] = useState<any[]>([]);
   const { data: sessionData } = useSession();
   const socket = useContext(SocketContext);
   const [socketAlertList, setSocketAlertList] = useState<Alert[]>();
@@ -62,6 +65,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
 
   const fetchPatientVitals = async () => {
     let patientVitalsArr: any[] = [];
+    let patientAlertsArr: any[] = [];
     for (const bedData of data) {
       let patientVitals = (bedData.patient as Patient)?.vital;
       if (patientVitals) {
@@ -72,50 +76,52 @@ export default function Patients({ selectedWard }: PatientListProps) {
       } else {
         patientVitalsArr.push(undefined);
       }
+      const res = await fetchAlertsByPatientId(
+        (bedData.patient as Patient)._id
+      );
+      const vitalAlerts = res.filter(
+        (alert: Alert) => alert.alertType === "Vital"
+      );
+      const bedAlerts = res.filter(
+        (alert: Alert) => alert.alertType === "SmartBed"
+      );
+      const lastVitalEntryStatus =
+        vitalAlerts[vitalAlerts.length - 1]?.status || "none";
+      const lastBedEntryStatus =
+        bedAlerts[bedAlerts.length - 1]?.status || "none";
+      patientAlertsArr.push([lastVitalEntryStatus, lastBedEntryStatus]);
     }
     const combined = data.map((bedData, index) => ({
       bed: bedData,
       vital: patientVitalsArr[index],
+      alerts: patientAlertsArr[index],
     }));
-    combined.sort((vital1, vital2) => {
-      if (vital1.vital === undefined && vital2.vital === undefined) {
-        return 0;
-      } else if (vital1.vital === undefined) {
-        return 1;
-      } else if (vital2.vital === undefined) {
+
+    combined.sort((bed1, bed2) => {
+      const countOpenBed1 =
+        bed1.alerts?.filter((x: string) => x === "open").length || 0;
+      const countOpenBed2 =
+        bed2.alerts?.filter((x: string) => x === "open").length || 0;
+      const countHandlingBed1 =
+        bed1.alerts?.filter((x: string) => x === "handling").length || 0;
+      const countHandlingBed2 =
+        bed2.alerts?.filter((x: string) => x === "handling").length || 0;
+
+      if (countOpenBed1 > countOpenBed2) {
         return -1;
+      } else if (countOpenBed1 < countOpenBed2) {
+        return 1;
+      } else if (countHandlingBed1 > countHandlingBed2) {
+        return -1;
+      } else if (countHandlingBed1 < countHandlingBed2) {
+        return 1;
       } else {
-        if (
-          (vital1.vital.heartRate === undefined ||
-            vital1.vital.heartRate.length == 0) &&
-          (vital2.vital.heartRate === undefined ||
-            vital2.vital.heartRate.length == 0)
-        ) {
-          return 0;
-        } else if (
-          vital1.vital.heartRate === undefined ||
-          vital1.vital.heartRate.length == 0
-        ) {
-          return 1;
-        } else if (
-          vital2.vital.heartRate === undefined ||
-          vital2.vital.heartRate.length == 0
-        ) {
-          return -1;
-        } else {
-          return (
-            Math.round(
-              vital2.vital.heartRate[vital2.vital.heartRate.length - 1].reading
-            ) -
-            Math.round(
-              vital1.vital.heartRate[vital1.vital.heartRate.length - 1].reading
-            )
-          );
-        }
+        return 0;
       }
     });
     const sortedBeds = combined.map((x) => x.bed);
     const sortedVitals = combined.map((x) => x.vital);
+    const sortedAlerts = combined.map((x) => x.alerts);
     if (
       sortedBeds.length !== data.length ||
       !sortedBeds.every((element, index) => element === data[index])
@@ -127,6 +133,12 @@ export default function Patients({ selectedWard }: PatientListProps) {
       !sortedVitals.every((element, index) => element === vitals[index])
     ) {
       setVitals(sortedVitals);
+    }
+    if (
+      sortedAlerts.length !== alerts.length ||
+      !sortedAlerts.every((element, index) => element === alerts[index])
+    ) {
+      setAlerts(sortedAlerts);
     }
   };
 
@@ -211,7 +223,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
       socket.off("patientAlertAdded", handleAlertIncoming);
       socket.off("patientAlertDeleted", handleDeleteAlert);
     };
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     fetchWardsByVirtualNurse(sessionData?.user.id).then((wards) => {
@@ -238,7 +250,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
         );
       });
     });
-  }, [selectedWard]);
+  }, [selectedWard, sessionData?.user.id]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -247,8 +259,8 @@ export default function Patients({ selectedWard }: PatientListProps) {
   }, [data]);
 
   return (
-    <div className="h-full overflow-auto scrollbar">
-      <table className="table-fixed w-full border-collapse border-spacing-3">
+    <div className="h-full overflow-auto scrollbar w-full">
+      <table className="table-fixed border-collapse border-spacing-3">
         <thead className="text-sm text-left">
           {/* ------ column headers ------ */}
           <tr>
@@ -260,11 +272,13 @@ export default function Patients({ selectedWard }: PatientListProps) {
             <th>Bed</th>
             <th>Ward</th>
             <th colSpan={4}>Bed Rails</th>
-            <th>Bed Brakes</th>
-            <th>Bed Lowest</th>
+            <th className="px-1">Bed Brakes</th>
+            <th className="px-1">Bed Lowest</th>
             <th>Blood Pressure</th>
             <th>Heart Rate</th>
-            <th>Saturation</th>
+            <th className="px-1">Respiratory Rate</th>
+            <th className="px-1">Saturation</th>
+            <th>Temperature</th>
           </tr>
         </thead>
         <tbody ref={parent}>
@@ -304,35 +318,44 @@ export default function Patients({ selectedWard }: PatientListProps) {
             <TableSubHeader subheaderText="Result" />
             <TableSubHeader subheaderText="Reading" />
             <TableSubHeader subheaderText="Reading" />
+            <TableSubHeader subheaderText="Reading" />
+            <TableSubHeader subheaderText="Reading" />
           </tr>
 
           {/* ------ data rows ------*/}
           {data
             .filter((bed) =>
-              (bed.patient as Patient)?.name
+              (bed.patient as Patient).name
                 .toLowerCase()
-                .includes(searchPatient || searchCondition)
+                .includes(searchPatient)
+            )
+            .filter((bed) =>
+              (bed.patient as Patient).condition
+                .toLowerCase()
+                .includes(searchCondition)
             )
             .map((pd, index) => (
               <tr className="text-left" key={pd._id}>
                 <td className="w-1/12 text-center">
-                  <Link
-                    href={`/patientVisualisation?patientId=${
-                      (pd.patient as Patient)?._id
-                    }&bedId=${pd._id}&viewAlerts=true`}
-                    as={`/patientVisualisation?patientId=${
-                      (pd.patient as Patient)?._id
-                    }&bedId=${pd._id}`}
-                  >
-                    <DashboardAlertIcon
-                      patientId={(pd.patient as Patient)?._id}
-                      socketData={
-                        socketPatient?._id === (pd.patient as Patient)?._id
-                          ? socketAlertList
-                          : null
-                      }
-                    />
-                  </Link>
+                  <div className="flex items-center justify-center">
+                    <Link
+                      href={`/patientVisualisation?patientId=${
+                        (pd.patient as Patient)?._id
+                      }&bedId=${pd._id}&viewAlerts=true`}
+                      as={`/patientVisualisation?patientId=${
+                        (pd.patient as Patient)?._id
+                      }&bedId=${pd._id}`}
+                    >
+                      <DashboardAlertIcon
+                        patientId={(pd.patient as Patient)?._id}
+                        socketData={
+                          socketPatient?._id === (pd.patient as Patient)?._id
+                            ? socketAlertList
+                            : null
+                        }
+                      />
+                    </Link>
+                  </div>
                 </td>
                 <td
                   id="patientName"
@@ -419,12 +442,28 @@ export default function Patients({ selectedWard }: PatientListProps) {
                     ]?.reading
                   )}
                 />
+                <TableDataRow
+                  id="resp-reading"
+                  width="1/5"
+                  data={
+                    vitals[index]?.respRate[vitals[index]?.respRate.length - 1]
+                      ?.reading
+                  }
+                />
 
                 <TableDataRow
                   id="spo2-reading"
-                  width="1/12"
                   data={
                     vitals[index]?.spO2[vitals[index]?.spO2.length - 1]?.reading
+                  }
+                />
+
+                <TableDataRow
+                  id="temp-reading"
+                  data={
+                    vitals[index]?.temperature[
+                      vitals[index]?.temperature.length - 1
+                    ]?.reading
                   }
                 />
               </tr>
