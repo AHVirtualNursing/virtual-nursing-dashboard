@@ -1,18 +1,35 @@
-import { SmartBed } from "@/models/smartBed";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import WarningIcon from "@mui/icons-material/Warning";
 import { updateProtocolBreachReason } from "@/pages/api/smartbed_api";
+import { SmartBed } from "@/types/smartbed";
+import { SocketContext } from "@/pages/layout";
+import { fetchPatientByPatientId } from "@/pages/api/patients_api";
+import { Patient } from "@/types/patient";
 
 interface BedProp {
   bed: SmartBed | undefined;
 }
 
-const BedStatusComponent = (bedProp: BedProp) => {
-  const [fallRisk, setFallRisk] = useState<string>("high");
+const BedStatusComponent = ({ bed }: BedProp) => {
+  const [fallRisk, setFallRisk] = useState<string | undefined>();
   const [reasonAdded, setReasonAdded] = useState<boolean>(false);
   const [inputReason, setInputReason] = useState<string>("");
+  const socket = useContext(SocketContext);
 
-  const { bed } = bedProp;
+  useEffect(() => {
+    //fetch patient to set fall risk correctly
+    fetchPatientByPatientId((bed?.patient as Patient)?._id).then((patient) =>
+      setFallRisk(patient.fallRisk)
+    );
+
+    socket.on("newFallRisk", (fallRiskValue) => {
+      setFallRisk(fallRiskValue);
+    });
+
+    return () => {
+      socket.off("newFallRisk");
+    };
+  }, [bed?.patient, socket]);
 
   const handleConfirm = () => {
     setReasonAdded(true);
@@ -21,22 +38,25 @@ const BedStatusComponent = (bedProp: BedProp) => {
 
   const BedAlarmWarning = () => {
     return (
-      fallRisk === "high" &&
-      !bed?.isBedExitAlarmOn && (
-        <WarningIcon color={reasonAdded ? "warning" : "error"} />
-      )
+      <>
+        {fallRisk === "High" && !bed?.isBedExitAlarmOn && (
+          <WarningIcon color={reasonAdded ? "warning" : "error"} />
+        )}
+      </>
     );
   };
 
   const ConfirmButton = () => {
     return (
-      fallRisk === "high" &&
-      !bed?.isBedExitAlarmOn &&
-      reasonAdded === false && (
-        <button className="float-right p-1" onClick={handleConfirm}>
-          Confirm
-        </button>
-      )
+      <>
+        {fallRisk === "High" &&
+          !bed?.isBedExitAlarmOn &&
+          reasonAdded === false && (
+            <button className="float-right p-1" onClick={handleConfirm}>
+              Confirm
+            </button>
+          )}
+      </>
     );
   };
 
@@ -46,28 +66,34 @@ const BedStatusComponent = (bedProp: BedProp) => {
         <div id="left-rails" className="flex gap-5 justify-evenly pt-4">
           <BedRailCard
             id="upper-left"
-            info={bedProp.bed?.isLeftUpperRail}
-            rail="Upper Left"
+            info={bed?.isLeftUpperRail}
+            rail="Left Upper"
           />
           <BedRailCard
             id="lower-left"
-            info={bedProp.bed?.isLeftLowerRail}
-            rail="Lower Left"
+            info={bed?.isLeftLowerRail}
+            rail="Left Lower"
           />
         </div>
 
-        <img src="/bed_stock.png" alt="Patient lying in bed" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/bed_stock.png"
+          alt="Patient lying in bed"
+          loading="lazy"
+          decoding="async"
+        />
 
         <div id="right-rails" className="flex gap-5 justify-evenly pb-4">
           <BedRailCard
             id="upper-right"
-            info={bedProp.bed?.isRightUpperRail}
-            rail="Upper Right"
+            info={bed?.isRightUpperRail}
+            rail="Right Upper"
           />
           <BedRailCard
             id="lower-right"
-            info={bedProp.bed?.isRightLowerRail}
-            rail="Lower Right"
+            info={bed?.isRightLowerRail}
+            rail="Right Lower"
           />
         </div>
         <div
@@ -87,16 +113,20 @@ const BedStatusComponent = (bedProp: BedProp) => {
       </div>
       <div id="bed-info" className="bg-white flex-1 space-y-4 p-2 text-left">
         <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
-          Bed Position: {bedProp.bed?.bedPosition}
+          Fall Risk: {fallRisk}
+        </div>
+        <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
+          Bed Position: {bed?.bedPosition}
         </div>
         <div className="bg-slate-200 font-bold rounded-lg uppercase flex gap-x-10 px-2 py-1 items-center ">
           <p>
-            Bed Alarm: {bedProp.bed?.isLowestPosition ? "lowest" : "not lowest"}
+            Bed Lowest Position:{" "}
+            {bed?.isLowestPosition ? "lowest" : "not lowest"}
           </p>
-          {!bedProp.bed?.isLowestPosition && <WarningIcon color="warning" />}
+          {!bed?.isLowestPosition && <WarningIcon color="warning" />}
         </div>
         <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
-          Brake Wheels: {bedProp.bed?.isBrakeSet ? "Locked" : "Not Locked"}
+          Brake Wheels: {bed?.isBrakeSet ? "Locked" : "Not Locked"}
         </div>
         <div className="bg-slate-200 font-bold rounded-lg uppercase flex gap-x-10 px-2 py-1 items-center ">
           {/* - when fall risk high, bed alarm not turned on, red alert, input box and confirm appears
@@ -104,11 +134,11 @@ const BedStatusComponent = (bedProp: BedProp) => {
               - if bed alarm ON, or fall risk drop to medium/low, warning sign and input disappear
           */}
           <p>
-            Bed Alarm: {bedProp.bed?.isBedExitAlarmOn ? "On" : "Not Turned On"}
+            Bed Exit Alarm: {bed?.isBedExitAlarmOn ? "On" : "Not Turned On"}
           </p>
           <BedAlarmWarning />
         </div>
-        {fallRisk === "high" && !bed?.isBedExitAlarmOn && (
+        {fallRisk === "High" && !bed?.isBedExitAlarmOn && (
           <textarea
             value={inputReason}
             name="reason-input"
@@ -135,7 +165,7 @@ const BedRailCard = ({ id, info, rail }: BedRailCardProps) => {
     <div
       id={id}
       className={`${
-        info ? "bg-green-400" : "bg-orange-400"
+        info ? "bg-emerald-400" : "bg-red-400"
       } rounded-lg py-3 px-10`}
     >
       <p>{rail}</p>

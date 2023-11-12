@@ -1,9 +1,9 @@
 import React from "react";
 import bed from "../../public/bed_stock.png";
 import { Cancel, CheckCircle, Man } from "@mui/icons-material";
-import { SmartBed } from "@/models/smartBed";
+import { SmartBed } from "@/types/smartbed";
 
-interface layout {
+interface CardLayout {
   [key: string]: boolean;
   allVitals: boolean;
   hr: boolean;
@@ -20,7 +20,7 @@ interface layout {
 }
 
 interface layoutProp {
-  cardLayout: layout | undefined;
+  cardLayout: CardLayout | undefined;
   smartbed: SmartBed | undefined;
 }
 
@@ -30,6 +30,8 @@ function BedTiles({ cardLayout, smartbed }: layoutProp) {
       {cardLayout?.rail ? (
         <div className="flex-1 py-2 px-4">
           <div className="flex text-center">
+            {/* <div className="bg-red-400"></div>
+            <div className="bg-emerald-400"></div> */}
             <div
               className={`flex-1 bg-${
                 smartbed?.isLeftUpperRail ? "emerald" : "red"
@@ -83,48 +85,38 @@ function BedTiles({ cardLayout, smartbed }: layoutProp) {
       {cardLayout?.warnings ? (
         <div className="flex-1 flex flex-col py-2 px-4">
           <h3>Bed Warnings</h3>
-          <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
-            <div className="flex items-center">
-              <p>
-                {smartbed?.isBedExitAlarmOn
-                  ? "Bed Exit Alarm On"
-                  : "Bed Exit Alarm Off"}
-              </p>
-              {smartbed?.isBedExitAlarmOn ? (
-                <CheckCircle className="fill-emerald-600" />
-              ) : (
+          {!smartbed?.isBedExitAlarmOn ? (
+            <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
+              <div className="flex items-center">
+                <p className="p-2">Bed exit alarm off.</p>
                 <Cancel className="fill-red-500" />
-              )}
+              </div>
             </div>
-          </div>
+          ) : null}
 
-          <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
-            <div className="flex items-center">
-              <p>
-                {smartbed?.isLowestPosition
-                  ? "Bed at lowest position"
-                  : "Bed not at lowest position"}
-              </p>
-              {smartbed?.isLowestPosition ? (
-                <CheckCircle className="fill-emerald-600" />
-              ) : (
+          {!smartbed?.isLowestPosition ? (
+            <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
+              <div className="flex items-center">
+                <p className="p-2">Bed not at lowest position.</p>
                 <Cancel className="fill-red-500" />
-              )}
+              </div>
             </div>
-          </div>
+          ) : null}
 
-          <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
-            <div className="flex items-center">
-              <p>
-                {smartbed?.isBrakeSet ? "Brake is set" : "Brake is not set"}
-              </p>
-              {smartbed?.isBrakeSet ? (
-                <CheckCircle className="fill-emerald-600" />
-              ) : (
+          {!smartbed?.isBrakeSet ? (
+            <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
+              <div className="flex items-center">
+                <p className="p-2">Brake is not set.</p>
                 <Cancel className="fill-red-500" />
-              )}
+              </div>
             </div>
-          </div>
+          ) : null}
+
+          {smartbed?.isBedExitAlarmOn &&
+          smartbed?.isLowestPosition &&
+          smartbed?.isBrakeSet ? (
+            <p>No warnings</p>
+          ) : null}
         </div>
       ) : null}
     </div>

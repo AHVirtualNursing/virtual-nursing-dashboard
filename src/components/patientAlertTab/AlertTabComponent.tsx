@@ -1,4 +1,4 @@
-import { Patient } from "@/models/patient";
+import { Patient } from "@/types/patient";
 import React, { useState } from "react";
 import PatientAlerts from "./PatientAlerts";
 import PatientConfigs from "./PatientConfigs";
@@ -6,14 +6,14 @@ import NotificationImportantIcon from "@mui/icons-material/NotificationImportant
 import EditNotificationsIcon from "@mui/icons-material/EditNotifications";
 
 type PropType = {
-  patient?: Patient;
+  patient: Patient | undefined;
 };
 
 const AlertTabComponent = ({ patient }: PropType) => {
   const tabs = ["ALERTS", "ALERT CONFIGS"];
   const [selectedTab, setSelectedTab] = useState<number>(0);
   return (
-    <div className="bg-white p-2 rounded-lg shadow-lg max-h-[470px] overflow-y-auto scrollbar">
+    <div className="bg-white p-2 rounded-lg shadow-lg overflow-y-auto scrollbar">
       <div
         id="pageTabs"
         className="bg-blue-900 p-2 rounded-xl flex justify-between items-center gap-x-5"

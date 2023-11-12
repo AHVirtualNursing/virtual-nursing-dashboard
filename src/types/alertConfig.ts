@@ -1,4 +1,4 @@
-export type AlertConfig = {
+export interface AlertConfig {
   _id: string;
   rrConfig: number[];
   hrConfig: number[];
@@ -6,4 +6,5 @@ export type AlertConfig = {
   bpDiaConfig: number[];
   spO2Config: number[];
   temperatureConfig: number[];
-};
+  createdAt: string;
+}

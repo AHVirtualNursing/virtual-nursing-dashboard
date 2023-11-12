@@ -15,8 +15,8 @@ import styles from "@/styles/Dashboard.module.css";
 import { Inter } from "next/font/google";
 import router from "next/router";
 import React, { useEffect, useState } from "react";
-import { SmartBed } from "@/models/smartBed";
-import { Patient } from "@/models/patient";
+import { SmartBed } from "@/types/smartbed";
+import { Patient } from "@/types/patient";
 import { fetchAllWards, fetchBedsByWardId } from "./api/wards_api";
 import { createNewPatient } from "./api/patients_api";
 import { updateSmartbedByBedId } from "./api/smartbed_api";
@@ -82,23 +82,22 @@ function createPatient() {
       return;
     }
     console.log("DETAILS VALID");
-    const res = await createNewPatient(patientName, patientNric, condition);
-    console.log(res?.status);
+    const res = await createNewPatient(
+      patientName,
+      patientNric,
+      condition,
+      bedAssigned
+    );
+
     if (res?.status === 200) {
-      const updateBedRes = await updateSmartbedByBedId(
-        bedAssigned,
-        res.data.data._id
-      );
-      if (updateBedRes?.status == 200) {
-        setShowSuccessMessage(true);
-        setShowNricErrorMessage(false);
-        setShowNameErrorMessage(false);
-        setShowBedErrorMessage(false);
-        setShowConditionErrorMessage(false);
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 1500);
-      }
+      setShowSuccessMessage(true);
+      setShowNricErrorMessage(false);
+      setShowNameErrorMessage(false);
+      setShowBedErrorMessage(false);
+      setShowConditionErrorMessage(false);
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1500);
     }
   };
 
@@ -197,7 +196,12 @@ function createPatient() {
               ))
             )}
           </Select>
-          <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full border-none"
+          >
             Assign Patient
           </Button>
           {showSuccessMessage ? (

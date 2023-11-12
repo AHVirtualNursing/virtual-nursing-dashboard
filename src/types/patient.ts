@@ -1,10 +1,10 @@
-import { Report } from "@/models/report";
 import { Alert } from "./alert";
 import { AlertConfig } from "./alertConfig";
 import { Reminder } from "./reminder";
+import { Report } from "./report";
 import { Vital } from "./vital";
 
-export type Patient = {
+export interface Patient {
   _id: string;
   name: string;
   nric: string;
@@ -19,16 +19,16 @@ export type Patient = {
   isDischarged: boolean;
   admissionDateTime: Date;
   dischargeDateTime: Date;
-  alerts: Alert[];
-  alertConfig: AlertConfig[];
-  reminders: Reminder[];
-  vital: Vital;
-  reports: Report[];
+  alerts: Alert[] | string[];
+  alertConfig: AlertConfig | string;
+  reminders: Reminder[] | string[];
+  vital: Vital | string;
+  reports: Report[] | string[];
   order: string[];
-};
+}
 
-export type InfoLog = {
+export interface InfoLog {
   info: string;
   datetime: string;
   addedBy: string;
-};
+}

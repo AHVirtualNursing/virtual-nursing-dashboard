@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, Grid, Button, Paper } from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { SmartBed } from "@/models/smartBed";
+import { SmartBed } from "@/types/smartbed";
 import { fetchAllWards, fetchBedsByWardId } from "./api/wards_api";
+import { Patient } from "@/types/patient";
 
 export default function Patients() {
   type BedWithWardNumObject = {
@@ -69,7 +70,10 @@ export default function Patients() {
               <Paper
                 sx={{ ":hover": { cursor: "pointer" } }}
                 onClick={() =>
-                  viewPatientVisualisation(bed.patient?._id, bed._id)
+                  viewPatientVisualisation(
+                    (bed.patient as Patient)?._id,
+                    bed._id
+                  )
                 }
                 elevation={3}
                 style={{
@@ -82,7 +86,11 @@ export default function Patients() {
                       : "pink",
                 }}
               >
-                <p>{bed.patient ? bed.patient.name : "Vacant Bed"}</p>
+                <p>
+                  {(bed.patient as Patient)
+                    ? (bed.patient as Patient)?.name
+                    : "Vacant Bed"}
+                </p>
                 <Typography variant="h6">
                   Ward: {wardNum}, Room: {bed.roomNum}, Bed: {bed.bedNum}
                 </Typography>

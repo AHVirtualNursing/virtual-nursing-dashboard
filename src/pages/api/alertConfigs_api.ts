@@ -1,4 +1,4 @@
-import { AlertConfig } from "@/models/alertConfig";
+import { AlertConfig } from "@/types/alertConfig";
 import axios from "axios";
 
 export const fetchAlertConfigByPatientId = async (

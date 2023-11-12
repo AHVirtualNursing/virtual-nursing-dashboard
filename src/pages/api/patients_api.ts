@@ -1,4 +1,4 @@
-import { Vital } from "@/models/vital";
+import { Vital } from "@/types/vital";
 import axios from "axios";
 import { Layout, Layouts } from "react-grid-layout";
 
@@ -66,13 +66,15 @@ export const updatePatientLayoutByPatientId = async (
 export const createNewPatient = async (
   patientName: string,
   patientNric: string,
-  condition: string
+  condition: string,
+  smartbedId: string
 ) => {
   try {
     const res = await axios.post(`http://localhost:3001/patient`, {
       name: patientName,
       nric: patientNric,
       condition: condition,
+      smartbed: smartbedId,
     });
     return res;
   } catch (error) {
@@ -85,10 +87,13 @@ export const getVitalByPatientId = async (
 ): Promise<Vital | null> => {
   var vital: Vital | null = null;
   try {
-    const response = await fetch(`http://localhost:3001/patient/${patientId}/vital`, {
-      method: "GET",
-      headers: { "Content-type": "application/json" },
-    });
+    const response = await fetch(
+      `http://localhost:3001/patient/${patientId}/vital`,
+      {
+        method: "GET",
+        headers: { "Content-type": "application/json" },
+      }
+    );
     const json = await response.json();
     vital = json;
   } catch (error) {
@@ -96,4 +101,4 @@ export const getVitalByPatientId = async (
   }
 
   return vital;
-}
+};

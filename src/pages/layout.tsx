@@ -18,7 +18,7 @@ const SocketProvider = ({ children }: any) => {
   );
 };
 
-export default function layout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   const { data: sessionData } = useSession();
   const nurseId = sessionData?.user.id;
 
@@ -65,13 +65,21 @@ export default function layout({ children }: { children: React.ReactNode }) {
       }
     };
 
+    const dischargePatientToast = (data: any) => {
+      console.log("toasting discharge patient");
+      const message = `${data.name} has been discharged.`;
+      toast.info(<AlertToast message={message} />);
+    };
+
     socket.on("alertIncoming", handleAlertIncoming);
+    socket.on("dischargePatient", dischargePatientToast);
 
     // Clean up the event listener when the component unmounts
     return () => {
       socket.off("alertIncoming", handleAlertIncoming);
+      socket.off("dischargePatient", dischargePatientToast);
     };
-  }, []);
+  }, [nurseId]);
 
   return (
     <SocketProvider>
@@ -84,7 +92,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
         </Head>
         <ToastContainer
           position="bottom-right"
-          autoClose={5000}
+          autoClose={false}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick

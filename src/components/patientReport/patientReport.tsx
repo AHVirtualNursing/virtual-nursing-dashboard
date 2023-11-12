@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { Patient } from "@/types/patient";
+import { Report } from "@/types/report";
 import {
   Button,
   Box,
@@ -13,8 +15,6 @@ import {
 } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Patient } from "@/models/patient";
-import { Report } from "@/models/report";
 import {
   callDeleteReportApi,
   callFetchAllReportsWithPatientParticularsApi,
@@ -47,7 +47,7 @@ export default function PatientReport({
       const patient: Patient = await fetchPatientByPatientId(patientId);
       if (patient && patient.reports) {
         const reportPromises = patient.reports.map((reportId) => {
-          return callFetchReportApi(reportId);
+          return callFetchReportApi(reportId as string);
         });
         const reports = await Promise.all(reportPromises);
         setReports(reports);

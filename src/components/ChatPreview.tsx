@@ -1,4 +1,4 @@
-import { Chat } from "@/models/chat";
+import { Chat } from "@/types/chat";
 import {
   darkerIndigo,
   lightIndigo,
@@ -11,6 +11,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { getFileByPresignedURL } from "@/pages/api/chat_api";
+import { BedSideNurse } from "@/types/bedsideNurse";
 
 type ChatPreviewProps = {
   chat: Chat;
@@ -30,17 +31,22 @@ const ChatPreview = ({
   const [imageUri, setImageUri] = useState<string>();
 
   useEffect(() => {
-    if (chat.bedsideNurse.picture && imageUri === undefined) {
-      getFileByPresignedURL(chat.bedsideNurse.picture).then((url) => {
-        if (url === null) return "";
+    if (
+      (chat.bedsideNurse as BedSideNurse)?.picture &&
+      imageUri === undefined
+    ) {
+      getFileByPresignedURL((chat.bedsideNurse as BedSideNurse).picture)
+        .then((url) => {
+          if (url === null) return "";
 
-        setImageUri(url);
-      });
+          setImageUri(url);
+        })
+        .catch((e) => console.error(e));
     }
   }, [chat, imageUri]);
   return (
     <Box
-      key={chat.bedsideNurse.name}
+      key={(chat.bedsideNurse as BedSideNurse)?.name}
       sx={{
         display: "flex",
         alignItems: "center",
@@ -104,7 +110,7 @@ const ChatPreview = ({
             height={50}
             style={{
               borderRadius: "50%",
-              objectFit: 'cover',
+              objectFit: "cover",
               display: imageLoading ? "none" : undefined,
             }}
           />
@@ -122,7 +128,7 @@ const ChatPreview = ({
 
       <Box sx={{ marginLeft: "20px" }}>
         <Typography sx={{ fontWeight: "bold", color: lightIndigo }}>
-          {chat.bedsideNurse.name}
+          {(chat.bedsideNurse as BedSideNurse)?.name}
         </Typography>
         <Typography
           sx={{

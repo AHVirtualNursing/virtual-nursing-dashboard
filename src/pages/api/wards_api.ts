@@ -9,11 +9,22 @@ export const fetchAllWards = async () => {
   }
 };
 
-export const fetchBedsByWardId = async (wardId : string | string[] | undefined) => {
+export const fetchBedsByWardId = async (wardId: string) => {
   try {
-    const res = await axios.get(`http://localhost:3001/ward/${wardId}/smartbeds`);
+    const res = await axios.get(
+      `http://localhost:3001/ward/${wardId}/smartbeds`
+    );
     return res.data;
   } catch (error) {
     console.error(error);
   }
-}
+};
+
+export const fetchAlertsByWardId = async (wardId: string) => {
+  try {
+    const res = await axios.get(`http://localhost:3001/ward/${wardId}/alerts`);
+    return res.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
