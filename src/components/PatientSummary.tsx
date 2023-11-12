@@ -30,6 +30,7 @@ const PatientSummary = ({
 }: PatientSummaryProps) => {
   const [fallRiskData, setFallRiskData] = useState<FallRiskPatientMap[]>([]);
   const [acuityData, setAcuityData] = useState<AcuityPatientMap[]>([]);
+  const [patients, setPatients] = useState<number>(0);
   const { data: sessionData } = useSession();
 
   // get all patients by selectedWard,
@@ -44,6 +45,8 @@ const PatientSummary = ({
     fallRisks.set("High", 0);
     fallRisks.set("Medium", 0);
     fallRisks.set("Low", 0);
+
+    let numPatients = 0;
 
     fetchWardsByVirtualNurse(sessionData?.user.id).then((wards) => {
       let wardsToView = [];
@@ -66,7 +69,7 @@ const PatientSummary = ({
         for (const bed of beds) {
           if (bed.bedStatus !== "occupied") continue;
           const { patient } = bed;
-
+          numPatients += 1;
           const num1 = fallRisks.get((patient as Patient)?.fallRisk);
           fallRisks.set((patient as Patient)?.fallRisk, num1 + 1);
 
@@ -80,13 +83,16 @@ const PatientSummary = ({
         setAcuityData(
           Array.from(acuityLevels, ([name, value]) => ({ name, value }))
         );
+
+        setPatients(numPatients);
       });
     });
   }, [selectedWard, sessionData?.user.id]);
 
   return (
-    <div className="flex flex-col w-1/2 h-full p-4 gap-y-4">
+    <div className="flex flex-col w-1/2 h-full p-3 gap-y-2">
       <h3 className="text-center">Patients Summary</h3>
+      <p className="text-center font-bold">Total Patients: {patients}</p>
       <div className="flex">
         <div>
           <p className="underline">Fall Risk of Patients</p>

@@ -1,6 +1,5 @@
 import React from "react";
 import GroupIcon from "@mui/icons-material/Group";
-import BedIcon from "@mui/icons-material/Bed";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import Link from "next/link";
