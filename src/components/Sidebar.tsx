@@ -2,6 +2,7 @@ import React from "react";
 import GroupIcon from "@mui/icons-material/Group";
 import BedIcon from "@mui/icons-material/Bed";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import Link from "next/link";
 import { ChatBox } from "./ChatBox";
 
@@ -14,14 +15,14 @@ export default function Sidebar() {
         dest={"dashboard"}
       />
       <SidebarTab
-        name={"Wards"}
-        icon={<BedIcon style={{ color: "white" }} />}
-        dest={"wards"}
-      />
-      <SidebarTab
         name={"Alerts"}
         icon={<NotificationsActiveIcon style={{ color: "white" }} />}
         dest={"alerts"}
+      />
+      <SidebarTab
+        name={"Reports"}
+        icon={<AssignmentIndIcon style={{ color: "white" }} />}
+        dest={"reports"}
       />
       <ChatBox />
     </div>
