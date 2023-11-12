@@ -197,7 +197,12 @@ function createPatient() {
               ))
             )}
           </Select>
-          <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full border-none"
+          >
             Assign Patient
           </Button>
           {showSuccessMessage ? (

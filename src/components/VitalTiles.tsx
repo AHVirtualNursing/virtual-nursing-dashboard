@@ -28,7 +28,7 @@ const VitalTiles = ({ data, cardLayout }: VitalProps) => {
   return (
     <div className="flex justify-around mt-2">
       {cardLayout?.hr ? (
-        <div className="flex-1 bg-emerald-400 rounded-2xl mx-2">
+        <div className="flex-1 bg-slate-200 border-solid border-2 rounded-2xl mx-2">
           <p>HR</p>
           <p>
             {data && data.heartRate.length > 0
@@ -38,7 +38,7 @@ const VitalTiles = ({ data, cardLayout }: VitalProps) => {
         </div>
       ) : null}
       {cardLayout?.rr ? (
-        <div className="flex-1 bg-red-400 rounded-2xl mx-2">
+        <div className="flex-1 bg-slate-200 border-solid border-2 rounded-2xl mx-2">
           <p>RR</p>
           <p>
             {data && data.respRate.length > 0
@@ -48,7 +48,7 @@ const VitalTiles = ({ data, cardLayout }: VitalProps) => {
         </div>
       ) : null}
       {cardLayout?.bp ? (
-        <div className="flex-1 bg-emerald-400 rounded-2xl mx-2">
+        <div className="flex-1 bg-slate-200 border-solid border-2 rounded-2xl mx-2">
           <p>BP</p>
           <p>
             {data &&
@@ -63,7 +63,7 @@ const VitalTiles = ({ data, cardLayout }: VitalProps) => {
         </div>
       ) : null}
       {cardLayout?.spo2 ? (
-        <div className="flex-1 bg-emerald-400 rounded-2xl mx-2">
+        <div className="flex-1 bg-slate-200 border-solid border-2 rounded-2xl mx-2">
           <p>SPO2</p>
           <p>
             {data && data.spO2.length > 0
@@ -73,7 +73,7 @@ const VitalTiles = ({ data, cardLayout }: VitalProps) => {
         </div>
       ) : null}
       {cardLayout?.temp ? (
-        <div className="flex-1 bg-emerald-400 rounded-2xl mx-2">
+        <div className="flex-1 bg-slate-200 border-solid border-2 rounded-2xl mx-2">
           <p>TEMP</p>
           <p>
             {data && data.temperature.length > 0

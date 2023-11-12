@@ -6,6 +6,9 @@ import { fetchWardsByVirtualNurse } from "./api/nurse_api";
 import { Ward } from "@/types/ward";
 import AlertsSummary from "@/components/AlertsSummary";
 import PatientSummary from "@/components/PatientSummary";
+import GridViewIcon from "@mui/icons-material/GridView";
+import ListIcon from "@mui/icons-material/List";
+import { Link } from "@mui/material";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -32,6 +35,16 @@ export default function Dashboard() {
         </button>
       </div>
       <div className="gap-x-3 flex justify-start items-center">
+        <div>
+          <button disabled className="p-0 m-0">
+            <ListIcon />
+          </button>
+          <Link href="/wards">
+            <button className="m-0 p-0">
+              <GridViewIcon />
+            </button>
+          </Link>
+        </div>
         <label
           htmlFor="ward-select"
           className="text-sm font-medium text-gray-900"

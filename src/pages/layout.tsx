@@ -92,7 +92,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
         </Head>
         <ToastContainer
           position="bottom-right"
-          autoClose={5000}
+          autoClose={false}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick
