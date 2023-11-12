@@ -75,6 +75,11 @@ const Alerts = () => {
 
   return (
     <div className="bg-slate-100 p-6 w-full">
+      <div>
+        <div className="flex flex-start p-2">
+          <h4>Alerts Overview</h4>
+        </div>
+      </div>
       {/* <AlertsTable alerts={alerts} /> */}
       <div className="overflow-auto scrollbar bg-white rounded-lg shadow-lg p-4 h-auto max-h-[700px] space-y-3">
         {shown && (

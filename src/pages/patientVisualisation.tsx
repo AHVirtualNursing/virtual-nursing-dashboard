@@ -62,6 +62,9 @@ const patientVisualisationPage = () => {
 
   return (
     <div className="flex flex-col p-8 gap-8 bg-slate-100 w-full shadow-lg">
+      <div className="flex flex-start">
+        <h4>Patient Dashboard</h4>
+      </div>
       <Box>
         <div className="flex bg-white mb-8 rounded-2xl shadow-lg">
           <Box className="p-4 text-center">
@@ -126,7 +129,9 @@ const patientVisualisationPage = () => {
             <VisualisationComponent patient={selectedBed?.patient as Patient} />
           ) : currentTab === "analytics" ? (
             <PatientChart patient={selectedBed?.patient as Patient} />
-          ) : currentTab === "reports" ? null : currentTab === "alerts" ? (
+          ) : currentTab === "reports" ? (
+            <PatientReport patient={selectedBed?.patient as Patient} />
+          ) : currentTab === "alerts" ? (
             <AlertTabComponent patient={selectedBed?.patient as Patient} />
           ) : currentTab === "bedstatus" ? (
             <BedStatusComponent bed={selectedBed} />

@@ -82,6 +82,7 @@ const BedStatusComponent = ({ bed }: BedProp) => {
           alt="Patient lying in bed"
           loading="lazy"
           decoding="async"
+          className="h-auto w-auto max-h-[300px] max-w-[300px]"
         />
 
         <div id="right-rails" className="flex gap-5 justify-evenly pb-4">
