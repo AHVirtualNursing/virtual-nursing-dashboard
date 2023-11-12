@@ -34,6 +34,8 @@ export default function Wards() {
   const [nurse, setNurse] = useState<VirtualNurse>();
   const [searchPatient, setSearchPatient] = useState<string>("");
   const [selectedWard, setSelectedWard] = useState("assigned-wards");
+  const [showVitalAlerts, setShowVitalAlerts] = useState("all-status");
+  const [showBedAlerts, setShowBedAlerts] = useState("all-status");
   const { data: sessionData } = useSession();
   const socket = useContext(SocketContext);
   const [socketAlertList, setSocketAlertList] = useState<Alert[]>();
@@ -169,6 +171,8 @@ export default function Wards() {
       setNurse(res.data);
     });
   }, [selectedWard]);
+
+  useEffect(() => {}, [showVitalAlerts, showBedAlerts]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -317,6 +321,46 @@ export default function Wards() {
             {wards.map((ward) => (
               <option value={`${ward.wardNum}`}>Ward {ward.wardNum}</option>
             ))}
+          </select>
+          <label
+            htmlFor="vital-alerts-select"
+            className="text-sm font-medium text-gray-900"
+          >
+            Vital Alerts
+          </label>
+          <select
+            name="vitalAlertsSelect"
+            id="vital-alerts-select"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1 mx-2"
+            value={showVitalAlerts}
+            onChange={(e) => {
+              console.log("selected option", e.target.value);
+              setShowVitalAlerts(e.target.value);
+            }}
+          >
+            <option value="all-status">All</option>
+            <option value="open">Open</option>
+            <option value="handling">Handling</option>
+          </select>
+          <label
+            htmlFor="bed-alerts-select"
+            className="text-sm font-medium text-gray-900"
+          >
+            Bed Alerts
+          </label>
+          <select
+            name="bedAlertsSelect"
+            id="bed-alerts-select"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1 mx-2"
+            value={showBedAlerts}
+            onChange={(e) => {
+              console.log("selected option", e.target.value);
+              setShowBedAlerts(e.target.value);
+            }}
+          >
+            <option value="all-status">All</option>
+            <option value="open">Open</option>
+            <option value="handling">Handling</option>
           </select>
         </div>
         <TileCustomisationModal
