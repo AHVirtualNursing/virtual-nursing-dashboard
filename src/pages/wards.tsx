@@ -172,8 +172,6 @@ export default function Wards() {
     });
   }, [selectedWard]);
 
-  useEffect(() => {}, [showVitalAlerts, showBedAlerts]);
-
   useEffect(() => {
     if (data.length > 0) {
       fetchPatientVitals();
@@ -213,6 +211,7 @@ export default function Wards() {
     };
 
     const refreshPatientVitals = (updatedVitals: any) => {
+      console.log("enter");
       const vitalObj = updatedVitals.vital;
       const patientId = updatedVitals.patient;
       setData((prevData) => {
@@ -227,6 +226,7 @@ export default function Wards() {
     };
 
     const discharge = (patient: any) => {
+      console.log("enter");
       setData((prevData) => {
         const updatedData = prevData.map((bed) => {
           if (bed.patient && (bed.patient as Patient)?._id === patient._id) {
@@ -239,11 +239,13 @@ export default function Wards() {
     };
 
     const handleAlertIncoming = (data: any) => {
+      console.log("enter");
       setSocketAlertList(data.alertList);
       setSocketPatient(data.patient);
     };
 
     const handleDeleteAlert = (data: any) => {
+      console.log("enter");
       setSocketAlertList(data.alertList);
       setSocketPatient(data.patient);
     };
@@ -339,8 +341,8 @@ export default function Wards() {
             }}
           >
             <option value="all-status">All</option>
-            <option value="open">Open</option>
-            <option value="handling">Handling</option>
+            <option value="open">open</option>
+            <option value="handling">handling</option>
           </select>
           <label
             htmlFor="bed-alerts-select"
@@ -359,8 +361,8 @@ export default function Wards() {
             }}
           >
             <option value="all-status">All</option>
-            <option value="open">Open</option>
-            <option value="handling">Handling</option>
+            <option value="open">open</option>
+            <option value="handling">handling</option>
           </select>
         </div>
         <TileCustomisationModal
@@ -389,7 +391,6 @@ export default function Wards() {
                     <p>
                       Ward: {(pd.ward as Ward)?.wardNum} Bed: {pd.bedNum}
                     </p>
-                    {nurse?.cardLayout.weight ? <p>Weight: 69kg</p> : null}
                   </div>
                 </div>
                 <div className="w-1/2 flex items-start justify-around">
@@ -406,19 +407,6 @@ export default function Wards() {
                       <p>Fall Risk</p>
                       <div className="flex items-center justify-center">
                         <p>{(pd.patient as Patient)?.fallRisk}</p>
-                        {(pd.patient as Patient)?.fallRisk === "High" &&
-                        !pd.isBedExitAlarmOn ? (
-                          <Tooltip
-                            title={
-                              <p style={{ fontSize: "16px" }}>
-                                {pd.bedAlarmProtocolBreachReason}
-                              </p>
-                            }
-                            placement="top"
-                          >
-                            <ReportProblemIcon className="fill-red-500" />
-                          </Tooltip>
-                        ) : null}
                       </div>
                     </div>
                   ) : null}
@@ -437,7 +425,11 @@ export default function Wards() {
                 </div>
               </div>
               <BedTiles cardLayout={nurse?.cardLayout} smartbed={pd} />
-              <VitalTiles cardLayout={nurse?.cardLayout} data={vitals[index]} />
+              <VitalTiles
+                cardLayout={nurse?.cardLayout}
+                data={vitals[index]}
+                patient={pd.patient as Patient}
+              />
             </div>
           ))}
       </div>
