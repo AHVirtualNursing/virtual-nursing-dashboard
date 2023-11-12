@@ -82,23 +82,22 @@ function createPatient() {
       return;
     }
     console.log("DETAILS VALID");
-    const res = await createNewPatient(patientName, patientNric, condition);
-    console.log(res?.status);
+    const res = await createNewPatient(
+      patientName,
+      patientNric,
+      condition,
+      bedAssigned
+    );
+
     if (res?.status === 200) {
-      const updateBedRes = await updateSmartbedByBedId(
-        bedAssigned,
-        res.data.data._id
-      );
-      if (updateBedRes?.status == 200) {
-        setShowSuccessMessage(true);
-        setShowNricErrorMessage(false);
-        setShowNameErrorMessage(false);
-        setShowBedErrorMessage(false);
-        setShowConditionErrorMessage(false);
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 1500);
-      }
+      setShowSuccessMessage(true);
+      setShowNricErrorMessage(false);
+      setShowNameErrorMessage(false);
+      setShowBedErrorMessage(false);
+      setShowConditionErrorMessage(false);
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1500);
     }
   };
 
