@@ -10,9 +10,9 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { AlertConfig } from "@/models/alertConfig";
-import { Patient } from "@/models/patient";
-import { Vital } from "@/models/vital";
+import { AlertConfig } from "@/types/alertConfig";
+import { Patient } from "@/types/patient";
+import { Vital } from "@/types/vital";
 import PatientAlerts from "../patientAlertTab/PatientAlerts";
 import { fetchPatientByPatientId } from "@/pages/api/patients_api";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";

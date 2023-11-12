@@ -19,9 +19,9 @@ export default function Sidebar() {
         dest={"alerts"}
       />
       <SidebarTab
-        name={"Reports"}
+        name={"Discharge Reports"}
         icon={<AssignmentIndIcon style={{ color: "white" }} />}
-        dest={"reports"}
+        dest={"dischargeReports"}
       />
       <ChatBox />
     </div>

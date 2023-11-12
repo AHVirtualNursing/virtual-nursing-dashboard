@@ -4,18 +4,22 @@ export const callCreateReportApi = async (
   patientId: string,
   reportName: string,
   reportType: string,
-  url: string,
-  content?: string
+  file: File
 ) => {
   try {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("patient", patientId);
+    formData.append("name", reportName);
+    formData.append("type", reportType);
+
     const response = await axios.post(
       process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + "/report",
+      formData,
       {
-        patient: patientId,
-        name: reportName,
-        type: reportType,
-        content: content,
-        url: url,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }
     );
 
@@ -37,10 +41,10 @@ export const callFetchAllReportsApi = async () => {
   }
 };
 
-export const callFetchAllReportsWithPatientParticularsApi = async () => {
+export const callFetchDischargeReportsApi = async () => {
   try {
     const response = await axios.get(
-      process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + "/report/patient"
+      process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + "/report/discharge"
     );
 
     return response.data;

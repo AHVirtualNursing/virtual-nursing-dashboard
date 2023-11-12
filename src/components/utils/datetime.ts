@@ -7,7 +7,7 @@ export const convertToSingaporeTime = (datetime: string) => {
 
   const sgDateTime = utcDateTime
     .setZone("Asia/Singapore")
-    .toFormat("yyyy-MM-dd' 'HH:mm a");
+    .toFormat("yyyy-MM-dd' 'hh:mm a");
 
   return sgDateTime;
 };

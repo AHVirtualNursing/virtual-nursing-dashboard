@@ -17,7 +17,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
   callDeleteReportApi,
-  callFetchAllReportsWithPatientParticularsApi,
+  callFetchDischargeReportsApi,
   callFetchReportApi,
 } from "@/pages/api/report_api";
 import { callRetrieveFileWithPresignedUrl } from "@/pages/api/s3_api";
@@ -25,15 +25,15 @@ import { ModalBoxStyle } from "@/styles/StyleTemplates";
 import { fetchPatientByPatientId } from "@/pages/api/patients_api";
 import { convertToSingaporeTime } from "../utils/datetime";
 
-interface PatientReportProps {
+interface PatientReportsProps {
   viewType: "all" | "single";
   patientId?: string;
 }
 
-export default function PatientReport({
+export default function PatientReports({
   viewType,
   patientId,
-}: PatientReportProps) {
+}: PatientReportsProps) {
   const [reports, setReports] = useState<Report[]>([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -53,7 +53,7 @@ export default function PatientReport({
         setReports(reports);
       }
     } else {
-      const reports = await callFetchAllReportsWithPatientParticularsApi();
+      const reports = await callFetchDischargeReportsApi();
       setReports(reports);
     }
   };
@@ -84,6 +84,9 @@ export default function PatientReport({
 
   return (
     <Box p={2}>
+      <h3 className="text-left mb-5">
+        {viewType == "all" ? "Discharge Reports" : "Patient Reports"}
+      </h3>
       {reports.length > 0 ? (
         <TableContainer component={Paper}>
           <Table>
@@ -101,64 +104,76 @@ export default function PatientReport({
                 <TableCell></TableCell>
               </TableRow>
             </TableHead>
-            {reports.map((report, index) => (
-              <>
-                <TableRow key={index}>
-                  {viewType == "all" && (
-                    <>
-                      <TableCell>{report.patientName}</TableCell>
-                      <TableCell>{report.patientNric}</TableCell>
-                    </>
-                  )}
-                  <TableCell>{report.name}</TableCell>
-                  <TableCell>
-                    {capitaliseFirstLetter(report.type)} Report
-                  </TableCell>
-                  <TableCell>
-                    {convertToSingaporeTime(report.createdAt)}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      onClick={() => handleShowDeleteModal()}
-                      startIcon={<DeleteIcon />}
-                    />
-                    <Button
-                      onClick={() => handleDownloadReport(report.url)}
-                      startIcon={<DownloadIcon />}></Button>
-                  </TableCell>
-                </TableRow>
+            {reports
+              .sort(
+                (a, b) =>
+                  new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime()
+              )
+              .map((report, index) => (
+                <>
+                  <TableRow key={index}>
+                    {viewType == "all" && (
+                      <>
+                        <TableCell>{report.patientName}</TableCell>
+                        <TableCell>
+                          {report.patientNric.replace(/^.{6}/, "XXXXXX")}
+                        </TableCell>
+                      </>
+                    )}
+                    <TableCell>{report.name}</TableCell>
+                    <TableCell>
+                      {capitaliseFirstLetter(report.type)} Report
+                    </TableCell>
+                    <TableCell>
+                      {convertToSingaporeTime(report.createdAt)}
+                    </TableCell>
+                    <TableCell>
+                      {report.type == "event" && (
+                        <Button
+                          onClick={() => handleShowDeleteModal()}
+                          startIcon={<DeleteIcon />}
+                        />
+                      )}
+                      <Button
+                        onClick={() => handleDownloadReport(report.url)}
+                        startIcon={<DownloadIcon />}></Button>
+                    </TableCell>
+                  </TableRow>
 
-                <Modal open={showDeleteModal} onClose={handleShowDeleteModal}>
-                  <Box sx={ModalBoxStyle}>
-                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                      Are you sure you want to delete {report.name}?
-                    </Typography>
-                    <Box sx={{ display: "flex", justifyContent: "center" }}>
-                      <Button
-                        onClick={() => handleDeleteReport(report._id)}
-                        variant="contained"
-                        color="error"
-                        sx={{ mt: 2 }}>
-                        Delete
-                      </Button>
-                      <Button
-                        onClick={handleShowDeleteModal}
-                        variant="contained"
-                        color="primary"
-                        sx={{ mt: 2, ml: 2 }}>
-                        Cancel
-                      </Button>
+                  <Modal open={showDeleteModal} onClose={handleShowDeleteModal}>
+                    <Box sx={ModalBoxStyle}>
+                      <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        Are you sure you want to delete {report.name}?
+                      </Typography>
+                      <Box sx={{ display: "flex", justifyContent: "center" }}>
+                        <Button
+                          onClick={() => handleDeleteReport(report._id)}
+                          variant="contained"
+                          color="error"
+                          sx={{ mt: 2 }}>
+                          Delete
+                        </Button>
+                        <Button
+                          onClick={handleShowDeleteModal}
+                          variant="contained"
+                          color="primary"
+                          sx={{ mt: 2, ml: 2 }}>
+                          Cancel
+                        </Button>
+                      </Box>
                     </Box>
-                  </Box>
-                </Modal>
-              </>
-            ))}
+                  </Modal>
+                </>
+              ))}
           </Table>
         </TableContainer>
       ) : (
         <Paper elevation={3} style={{ padding: "20px" }}>
           <Typography variant="body1">
-            No reports available for this patient.
+            {viewType == "single"
+              ? "No reports created for this patient."
+              : "No discharge reports created."}
           </Typography>
         </Paper>
       )}
