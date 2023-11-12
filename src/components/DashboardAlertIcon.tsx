@@ -37,7 +37,7 @@ const DashboardAlertIcon = ({
       setLastVitalAlert(vitalAlerts[vitalAlerts.length - 1]);
       setLastBedAlert(bedAlerts[bedAlerts.length - 1]);
     }
-  }, [socketData]);
+  }, [socketData, patientId]);
 
   return (
     <div id="iconBadgeContainer" className="relative">

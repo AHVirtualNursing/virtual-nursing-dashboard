@@ -13,6 +13,7 @@ import { Link } from "@mui/material";
 export default function Dashboard() {
   const router = useRouter();
   const [selectedOption, setSelectedOption] = useState("assigned-wards");
+  const [selectedTime, setSelectedTime] = useState("today");
   const [wards, setWards] = useState<Ward[]>([]);
   const { data: sessionData } = useSession();
   const nurseId = sessionData && sessionData.user.id;
@@ -63,13 +64,35 @@ export default function Dashboard() {
         >
           <option value="assigned-wards">Assigned Wards</option>
           {wards.map((ward) => (
-            <option value={`${ward.wardNum}`}>Ward {ward.wardNum}</option>
+            <option key={ward._id} value={`${ward.wardNum}`}>
+              Ward {ward.wardNum}
+            </option>
           ))}
+        </select>
+
+        <select
+          name="timeSelect"
+          id="time-select"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+          value={selectedTime}
+          onChange={(e) => {
+            console.log("selected time", e.target.value);
+            setSelectedTime(e.target.value);
+          }}
+        >
+          <option value="today">Today</option>
+          <option value="all">All</option>
         </select>
       </div>
       <div className="bg-white rounded-2xl h-2/6 p-4 flex shadow-lg ">
-        <AlertsSummary />
-        <PatientSummary />
+        <AlertsSummary
+          selectedWard={selectedOption}
+          selectedTime={selectedTime}
+        />
+        <PatientSummary
+          selectedWard={selectedOption}
+          selectedTime={selectedTime}
+        />
       </div>
       <div className="bg-white rounded-2xl h-4/6 p-3 shadow-lg">
         <Patients selectedWard={selectedOption} />

@@ -17,6 +17,7 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
   const [systolic, setSystolic] = useState<number[]>([]);
   const [diastolic, setDiastolic] = useState<number[]>([]);
   const [spo2, setSpo2] = useState<number[]>([]);
+  const [temp, setTemp] = useState<number[]>([]);
 
   const [saved, setSaved] = useState<boolean>(false);
   const [confirmMessage, setConfirmMessage] = useState<string>("");
@@ -24,15 +25,22 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
   useEffect(() => {
     fetchAlertConfigByPatientId(patient?._id).then((res) => {
       setDefaultConfigId(res?.data._id);
-      const { hrConfig, rrConfig, spO2Config, bpDiaConfig, bpSysConfig } =
-        res?.data;
+      const {
+        hrConfig,
+        rrConfig,
+        spO2Config,
+        bpDiaConfig,
+        bpSysConfig,
+        temperatureConfig,
+      } = res?.data;
       setHeartRate(hrConfig);
       setSystolic(bpSysConfig);
       setDiastolic(bpDiaConfig);
       setSpo2(spO2Config);
       setRr(rrConfig);
+      setTemp(temperatureConfig);
     });
-  }, []);
+  }, [patient?._id]);
 
   useEffect(() => {
     if (saved) {
@@ -45,12 +53,14 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
 
   function handleSaveConfigs() {
     const alertConfig = {
-      _id: patient?._id,
+      _id: (patient as Patient)._id,
       rrConfig: rr,
       hrConfig: heartRate,
       bpSysConfig: systolic,
       bpDiaConfig: diastolic,
       spO2Config: spo2,
+      temperatureConfig: temp,
+      createdAt: "",
     };
     updateAlertConfig(defaultConfigId, alertConfig).then((res) =>
       console.log("Updated Alert Config", res)
@@ -61,6 +71,17 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
   return (
     <div className="p-4 space-y-2 flex flex-col">
       <h3 className="text-left">Thresholds</h3>
+      {rr.length > 0 && (
+        <RangeSlider
+          min={0}
+          max={200}
+          lowerBound={rr[0]}
+          upperBound={rr[1]}
+          label="Respiratory Rate"
+          handleThresholds={setRr}
+        />
+      )}
+
       {heartRate.length > 0 && (
         <RangeSlider
           min={0}
@@ -72,16 +93,6 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
         />
       )}
 
-      {spo2.length > 0 && (
-        <RangeSlider
-          min={0}
-          max={100}
-          lowerBound={spo2[0]}
-          upperBound={spo2[1]}
-          label="SP02"
-          handleThresholds={setSpo2}
-        />
-      )}
       {systolic.length > 0 && (
         <RangeSlider
           min={0}
@@ -100,6 +111,28 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
           upperBound={diastolic[1]}
           label="Diastolic"
           handleThresholds={setDiastolic}
+        />
+      )}
+
+      {spo2.length > 0 && (
+        <RangeSlider
+          min={0}
+          max={100}
+          lowerBound={spo2[0]}
+          upperBound={spo2[1]}
+          label="SP02"
+          handleThresholds={setSpo2}
+        />
+      )}
+
+      {temp.length > 0 && (
+        <RangeSlider
+          min={20}
+          max={50}
+          lowerBound={temp[0]}
+          upperBound={temp[1]}
+          label="Temperature"
+          handleThresholds={setTemp}
         />
       )}
 

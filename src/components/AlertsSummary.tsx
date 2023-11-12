@@ -3,27 +3,33 @@ import { fetchAllAlerts } from "@/pages/api/alerts_api";
 import React, { useEffect, useState } from "react";
 import { BarChart, Bar, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
-const data = [
-  {
-    name: "Page B",
-    uv: 3000,
-    pv: 1398,
-    amt: 2210,
-  },
-];
+type AlertsSummaryProps = {
+  selectedWard: string;
+  selectedTime: string;
+};
 
-const AlertsSummary = () => {
-  const [alerts, setAlerts] = useState<Alert[]>();
+const AlertsSummary = ({ selectedWard, selectedTime }: AlertsSummaryProps) => {
+  const [alerts, setAlerts] = useState<Alert[]>([]);
 
   useEffect(() => {
     fetchAllAlerts().then((alerts) => {
-      setAlerts(alerts.data);
+      const alertsList = alerts.data;
+      if (selectedTime === "today") {
+        const todayAlerts = alertsList.filter(
+          (alert: Alert) =>
+            alert.createdAt.replace("T", " ").substring(0, 10) ===
+            new Date().toISOString().slice(0, 10)
+        );
+        setAlerts(todayAlerts);
+      } else {
+        setAlerts(alertsList);
+      }
     });
-  }, []);
+  }, [selectedTime]);
 
   const alertsData = [
     {
-      name: "Page B",
+      name: "Alerts",
       open: alerts?.filter((alert) => alert.status === "open").length,
       handling: alerts?.filter((alert) => alert.status === "handling").length,
       completed: alerts?.filter((alert) => alert.status === "complete").length,

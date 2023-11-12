@@ -11,11 +11,11 @@ import TableDataRow from "./TableDataRow";
 import { Ward } from "@/types/ward";
 import Link from "next/link";
 import DashboardAlertIcon from "./DashboardAlertIcon";
-import { SocketContext } from "@/pages/layout";
 import { Alert } from "@/types/alert";
 import { Patient } from "@/types/patient";
 import HotelIcon from "@mui/icons-material/Hotel";
 import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
+import { SocketContext } from "@/pages/layout";
 
 type PatientListProps = {
   /**
@@ -223,7 +223,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
       socket.off("patientAlertAdded", handleAlertIncoming);
       socket.off("patientAlertDeleted", handleDeleteAlert);
     };
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     fetchWardsByVirtualNurse(sessionData?.user.id).then((wards) => {
@@ -250,7 +250,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
         );
       });
     });
-  }, [selectedWard]);
+  }, [selectedWard, sessionData?.user.id]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -259,8 +259,8 @@ export default function Patients({ selectedWard }: PatientListProps) {
   }, [data]);
 
   return (
-    <div className="h-full overflow-auto scrollbar">
-      <table className="table-fixed w-full border-collapse border-spacing-3">
+    <div className="h-full overflow-auto scrollbar w-full">
+      <table className="table-fixed border-collapse border-spacing-3">
         <thead className="text-sm text-left">
           {/* ------ column headers ------ */}
           <tr>
@@ -272,11 +272,13 @@ export default function Patients({ selectedWard }: PatientListProps) {
             <th>Bed</th>
             <th>Ward</th>
             <th colSpan={4}>Bed Rails</th>
-            <th>Bed Brakes</th>
-            <th>Bed Lowest</th>
+            <th className="px-1">Bed Brakes</th>
+            <th className="px-1">Bed Lowest</th>
             <th>Blood Pressure</th>
             <th>Heart Rate</th>
-            <th>Saturation</th>
+            <th className="px-1">Respiratory Rate</th>
+            <th className="px-1">Saturation</th>
+            <th>Temperature</th>
           </tr>
         </thead>
         <tbody ref={parent}>
@@ -316,14 +318,21 @@ export default function Patients({ selectedWard }: PatientListProps) {
             <TableSubHeader subheaderText="Result" />
             <TableSubHeader subheaderText="Reading" />
             <TableSubHeader subheaderText="Reading" />
+            <TableSubHeader subheaderText="Reading" />
+            <TableSubHeader subheaderText="Reading" />
           </tr>
 
           {/* ------ data rows ------*/}
           {data
             .filter((bed) =>
-              (bed.patient as Patient)?.name
+              (bed.patient as Patient).name
                 .toLowerCase()
-                .includes(searchPatient || searchCondition)
+                .includes(searchPatient)
+            )
+            .filter((bed) =>
+              (bed.patient as Patient).condition
+                .toLowerCase()
+                .includes(searchCondition)
             )
             .map((pd, index) => (
               <tr className="text-left" key={pd._id}>
@@ -433,12 +442,28 @@ export default function Patients({ selectedWard }: PatientListProps) {
                     ]?.reading
                   )}
                 />
+                <TableDataRow
+                  id="resp-reading"
+                  width="1/5"
+                  data={
+                    vitals[index]?.respRate[vitals[index]?.respRate.length - 1]
+                      ?.reading
+                  }
+                />
 
                 <TableDataRow
                   id="spo2-reading"
-                  width="1/12"
                   data={
                     vitals[index]?.spO2[vitals[index]?.spO2.length - 1]?.reading
+                  }
+                />
+
+                <TableDataRow
+                  id="temp-reading"
+                  data={
+                    vitals[index]?.temperature[
+                      vitals[index]?.temperature.length - 1
+                    ]?.reading
                   }
                 />
               </tr>
