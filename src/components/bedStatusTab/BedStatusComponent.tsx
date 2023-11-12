@@ -38,22 +38,25 @@ const BedStatusComponent = ({ bed }: BedProp) => {
 
   const BedAlarmWarning = () => {
     return (
-      fallRisk === "High" &&
-      !bed?.isBedExitAlarmOn && (
-        <WarningIcon color={reasonAdded ? "warning" : "error"} />
-      )
+      <>
+        {fallRisk === "High" && !bed?.isBedExitAlarmOn && (
+          <WarningIcon color={reasonAdded ? "warning" : "error"} />
+        )}
+      </>
     );
   };
 
   const ConfirmButton = () => {
     return (
-      fallRisk === "High" &&
-      !bed?.isBedExitAlarmOn &&
-      reasonAdded === false && (
-        <button className="float-right p-1" onClick={handleConfirm}>
-          Confirm
-        </button>
-      )
+      <>
+        {fallRisk === "High" &&
+          !bed?.isBedExitAlarmOn &&
+          reasonAdded === false && (
+            <button className="float-right p-1" onClick={handleConfirm}>
+              Confirm
+            </button>
+          )}
+      </>
     );
   };
 
@@ -64,12 +67,12 @@ const BedStatusComponent = ({ bed }: BedProp) => {
           <BedRailCard
             id="upper-left"
             info={bed?.isLeftUpperRail}
-            rail="Upper Left"
+            rail="Left Upper"
           />
           <BedRailCard
             id="lower-left"
             info={bed?.isLeftLowerRail}
-            rail="Lower Left"
+            rail="Left Lower"
           />
         </div>
 
@@ -85,12 +88,12 @@ const BedStatusComponent = ({ bed }: BedProp) => {
           <BedRailCard
             id="upper-right"
             info={bed?.isRightUpperRail}
-            rail="Upper Right"
+            rail="Right Upper"
           />
           <BedRailCard
             id="lower-right"
             info={bed?.isRightLowerRail}
-            rail="Lower Right"
+            rail="Right Lower"
           />
         </div>
         <div
@@ -110,10 +113,16 @@ const BedStatusComponent = ({ bed }: BedProp) => {
       </div>
       <div id="bed-info" className="bg-white flex-1 space-y-4 p-2 text-left">
         <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
+          Fall Risk: {fallRisk}
+        </div>
+        <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
           Bed Position: {bed?.bedPosition}
         </div>
         <div className="bg-slate-200 font-bold rounded-lg uppercase flex gap-x-10 px-2 py-1 items-center ">
-          <p>Bed Alarm: {bed?.isLowestPosition ? "lowest" : "not lowest"}</p>
+          <p>
+            Bed Lowest Position:{" "}
+            {bed?.isLowestPosition ? "lowest" : "not lowest"}
+          </p>
           {!bed?.isLowestPosition && <WarningIcon color="warning" />}
         </div>
         <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
@@ -124,7 +133,9 @@ const BedStatusComponent = ({ bed }: BedProp) => {
               - when VN inputs + confirm,  red warning turns orange
               - if bed alarm ON, or fall risk drop to medium/low, warning sign and input disappear
           */}
-          <p>Bed Alarm: {bed?.isBedExitAlarmOn ? "On" : "Not Turned On"}</p>
+          <p>
+            Bed Exit Alarm: {bed?.isBedExitAlarmOn ? "On" : "Not Turned On"}
+          </p>
           <BedAlarmWarning />
         </div>
         {fallRisk === "High" && !bed?.isBedExitAlarmOn && (
