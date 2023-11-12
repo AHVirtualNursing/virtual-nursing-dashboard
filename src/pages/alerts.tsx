@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { fetchPatientByPatientId } from "./api/patients_api";
 import { Alert, AlertVitals } from "@/types/alert";
 import AlertsTableRow from "@/components/AlertsTableRow";
@@ -9,6 +9,7 @@ import { fetchAlertsByWardId } from "./api/wards_api";
 import { Ward } from "@/types/ward";
 import AlertsTable from "@/components/AlertsTable";
 import SelectFilter from "@/components/SelectFilter";
+import { SocketContext } from "./layout";
 
 type AlertPatientMapping = {
   alert: Alert;
@@ -27,6 +28,9 @@ const Alerts = () => {
   const [shown, setShown] = useState(false);
   const [wards, setWards] = useState<Ward[]>([]);
   const { data: sessionData } = useSession();
+  const socket = useContext(SocketContext);
+
+  useEffect(() => {}, [socket]);
 
   // get wards assigned to virtual nurse
   // then get alerts for each ward

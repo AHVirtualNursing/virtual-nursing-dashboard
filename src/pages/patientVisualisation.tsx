@@ -83,15 +83,50 @@ const patientVisualisationPage = () => {
             </h3>
           </Box>
           <Box style={{ width: "100%" }}>
-            <Box display={"flex"} sx={{ paddingTop: "20px" }}>
+            <Box
+              display={"flex"}
+              sx={{ paddingTop: "20px", justifyContent: "space-between" }}
+            >
               <p>
                 Ward: {(selectedBed?.ward as Ward)?.wardNum}, Room:{" "}
                 {selectedBed?.roomNum}, Bed: {selectedBed?.bedNum}
               </p>
             </Box>
-            <Box textAlign={"left"}>
-              <p>Condition: {(selectedBed?.patient as Patient)?.condition} </p>
+
+            <Box
+              display={"flex"}
+              sx={{ paddingTop: "20px", flexDirection: "column" }}
+            >
+              <div className="flex flex-col text-left">
+                <p>Condition: {(selectedBed?.patient as Patient)?.condition}</p>
+                <br />
+                <p>
+                  Additional Notes:
+                  {/* {(selectedBed?.patient as Patient)?.infoLogs[0]?.info} */}
+                </p>
+                <p>
+                  Patient is homesick and wants to be discharged as soon as
+                  possible
+                </p>
+                <button
+                  className={`${
+                    (selectedBed?.patient as Patient)?.fallRisk === "High"
+                      ? "bg-red-400"
+                      : (selectedBed?.patient as Patient)?.fallRisk === "Medium"
+                      ? "bg-orange-400"
+                      : "bg-emerald-400"
+                  } text-white font-bold p-1 border-none pointer-events-none mt-4 w-1/5`}
+                >
+                  Fall Risk: {(selectedBed?.patient as Patient)?.fallRisk}
+                </button>
+                <button className="pointer-events-none text-white font-bold p-1 border-none mr-4 bg-orange-400 mt-4 w-1/5">
+                  Acuity Level: {(selectedBed?.patient as Patient)?.acuityLevel}
+                </button>
+              </div>
+              <div></div>
             </Box>
+
+            <Box textAlign={"right"} marginRight={2}></Box>
             <Box textAlign={"right"} marginRight={2}>
               <button
                 className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full border-none"
@@ -100,7 +135,12 @@ const patientVisualisationPage = () => {
                 Update Details
               </button>
             </Box>
-            <Box textAlign={"right"} marginRight={2} marginTop={2}>
+            <Box
+              textAlign={"right"}
+              marginRight={2}
+              marginTop={2}
+              marginBottom={2}
+            >
               <Button
                 component="label"
                 variant="contained"
