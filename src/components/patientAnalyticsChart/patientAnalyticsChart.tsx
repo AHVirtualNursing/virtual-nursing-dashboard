@@ -500,7 +500,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
         </Grid>
         <Box sx={{ height: 400 }} id="chart1">
           <Line
-            data={updateChartData("chart1")}
+            data={vitals ? updateChartData("chart1") : []}
             options={{
               ...updateChartOptions(
                 selectedVitals,
@@ -518,7 +518,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
         </Box>
         <Box sx={{ height: 400 }} id="chart2">
           <Line
-            data={updateChartData("chart2")}
+            data={vitals ? updateChartData("chart2") : []}
             options={{
               ...updateChartOptions(
                 selectedVitals,
