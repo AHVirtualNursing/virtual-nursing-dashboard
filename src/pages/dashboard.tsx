@@ -8,7 +8,7 @@ import AlertsSummary from "@/components/AlertsSummary";
 import PatientSummary from "@/components/PatientSummary";
 import GridViewIcon from "@mui/icons-material/GridView";
 import ListIcon from "@mui/icons-material/List";
-import { Link } from "@mui/material";
+import Link from "next/link";
 
 export default function Dashboard() {
   const router = useRouter();

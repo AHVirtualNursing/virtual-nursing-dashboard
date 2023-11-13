@@ -2,6 +2,9 @@ import React from "react";
 import bed from "../../public/bed_stock.png";
 import { Cancel, CheckCircle, Man } from "@mui/icons-material";
 import { SmartBed } from "@/types/smartbed";
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
+import { Patient } from "@/types/patient";
+import { Tooltip } from "@mui/material";
 
 interface CardLayout {
   [key: string]: boolean;
@@ -89,7 +92,19 @@ function BedTiles({ cardLayout, smartbed }: layoutProp) {
             <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
               <div className="flex items-center">
                 <p className="p-2">Bed exit alarm off.</p>
-                <Cancel className="fill-red-500" />
+                {(smartbed?.patient as Patient).fallRisk === "High" ? (
+                  <Tooltip
+                    title={
+                      <p style={{ fontSize: "16px" }}>
+                        {smartbed?.bedAlarmProtocolBreachReason}
+                      </p>
+                    }
+                  >
+                    <ReportProblemIcon sx={{ color: "orange" }} />
+                  </Tooltip>
+                ) : (
+                  <ReportProblemIcon sx={{ color: "red" }} />
+                )}
               </div>
             </div>
           ) : null}
@@ -98,7 +113,7 @@ function BedTiles({ cardLayout, smartbed }: layoutProp) {
             <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
               <div className="flex items-center">
                 <p className="p-2">Bed not at lowest position.</p>
-                <Cancel className="fill-red-500" />
+                <ReportProblemIcon sx={{ color: "orange" }} />
               </div>
             </div>
           ) : null}
@@ -107,7 +122,7 @@ function BedTiles({ cardLayout, smartbed }: layoutProp) {
             <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
               <div className="flex items-center">
                 <p className="p-2">Brake is not set.</p>
-                <Cancel className="fill-red-500" />
+                <ReportProblemIcon sx={{ color: "orange" }} />
               </div>
             </div>
           ) : null}
