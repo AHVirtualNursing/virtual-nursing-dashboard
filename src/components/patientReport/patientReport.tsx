@@ -117,7 +117,7 @@ export default function PatientReports({
                       <>
                         <TableCell>{report.patientName}</TableCell>
                         <TableCell>
-                          {report.patientNric.replace(/^.{6}/, "XXXXXX")}
+                          {report.patientNric.replace(/^.{5}/, "XXXXX")}
                         </TableCell>
                       </>
                     )}

@@ -126,7 +126,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     useState(false);
 
   const [pdfDetails, setPdfDetails] = useState({
-    name: `${patient?.name} Vitals Charts`,
+    name: `${patient?.name} Event Report`,
     notes: "",
   });
   const [showChartOptionsModal, setShowChartOptionsModal] = useState(false);
@@ -344,7 +344,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     setSelectedTimeRange("1D");
 
     setPdfDetails({
-      name: `${patient?.name} Vitals Charts`,
+      name: `${patient?.name} Event Report`,
       notes: "",
     });
   };
@@ -386,6 +386,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
   return (
     <>
       <Box ref={targetRef} sx={{ padding: 10 }}>
+        <h3 className="text-left mb-5">Patient Analytics Chart</h3>
         <Grid item xs={6}>
           <FormGroup id="vitals" sx={{ flexDirection: "row" }}>
             <FormLabel
