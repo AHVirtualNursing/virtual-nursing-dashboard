@@ -3,7 +3,7 @@ import GroupIcon from "@mui/icons-material/Group";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import Link from "next/link";
-import { ChatBox } from "./ChatBox";
+import { ChatBox } from "./chat/ChatBox";
 
 export default function Sidebar() {
   return (

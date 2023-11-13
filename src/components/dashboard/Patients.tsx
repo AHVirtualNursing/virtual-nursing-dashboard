@@ -16,7 +16,7 @@ import { Patient } from "@/types/patient";
 import HotelIcon from "@mui/icons-material/Hotel";
 import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
 import { SocketContext } from "@/pages/layout";
-import SelectFilter from "./SelectFilter";
+import SelectFilter from "../SelectFilter";
 
 type PatientListProps = {
   /**

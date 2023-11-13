@@ -2,7 +2,7 @@ import { Alert, AlertVitals } from "@/types/alert";
 import { Patient } from "@/types/patient";
 import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
 import React, { useEffect, useState } from "react";
-import AlertsTableRow from "../AlertsTableRow";
+import AlertsTableRow from "../alerts/AlertsTableRow";
 
 interface PatientProp {
   patient: Patient | undefined;

@@ -572,9 +572,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                 {hoverCreateButton ? (
                   <AddCircleIcon sx={{ color: white, fontSize: 30 }} />
                 ) : (
-                  <AddCircleOutlineIcon
-                    sx={{ color: white, fontSize: 30 }}
-                  />
+                  <AddCircleOutlineIcon sx={{ color: white, fontSize: 30 }} />
                 )}
               </IconButton>
             </Box>
@@ -705,9 +703,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                       }}
                     >
                       <IconButton onClick={handleCloseEditButton}>
-                        <CloseIcon
-                          sx={{ fontSize: "20", color: darkBlue }}
-                        />
+                        <CloseIcon sx={{ fontSize: "20", color: darkBlue }} />
                       </IconButton>
                     </Box>
                   </Box>
@@ -751,14 +747,10 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                   ) : (
                     <>
                       <IconButton onClick={handleOpenSharingPatientToChat}>
-                        <PersonOutlineIcon
-                          sx={{ color: blue, fontSize: 30 }}
-                        />
+                        <PersonOutlineIcon sx={{ color: blue, fontSize: 30 }} />
                       </IconButton>
                       <IconButton onClick={handleSendMessage}>
-                        <ArrowCircleUpIcon
-                          sx={{ color: blue, fontSize: 30 }}
-                        />
+                        <ArrowCircleUpIcon sx={{ color: blue, fontSize: 30 }} />
                       </IconButton>
                     </>
                   )}

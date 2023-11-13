@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import { fetchPatientByPatientId } from "./api/patients_api";
 import { Alert, AlertVitals } from "@/types/alert";
-import AlertsTableRow from "@/components/AlertsTableRow";
-import AlertDetailsModal from "@/components/AlertDetailsModal";
+import AlertsTableRow from "@/components/alerts/AlertsTableRow";
+import AlertDetailsModal from "@/components/alerts/AlertDetailsModal";
 import { useSession } from "next-auth/react";
 import { fetchWardsByVirtualNurse } from "./api/nurse_api";
 import { fetchAlertsByWardId } from "./api/wards_api";
 import { Ward } from "@/types/ward";
-import AlertsTable from "@/components/AlertsTable";
+import AlertsTable from "@/components/alerts/AlertsTable";
 import SelectFilter from "@/components/SelectFilter";
 import { SocketContext } from "./layout";
 

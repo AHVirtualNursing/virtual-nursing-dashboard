@@ -9,10 +9,15 @@ type SearchProps = {
   selectedChat: Chat | undefined;
   setSelectedChat: Dispatch<SetStateAction<Chat | undefined>>;
   chats: Chat[] | undefined;
-  handleDeleteChat: (chat: Chat) => void
+  handleDeleteChat: (chat: Chat) => void;
 };
 
-const Search = ({ selectedChat, setSelectedChat, chats, handleDeleteChat }: SearchProps) => {
+const Search = ({
+  selectedChat,
+  setSelectedChat,
+  chats,
+  handleDeleteChat,
+}: SearchProps) => {
   const [searchNurse, setSearchNurse] = useState("");
 
   return (
@@ -64,13 +69,16 @@ const Search = ({ selectedChat, setSelectedChat, chats, handleDeleteChat }: Sear
 
               // Compare the createdAt property of the latest messages
               return (
-                new Date(latestMessageB.createdAt).getTime()- new Date(latestMessageA.createdAt).getTime()
+                new Date(latestMessageB.createdAt).getTime() -
+                new Date(latestMessageA.createdAt).getTime()
               );
             })
             .filter((chat) => {
               if (searchNurse === "") return true;
 
-              const chatName = (chat.bedsideNurse  as BedSideNurse)?.name.toUpperCase();
+              const chatName = (
+                chat.bedsideNurse as BedSideNurse
+              )?.name.toUpperCase();
               const query = searchNurse.toUpperCase();
               return chatName.indexOf(query) > -1;
             })
@@ -80,7 +88,8 @@ const Search = ({ selectedChat, setSelectedChat, chats, handleDeleteChat }: Sear
                   key={(chat.bedsideNurse as BedSideNurse)?.name}
                   chat={chat}
                   isSelected={
-                    (selectedChat?.bedsideNurse as BedSideNurse)?.name === (chat.bedsideNurse as BedSideNurse)?.name
+                    (selectedChat?.bedsideNurse as BedSideNurse)?.name ===
+                    (chat.bedsideNurse as BedSideNurse)?.name
                   }
                   onClickChatPreview={() => {
                     setSelectedChat(chat);

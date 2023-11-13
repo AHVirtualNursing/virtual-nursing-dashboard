@@ -1,11 +1,11 @@
-import Patients from "@/components/Patients";
+import Patients from "@/components/dashboard/Patients";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchWardsByVirtualNurse } from "./api/nurse_api";
 import { Ward } from "@/types/ward";
-import AlertsSummary from "@/components/AlertsSummary";
-import PatientSummary from "@/components/PatientSummary";
+import AlertsSummary from "@/components/dashboard/AlertsSummary";
+import PatientSummary from "@/components/dashboard/PatientSummary";
 import GridViewIcon from "@mui/icons-material/GridView";
 import ListIcon from "@mui/icons-material/List";
 import { Link } from "@mui/material";
