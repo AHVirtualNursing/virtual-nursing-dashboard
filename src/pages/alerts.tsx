@@ -31,7 +31,6 @@ const Alerts = () => {
   const socket = useContext(SocketContext);
 
   useEffect(() => {}, [socket]);
-
   // get wards assigned to virtual nurse
   // then get alerts for each ward
   // for each alert, map the alert to the patient

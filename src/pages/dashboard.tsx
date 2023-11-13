@@ -77,6 +77,7 @@ export default function Dashboard() {
         <AlertsSummary
           selectedWard={selectedOption}
           selectedTime={selectedTime}
+          wards={wards}
         />
         <PatientSummary
           selectedWard={selectedOption}

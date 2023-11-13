@@ -2,30 +2,51 @@ import { Alert } from "@/types/alert";
 import { fetchAllAlerts } from "@/pages/api/alerts_api";
 import React, { useEffect, useState } from "react";
 import { BarChart, Bar, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { Ward } from "@/types/ward";
+import { fetchAlertsByWardId } from "@/pages/api/wards_api";
 
 type AlertsSummaryProps = {
   selectedWard: string;
   selectedTime: string;
+  wards: Ward[];
 };
 
-const AlertsSummary = ({ selectedWard, selectedTime }: AlertsSummaryProps) => {
+const AlertsSummary = ({
+  selectedWard,
+  selectedTime,
+  wards,
+}: AlertsSummaryProps) => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
+  console.log("wards", wards);
 
+  // fetch all alerts of patients in selected ward, then filter by selected time
   useEffect(() => {
-    fetchAllAlerts().then((alerts) => {
-      const alertsList = alerts.data;
-      if (selectedTime === "today") {
-        const todayAlerts = alertsList.filter(
-          (alert: Alert) =>
-            alert.createdAt.replace("T", " ").substring(0, 10) ===
-            new Date().toISOString().slice(0, 10)
-        );
-        setAlerts(todayAlerts);
-      } else {
-        setAlerts(alertsList);
-      }
+    let wardsToView: Ward[] = [],
+      wardAlertsPromises: any[] = [];
+    if (selectedWard === "") {
+      wardsToView = wards;
+    } else {
+      wardsToView = wards.filter((ward) => ward.wardNum === selectedWard);
+    }
+
+    wardAlertsPromises = wardsToView.map((ward) =>
+      fetchAlertsByWardId(ward._id)
+    );
+
+    Promise.all(wardAlertsPromises).then((result) => {
+      const alerts: Alert[] = [].concat(...result);
+      // filter by time
+      selectedTime === ""
+        ? setAlerts(alerts)
+        : setAlerts(
+            alerts.filter(
+              (alert: Alert) =>
+                alert.createdAt.replace("T", " ").substring(0, 10) ===
+                new Date().toISOString().slice(0, 10)
+            )
+          );
     });
-  }, [selectedTime]);
+  }, [selectedTime, selectedWard, wards]);
 
   const alertsData = [
     {
