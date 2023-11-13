@@ -385,7 +385,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
 
   return (
     <>
-      <Box ref={targetRef}>
+      <Box ref={targetRef} sx={{ padding: 10 }}>
         <Grid item xs={6}>
           <FormGroup id="vitals" sx={{ flexDirection: "row" }}>
             <FormLabel
@@ -563,8 +563,16 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
             Custom
           </ToggleButton>
         </ToggleButtonGroup>
-        <Box marginTop={2}>
-          <Typography>Nurse Notes: {pdfDetails.notes}</Typography>
+        <Box
+          marginTop={2}
+          padding={2}
+          borderRadius={8}
+          bgcolor="#f5f5f5"
+          height={200}>
+          <Typography variant="h6" gutterBottom>
+            Nurse Notes:
+          </Typography>
+          <Typography variant="body1">{pdfDetails.notes}</Typography>
         </Box>
       </Box>
       <Modal
