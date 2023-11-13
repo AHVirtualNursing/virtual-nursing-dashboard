@@ -35,6 +35,17 @@ export const fetchPatientByPatientId = async (
   }
 };
 
+export const fetchPatientByPatientNRIC = async (
+  patientNRIC: string | string[] | undefined
+) => {
+  try {
+    const res = await axios.get(`http://localhost:3001/patient/nric/${patientNRIC}`);
+    return res.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const updatePatientConditionByPatientId = async (
   patientId: string | string[] | undefined,
   condition: string
