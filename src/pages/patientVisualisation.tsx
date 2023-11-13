@@ -1,7 +1,7 @@
 import { Box, Button, Tab, Tabs } from "@mui/material";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import profilePic from "../../public/profilepic.jpg";
+import profilePic from "../../public/profilepic.png";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/types/smartbed";

@@ -1,10 +1,9 @@
 import {
-  darkIndigo,
-  darkerIndigo,
-  indigo,
-  lightIndigo,
-  lighterIndigo,
-  midIndigo,
+  darkBlue,
+  lightBlue,
+  white,
+  lighterBlue,
+  blue,
 } from "@/styles/colorTheme";
 import {
   Typography,
@@ -535,7 +534,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
             width: "60%",
             minWidth: 900,
             height: "80%",
-            bgcolor: lightIndigo,
+            bgcolor: white,
             borderRadius: 5,
             overflow: "hidden",
             display: "flex",
@@ -546,7 +545,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
           <Box
             sx={{
               flex: 1,
-              bgcolor: midIndigo,
+              bgcolor: blue,
               paddingTop: "20px",
               paddingBottom: "20px",
             }}
@@ -561,7 +560,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
               }}
             >
               <Typography
-                sx={{ fontSize: 20, fontWeight: "bold", color: lightIndigo }}
+                sx={{ fontSize: 20, fontWeight: "bold", color: white }}
               >
                 Chats
               </Typography>
@@ -571,10 +570,10 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                 onClick={handleOpenCreateChat}
               >
                 {hoverCreateButton ? (
-                  <AddCircleIcon sx={{ color: lightIndigo, fontSize: 30 }} />
+                  <AddCircleIcon sx={{ color: white, fontSize: 30 }} />
                 ) : (
                   <AddCircleOutlineIcon
-                    sx={{ color: lightIndigo, fontSize: 30 }}
+                    sx={{ color: white, fontSize: 30 }}
                   />
                 )}
               </IconButton>
@@ -598,7 +597,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
               >
                 <Box
                   sx={{
-                    backgroundColor: indigo,
+                    backgroundColor: lightBlue,
                     borderRadius: "10px",
                     height: "6vh",
                     minHeight: "50px",
@@ -610,7 +609,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                 >
                   <Typography
                     sx={{
-                      color: darkerIndigo,
+                      color: darkBlue,
                       fontWeight: "bold",
                       fontSize: "22px",
                     }}
@@ -658,7 +657,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                       display: "flex",
                       flexDirection: "row",
                       alignItems: "center",
-                      backgroundColor: indigo,
+                      backgroundColor: lightBlue,
                       borderRadius: "10px 10px 0px 0px",
                       paddingTop: "5px",
                       paddingBottom: "5px",
@@ -668,7 +667,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                     <EditIcon
                       sx={{
                         fontSize: "20",
-                        color: darkerIndigo,
+                        color: darkBlue,
                         flex: "1",
                       }}
                     />
@@ -681,7 +680,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                       <Typography
                         sx={{
                           fontWeight: "bold",
-                          color: darkerIndigo,
+                          color: darkBlue,
                         }}
                       >
                         Edit Message
@@ -707,7 +706,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                     >
                       <IconButton onClick={handleCloseEditButton}>
                         <CloseIcon
-                          sx={{ fontSize: "20", color: darkerIndigo }}
+                          sx={{ fontSize: "20", color: darkBlue }}
                         />
                       </IconButton>
                     </Box>
@@ -715,7 +714,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                 )}
                 <Box
                   sx={{
-                    backgroundColor: lighterIndigo,
+                    backgroundColor: lighterBlue,
                     borderRadius: isEditMode ? "0px 0px 10px 10px" : "10px",
                     display: "flex",
                     alignItems: "flex-end",
@@ -735,7 +734,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                     style={{
                       backgroundColor: "transparent",
                       border: "none",
-                      color: darkIndigo,
+                      color: darkBlue,
                       outline: "none",
                       fontSize: 16,
                       width: "100%",
@@ -747,18 +746,18 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                   ></textarea>
                   {isEditMode ? (
                     <IconButton onClick={handleUpdateMessage}>
-                      <DoneIcon sx={{ color: midIndigo, fontSize: 30 }} />
+                      <DoneIcon sx={{ color: blue, fontSize: 30 }} />
                     </IconButton>
                   ) : (
                     <>
                       <IconButton onClick={handleOpenSharingPatientToChat}>
                         <PersonOutlineIcon
-                          sx={{ color: midIndigo, fontSize: 30 }}
+                          sx={{ color: blue, fontSize: 30 }}
                         />
                       </IconButton>
                       <IconButton onClick={handleSendMessage}>
                         <ArrowCircleUpIcon
-                          sx={{ color: midIndigo, fontSize: 30 }}
+                          sx={{ color: blue, fontSize: 30 }}
                         />
                       </IconButton>
                     </>
@@ -780,7 +779,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                     cursor: "default",
                     userSelect: "none",
                     fontWeight: 600,
-                    color: darkIndigo,
+                    color: darkBlue,
                   }}
                 >
                   Select a chat to start messaging
@@ -803,7 +802,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
             marginTop: "10%",
             width: "40%",
             height: "50%",
-            bgcolor: lightIndigo,
+            bgcolor: white,
             borderRadius: 5,
             overflow: "hidden",
             display: "flex",
@@ -817,7 +816,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
             sx={{
               fontSize: "18px",
               fontWeight: "bold",
-              color: darkIndigo,
+              color: darkBlue,
               marginBottom: "20px",
             }}
           >
@@ -827,7 +826,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
             sx={{
               fontSize: "12px",
               fontWeight: "bold",
-              color: darkIndigo,
+              color: darkBlue,
             }}
           >
             Patient
@@ -853,7 +852,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
             sx={{
               fontSize: "12px",
               fontWeight: "bold",
-              color: darkIndigo,
+              color: darkBlue,
             }}
           >
             Bedside Nurse
@@ -879,10 +878,10 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
             sx={{
               marginTop: "20px",
               borderRadius: "20px",
-              backgroundColor: darkIndigo,
+              backgroundColor: darkBlue,
               alignSelf: "flex-end",
               "&:hover": {
-                backgroundColor: darkerIndigo,
+                backgroundColor: darkBlue,
               },
             }}
             onClick={handleCreateChat}
@@ -904,7 +903,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
             marginTop: "10%",
             width: "40%",
             height: "50%",
-            bgcolor: lightIndigo,
+            bgcolor: white,
             borderRadius: 5,
             overflow: "hidden",
             display: "flex",
@@ -924,7 +923,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
             sx={{
               fontSize: "18px",
               fontWeight: "bold",
-              color: darkIndigo,
+              color: darkBlue,
             }}
           >
             Share Patient to Bedside Nurse
@@ -943,7 +942,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
             sx={{
               fontSize: "12px",
               fontWeight: "bold",
-              color: darkIndigo,
+              color: darkBlue,
             }}
           >
             Patient
@@ -970,7 +969,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
               sx={{
                 fontSize: "12px",
                 fontWeight: "bold",
-                color: darkIndigo,
+                color: darkBlue,
               }}
             >
               Preview
@@ -978,7 +977,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
             <Box
               sx={{
                 height: "20vh",
-                backgroundColor: lighterIndigo,
+                backgroundColor: lighterBlue,
                 borderRadius: "10px",
                 display: "flex",
                 flexDirection: "column-reverse",
@@ -1009,10 +1008,10 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
             sx={{
               marginTop: "20px",
               borderRadius: "20px",
-              backgroundColor: darkIndigo,
+              backgroundColor: darkBlue,
               alignSelf: "flex-end",
               "&:hover": {
-                backgroundColor: darkerIndigo,
+                backgroundColor: darkBlue,
               },
             }}
             onClick={handleSharePatientToSelectedChat}
@@ -1034,7 +1033,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
             marginTop: "20px",
             width: imageWidth,
             height: imageHeight,
-            bgcolor: lightIndigo,
+            bgcolor: white,
             borderRadius: 5,
             overflow: "hidden",
             display: "flex",

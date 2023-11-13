@@ -57,7 +57,7 @@ function TileCustomisationModal({ cardLayout, setNurse }: layoutProp) {
     { name: "news2", label: "NEWS2" },
     { name: "rail", label: "Patient & Rail Visuals" },
     { name: "warnings", label: "Bed Warnings" },
-    { name: "weight", label: "Weight of Patient" },
+    // { name: "weight", label: "Weight of Patient" },
     { name: "fallRisk", label: "Fall Risk of Patient" },
   ];
 
