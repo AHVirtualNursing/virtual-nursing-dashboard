@@ -1,8 +1,9 @@
 import { Alert, AlertVitals } from "@/types/alert";
 import { Patient } from "@/types/patient";
 import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AlertsTableRow from "../alerts/AlertsTableRow";
+import { SocketContext } from "@/pages/layout";
 
 interface PatientProp {
   patient: Patient | undefined;
@@ -14,13 +15,26 @@ const PatientAlerts = (patientProp: PatientProp) => {
   const [vitalCriteria, setVitalCriteria] = useState("");
   const [nurseSearch, setNurseSearch] = useState("");
   const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [socketData, setSocketData] = useState<Alert>();
+  const socket = useContext(SocketContext);
+
+  useEffect(() => {
+    const handleUpdatedAlert = (data: any) => {
+      console.log(data);
+      setSocketData(data);
+    };
+    socket.on("updatedAlert", handleUpdatedAlert);
+    return () => {
+      socket.off("updatedAlert");
+    };
+  }, [socket]);
 
   useEffect(() => {
     fetchAlertsByPatientId(patientProp.patient?._id).then((res) => {
       console.log("patient alerts", res);
       setAlerts(res);
     });
-  }, [patientProp.patient?._id]);
+  }, [patientProp.patient?._id, socketData]);
 
   return (
     <div className="overflow-auto scrollbar bg-white rounded-lg shadow-lg p-4 h-auto max-h-[700px] space-y-3">
