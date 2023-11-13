@@ -35,7 +35,6 @@ const VitalTiles = ({ data, cardLayout, patient }: VitalProps) => {
         setPatientConfig(res?.data);
       });
     }
-    // console.log(patientConfig);
   }, [patientConfig]);
 
   function getColour(reading: number | number[], configType: string) {
@@ -54,9 +53,6 @@ const VitalTiles = ({ data, cardLayout, patient }: VitalProps) => {
       } else if (configType == "temp") {
         config = patientConfig.temperatureConfig;
       }
-      // console.log(bpsys);
-      // console.log(config);
-      // console.log(reading);
       if (bpsys.length > 0) {
         if (
           ((reading as number[])[0] <= bpsys[0] ||
