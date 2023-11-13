@@ -22,7 +22,7 @@ import {
 } from "./api/patients_api";
 import { updateSmartbedByBedId } from "./api/smartbed_api";
 
-function createPatient() {
+export default function CreatePatient() {
   type BedWithWardNumObject = {
     wardNum: string;
     smartbeds: SmartBed[];
@@ -133,23 +133,22 @@ function createPatient() {
       return;
     }
     console.log("DETAILS VALID");
-    const res = await createNewPatient(patientName, patientNric, condition);
+    const res = await createNewPatient(
+      patientName,
+      patientNric,
+      condition,
+      bedAssigned
+    );
     console.log(res?.status);
     if (res?.status === 200) {
-      const updateBedRes = await updateSmartbedByBedId(
-        bedAssigned,
-        res.data.data._id
-      );
-      if (updateBedRes?.status == 200) {
-        setShowSuccessMessage(true);
-        setShowNricErrorMessage(false);
-        setShowNameErrorMessage(false);
-        setShowBedErrorMessage(false);
-        setShowConditionErrorMessage(false);
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 1000);
-      }
+      setShowSuccessMessage(true);
+      setShowNricErrorMessage(false);
+      setShowNameErrorMessage(false);
+      setShowBedErrorMessage(false);
+      setShowConditionErrorMessage(false);
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1000);
     }
   };
 
@@ -310,5 +309,3 @@ function createPatient() {
     </div>
   );
 }
-
-export default createPatient;

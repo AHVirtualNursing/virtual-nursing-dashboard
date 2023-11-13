@@ -9,13 +9,12 @@ import {
 } from "./api/nurse_api";
 import { fetchBedByBedId } from "./api/smartbed_api";
 import autoAnimate from "@formkit/auto-animate";
-import profilePic from "../../public/profilepic.jpg";
+import profilePic from "../../public/profilepic.png";
 import VitalTiles from "@/components/VitalTiles";
 import TileCustomisationModal from "@/components/TileCustomisationModal";
 import BedTiles from "@/components/BedTiles";
-import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import { VirtualNurse } from "@/types/virtualNurse";
-import { Link, Tooltip } from "@mui/material";
+import Link from "next/link";
 import { Ward } from "@/types/ward";
 import { SocketContext } from "@/pages/layout";
 import { Alert } from "@/types/alert";
@@ -34,8 +33,8 @@ export default function Wards() {
   const [nurse, setNurse] = useState<VirtualNurse>();
   const [searchPatient, setSearchPatient] = useState<string>("");
   const [selectedWard, setSelectedWard] = useState("assigned-wards");
-  const [showVitalAlerts, setShowVitalAlerts] = useState("all-status");
-  const [showBedAlerts, setShowBedAlerts] = useState("all-status");
+  const [vitalFilterCriteria, setVitalFilterCriteria] = useState("all");
+  const [bedFilterCriteria, setBedFilterCriteria] = useState("all");
   const { data: sessionData } = useSession();
   const socket = useContext(SocketContext);
   const [socketAlertList, setSocketAlertList] = useState<Alert[]>();
@@ -170,9 +169,7 @@ export default function Wards() {
     fetchVirtualNurseByNurseId(sessionData?.user.id).then((res) => {
       setNurse(res.data);
     });
-  }, [selectedWard]);
-
-  useEffect(() => {}, [showVitalAlerts, showBedAlerts]);
+  }, [selectedWard, vitalFilterCriteria, bedFilterCriteria]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -213,6 +210,7 @@ export default function Wards() {
     };
 
     const refreshPatientVitals = (updatedVitals: any) => {
+      console.log("enter");
       const vitalObj = updatedVitals.vital;
       const patientId = updatedVitals.patient;
       setData((prevData) => {
@@ -227,6 +225,7 @@ export default function Wards() {
     };
 
     const discharge = (patient: any) => {
+      console.log("enter");
       setData((prevData) => {
         const updatedData = prevData.map((bed) => {
           if (bed.patient && (bed.patient as Patient)?._id === patient._id) {
@@ -239,11 +238,13 @@ export default function Wards() {
     };
 
     const handleAlertIncoming = (data: any) => {
+      console.log("enter");
       setSocketAlertList(data.alertList);
       setSocketPatient(data.patient);
     };
 
     const handleDeleteAlert = (data: any) => {
+      console.log("enter");
       setSocketAlertList(data.alertList);
       setSocketPatient(data.patient);
     };
@@ -263,6 +264,25 @@ export default function Wards() {
       socket.off("patientAlertDeleted", handleDeleteAlert);
     };
   }, []);
+
+  function filteredByAlerts(index: number) {
+    if (vitalFilterCriteria === "all" && bedFilterCriteria === "all") {
+      return true;
+    } else {
+      if (alerts.length > 0) {
+        if (vitalFilterCriteria === "all") {
+          return alerts[index][1] === bedFilterCriteria;
+        } else if (bedFilterCriteria === "all") {
+          return alerts[index][0] === vitalFilterCriteria;
+        } else {
+          return (
+            alerts[index][0] === vitalFilterCriteria &&
+            alerts[index][1] === bedFilterCriteria
+          );
+        }
+      }
+    }
+  }
 
   return (
     <div className="flex flex-col p-8 gap-6 w-full shadow-lg bg-slate-100">
@@ -332,13 +352,13 @@ export default function Wards() {
             name="vitalAlertsSelect"
             id="vital-alerts-select"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1 mx-2"
-            value={showVitalAlerts}
+            value={vitalFilterCriteria}
             onChange={(e) => {
               console.log("selected option", e.target.value);
-              setShowVitalAlerts(e.target.value);
+              setVitalFilterCriteria(e.target.value);
             }}
           >
-            <option value="all-status">All</option>
+            <option value="all">All</option>
             <option value="open">Open</option>
             <option value="handling">Handling</option>
           </select>
@@ -352,13 +372,13 @@ export default function Wards() {
             name="bedAlertsSelect"
             id="bed-alerts-select"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1 mx-2"
-            value={showBedAlerts}
+            value={bedFilterCriteria}
             onChange={(e) => {
               console.log("selected option", e.target.value);
-              setShowBedAlerts(e.target.value);
+              setBedFilterCriteria(e.target.value);
             }}
           >
-            <option value="all-status">All</option>
+            <option value="all">All</option>
             <option value="open">Open</option>
             <option value="handling">Handling</option>
           </select>
@@ -370,8 +390,11 @@ export default function Wards() {
       </div>
       <div className="grid grid-cols-2 gap-4 flex" ref={parent}>
         {data
-          .filter((bed) =>
-            (bed.patient as Patient)?.name.toLowerCase().includes(searchPatient)
+          .filter(
+            (bed, index) =>
+              (bed.patient as Patient)?.name
+                .toLowerCase()
+                .includes(searchPatient) && filteredByAlerts(index)
           )
           .map((pd, index) => (
             <div
@@ -383,13 +406,17 @@ export default function Wards() {
             >
               <div className="flex items-start justify-start">
                 <div className="w-1/2 flex items-start justify-start">
-                  <img width={60} src={profilePic.src} />
+                  <img
+                    style={{ borderRadius: "50%" }}
+                    width={60}
+                    src={profilePic.src}
+                  />
+
                   <div className="text-left px-4">
                     <h3>{(pd.patient as Patient)?.name}</h3>
                     <p>
                       Ward: {(pd.ward as Ward)?.wardNum} Bed: {pd.bedNum}
                     </p>
-                    {nurse?.cardLayout.weight ? <p>Weight: 69kg</p> : null}
                   </div>
                 </div>
                 <div className="w-1/2 flex items-start justify-around">
@@ -406,19 +433,6 @@ export default function Wards() {
                       <p>Fall Risk</p>
                       <div className="flex items-center justify-center">
                         <p>{(pd.patient as Patient)?.fallRisk}</p>
-                        {(pd.patient as Patient)?.fallRisk === "High" &&
-                        !pd.isBedExitAlarmOn ? (
-                          <Tooltip
-                            title={
-                              <p style={{ fontSize: "16px" }}>
-                                {pd.bedAlarmProtocolBreachReason}
-                              </p>
-                            }
-                            placement="top"
-                          >
-                            <ReportProblemIcon className="fill-red-500" />
-                          </Tooltip>
-                        ) : null}
                       </div>
                     </div>
                   ) : null}
@@ -437,7 +451,11 @@ export default function Wards() {
                 </div>
               </div>
               <BedTiles cardLayout={nurse?.cardLayout} smartbed={pd} />
-              <VitalTiles cardLayout={nurse?.cardLayout} data={vitals[index]} />
+              <VitalTiles
+                cardLayout={nurse?.cardLayout}
+                data={vitals[index]}
+                patient={pd.patient as Patient}
+              />
             </div>
           ))}
       </div>

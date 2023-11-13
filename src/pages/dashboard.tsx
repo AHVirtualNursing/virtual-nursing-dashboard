@@ -8,7 +8,7 @@ import AlertsSummary from "@/components/AlertsSummary";
 import PatientSummary from "@/components/PatientSummary";
 import GridViewIcon from "@mui/icons-material/GridView";
 import ListIcon from "@mui/icons-material/List";
-import { Link } from "@mui/material";
+import Link from "next/link";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -50,7 +50,7 @@ export default function Dashboard() {
           htmlFor="ward-select"
           className="text-sm font-medium text-gray-900"
         >
-          Beds
+          Wards
         </label>
         <select
           name="wardSelect"
@@ -69,7 +69,12 @@ export default function Dashboard() {
             </option>
           ))}
         </select>
-
+        <label
+          htmlFor="timeSelect"
+          className="text-sm font-medium text-gray-900"
+        >
+          Time
+        </label>
         <select
           name="timeSelect"
           id="time-select"

@@ -1,10 +1,10 @@
 import { Message } from "@/types/chat";
 import { VirtualNurse } from "@/types/virtualNurse";
 import {
-  darkIndigo,
-  lighterIndigo,
-  indigo,
-  lightIndigo,
+  darkBlue,
+  lighterBlue,
+  lightBlue,
+  white,
 } from "@/styles/colorTheme";
 import { Box, IconButton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -14,6 +14,7 @@ import { getFileByPresignedURL } from "@/pages/api/chat_api";
 import Image from "next/image";
 import { Patient } from "@/types/patient";
 import { Alert } from "@/types/alert";
+import profilePic from "../../public/profilepic.png";
 
 type ChatBubbleProps = {
   message: Message | undefined;
@@ -40,11 +41,17 @@ const ChatBubble = ({
   const [patientImageLoading, setPatientImageLoading] = useState(false);
 
   useEffect(() => {
-    if (message?.patient && (message.patient as Patient).picture && imageUri === undefined) {
-      getFileByPresignedURL((message.patient as Patient).picture).then((url) => {
-        if (url === null) return "";
-        setImageUri(url);
-      });
+    if (
+      message?.patient &&
+      (message.patient as Patient).picture &&
+      imageUri === undefined
+    ) {
+      getFileByPresignedURL((message.patient as Patient).picture).then(
+        (url) => {
+          if (url === null) return "";
+          setImageUri(url);
+        }
+      );
     }
   }, [message, imageUri]);
 
@@ -65,7 +72,7 @@ const ChatBubble = ({
         <Box
           sx={{
             padding: "10px",
-            backgroundColor: isMsgFromVirtualNurse ? indigo : lighterIndigo,
+            backgroundColor: isMsgFromVirtualNurse ? lightBlue : lighterBlue,
             borderRadius: isMsgFromVirtualNurse
               ? "15px 15px 0px 15px"
               : "15px 15px 15px 0px",
@@ -131,7 +138,7 @@ const ChatBubble = ({
           <Box
             sx={{
               padding: "10px",
-              backgroundColor: isMsgFromVirtualNurse ? indigo : lighterIndigo,
+              backgroundColor: isMsgFromVirtualNurse ? lightBlue : lighterBlue,
               borderRadius: isMsgFromVirtualNurse
                 ? "15px 15px 0px 15px"
                 : "15px 15px 15px 0px",
@@ -162,7 +169,7 @@ const ChatBubble = ({
                       sx={{
                         width: 80,
                         height: 80,
-                        backgroundColor: lightIndigo,
+                        backgroundColor: white,
                         borderRadius: "100%",
                         display: !patientImageLoading ? "none" : undefined,
                       }}
@@ -183,14 +190,16 @@ const ChatBubble = ({
                     />
                   </>
                 ) : (
-                  <Box
-                    sx={{
-                      width: 80,
-                      height: 80,
-                      borderRadius: "100%",
-                      backgroundColor: lightIndigo,
+                  <Image
+                    src={profilePic}
+                    alt="Picture"
+                    width={80}
+                    height={80}
+                    style={{
+                      borderRadius: "50%",
+                      objectFit: "cover",
                     }}
-                  ></Box>
+                  />
                 )}
                 <Box>
                   <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
@@ -226,7 +235,7 @@ const ChatBubble = ({
           <Box
             sx={{
               padding: "10px",
-              backgroundColor: isMsgFromVirtualNurse ? indigo : lighterIndigo,
+              backgroundColor: isMsgFromVirtualNurse ? lightBlue : lighterBlue,
               borderRadius: isMsgFromVirtualNurse
                 ? "15px 15px 0px 15px"
                 : "15px 15px 15px 0px",
@@ -262,7 +271,9 @@ const ChatBubble = ({
                 Status
               </Typography>
               <Typography style={{ whiteSpace: "pre-line" }}>
-                {(message?.alert as Alert)!.status.substring(0, 1).toUpperCase() +
+                {(message?.alert as Alert)!.status
+                  .substring(0, 1)
+                  .toUpperCase() +
                   (message?.alert as Alert)!.status.substring(1)}
               </Typography>
               <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
@@ -355,7 +366,7 @@ const ChatBubble = ({
                 }}
                 onClick={() => handleDeleteMessage(message!)}
               >
-                <DeleteIcon sx={{ fontSize: "20", color: darkIndigo }} />
+                <DeleteIcon sx={{ fontSize: "20", color: darkBlue }} />
               </IconButton>
               <IconButton
                 sx={{
@@ -372,7 +383,7 @@ const ChatBubble = ({
                   handleEditMessage(message!);
                 }}
               >
-                <EditIcon sx={{ fontSize: "20", color: darkIndigo }} />
+                <EditIcon sx={{ fontSize: "20", color: darkBlue }} />
               </IconButton>
             </>
           )}
@@ -383,7 +394,7 @@ const ChatBubble = ({
           <Box
             sx={{
               padding: "10px",
-              backgroundColor: isMsgFromVirtualNurse ? indigo : lighterIndigo,
+              backgroundColor: isMsgFromVirtualNurse ? lightBlue : lighterBlue,
               borderRadius: isMsgFromVirtualNurse
                 ? "15px 15px 0px 15px"
                 : "15px 15px 15px 0px",

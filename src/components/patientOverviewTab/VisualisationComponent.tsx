@@ -257,6 +257,7 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
 
   useEffect(() => {
     const updateCharts = (vitalAndPatientId: any) => {
+      console.log("ENTER");
       const data = vitalAndPatientId.vital;
       const patientId = router.query.patientId;
       const patientIdFromSocket = vitalAndPatientId.patient;

@@ -1,10 +1,9 @@
 import { Chat } from "@/types/chat";
 import {
-  darkerIndigo,
-  lightIndigo,
-  indigo,
-  darkIndigo,
-  lighterIndigo,
+  white,
+  lightBlue,
+  darkBlue,
+  lighterBlue,
 } from "@/styles/colorTheme";
 import { Box, IconButton, Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -55,9 +54,9 @@ const ChatPreview = ({
         paddingBottom: "10px",
         paddingRight: "10px",
         paddingLeft: "20px",
-        backgroundColor: isSelected ? darkerIndigo : "transparent",
+        backgroundColor: isSelected ? darkBlue : "transparent",
         "&:hover": {
-          backgroundColor: darkerIndigo,
+          backgroundColor: darkBlue,
         },
         position: "relative",
       }}
@@ -73,17 +72,17 @@ const ChatPreview = ({
             sx={{
               position: "absolute",
               right: "20px",
-              backgroundColor: lightIndigo,
+              backgroundColor: white,
               width: "50px",
               height: "50px",
               "&:hover": {
-                backgroundColor: lighterIndigo,
+                backgroundColor: lighterBlue,
               },
               zIndex: "100",
             }}
             onClick={handleDeleteChat}
           >
-            <DeleteIcon sx={{ fontSize: "20", color: darkIndigo }} />
+            <DeleteIcon sx={{ fontSize: "20", color: darkBlue }} />
           </IconButton>
         </>
       )}
@@ -93,7 +92,7 @@ const ChatPreview = ({
             sx={{
               width: 50,
               height: 50,
-              backgroundColor: lightIndigo,
+              backgroundColor: white,
               borderRadius: "100%",
               display: !imageLoading ? "none" : undefined,
             }}
@@ -121,18 +120,18 @@ const ChatPreview = ({
             width: 50,
             height: 50,
             borderRadius: "100%",
-            backgroundColor: lightIndigo,
+            backgroundColor: white,
           }}
         ></Box>
       )}
 
       <Box sx={{ marginLeft: "20px" }}>
-        <Typography sx={{ fontWeight: "bold", color: lightIndigo }}>
+        <Typography sx={{ fontWeight: "bold", color: white }}>
           {(chat.bedsideNurse as BedSideNurse)?.name}
         </Typography>
         <Typography
           sx={{
-            color: indigo,
+            color: lightBlue,
             width: "14vw",
             whiteSpace: "nowrap",
             overflow: "hidden",
