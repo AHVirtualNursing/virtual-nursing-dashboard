@@ -301,6 +301,24 @@ export default function Wards() {
     }
   }
 
+  const filteredOutIndex: number[] = [];
+
+  const filteredData = data.filter((bed, index) => {
+    const include =
+      (bed.patient as Patient)?.name.toLowerCase().includes(searchPatient) &&
+      filteredByAlerts(index);
+    if (!include) {
+      filteredOutIndex.push(index);
+    }
+    return include;
+  });
+  console.log(filteredData);
+  console.log(filteredOutIndex);
+  const filteredVital = vitals.filter(
+    (_, index) => !filteredOutIndex.includes(index)
+  );
+  console.log(filteredVital);
+
   return (
     <div className="flex flex-col p-8 gap-6 w-full shadow-lg bg-slate-100">
       <div className="flex justify-between">
@@ -406,70 +424,63 @@ export default function Wards() {
         />
       </div>
       <div className="grid grid-cols-2 gap-4 flex" ref={parent}>
-        {data
-          .filter(
-            (bed, index) =>
-              (bed.patient as Patient)?.name
-                .toLowerCase()
-                .includes(searchPatient) && filteredByAlerts(index)
-          )
-          .map((pd, index) => (
-            <div
-              className="bg-white rounded-2xl p-4 shadow-lg hover:cursor-pointer hover:bg-blue-100"
-              onClick={() =>
-                viewPatientVisualisation((pd.patient as Patient)?._id, pd._id)
-              }
-              key={pd._id}
-            >
-              <div className="flex items-start justify-start">
-                <div className="w-1/2 flex items-start justify-start">
-                  <img width={60} src={profilePic.src} />
-                  <div className="text-left px-4">
-                    <h3>{(pd.patient as Patient)?.name}</h3>
-                    <p>
-                      Ward: {(pd.ward as Ward)?.wardNum} Bed: {pd.bedNum}
-                    </p>
-                  </div>
-                </div>
-                <div className="w-1/2 flex items-start justify-around">
-                  <DashboardAlertIcon
-                    patientId={(pd.patient as Patient)?._id}
-                    socketData={
-                      socketPatient?._id === (pd.patient as Patient)?._id
-                        ? socketAlertList
-                        : null
-                    }
-                  />
-                  {nurse?.cardLayout.fallRisk ? (
-                    <div>
-                      <p>Fall Risk</p>
-                      <div className="flex items-center justify-center">
-                        <p>{(pd.patient as Patient)?.fallRisk}</p>
-                      </div>
-                    </div>
-                  ) : null}
-                  {nurse?.cardLayout.news2 ? (
-                    <div>
-                      <p>NEWS2</p>
-                      <p>
-                        {
-                          vitals[index]?.news2Score[
-                            vitals[index]?.news2Score.length - 1
-                          ]?.reading
-                        }
-                      </p>
-                    </div>
-                  ) : null}
+        {filteredData.map((pd, index) => (
+          <div
+            className="bg-white rounded-2xl p-4 shadow-lg hover:cursor-pointer hover:bg-blue-100"
+            onClick={() =>
+              viewPatientVisualisation((pd.patient as Patient)?._id, pd._id)
+            }
+            key={pd._id}
+          >
+            <div className="flex items-start justify-start">
+              <div className="w-1/2 flex items-start justify-start">
+                <img width={60} src={profilePic.src} />
+                <div className="text-left px-4">
+                  <h3>{(pd.patient as Patient)?.name}</h3>
+                  <p>
+                    Ward: {(pd.ward as Ward)?.wardNum} Bed: {pd.bedNum}
+                  </p>
                 </div>
               </div>
-              <BedTiles cardLayout={nurse?.cardLayout} smartbed={pd} />
-              <VitalTiles
-                cardLayout={nurse?.cardLayout}
-                data={vitals[index]}
-                patient={pd.patient as Patient}
-              />
+              <div className="w-1/2 flex items-start justify-around">
+                <DashboardAlertIcon
+                  patientId={(pd.patient as Patient)?._id}
+                  socketData={
+                    socketPatient?._id === (pd.patient as Patient)?._id
+                      ? socketAlertList
+                      : null
+                  }
+                />
+                {nurse?.cardLayout.fallRisk ? (
+                  <div>
+                    <p>Fall Risk</p>
+                    <div className="flex items-center justify-center">
+                      <p>{(pd.patient as Patient)?.fallRisk}</p>
+                    </div>
+                  </div>
+                ) : null}
+                {nurse?.cardLayout.news2 ? (
+                  <div>
+                    <p>NEWS2</p>
+                    <p>
+                      {
+                        filteredVital[index]?.news2Score[
+                          filteredVital[index]?.news2Score.length - 1
+                        ]?.reading
+                      }
+                    </p>
+                  </div>
+                ) : null}
+              </div>
             </div>
-          ))}
+            <BedTiles cardLayout={nurse?.cardLayout} smartbed={pd} />
+            <VitalTiles
+              cardLayout={nurse?.cardLayout}
+              data={filteredVital[index]}
+              patient={pd.patient as Patient}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
