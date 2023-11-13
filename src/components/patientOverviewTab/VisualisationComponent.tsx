@@ -262,11 +262,6 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
       const patientId = router.query.patientId;
       const patientIdFromSocket = vitalAndPatientId.patient;
       if (patientId === patientIdFromSocket) {
-        // const datetime = new Date(data.datetime);
-        // const hours = datetime.getHours().toString().padStart(2, "0");
-        // const minutes = datetime.getMinutes().toString().padStart(2, "0");
-        // const seconds = datetime.getSeconds().toString().padStart(2, "0");
-        // const formattedDateTime = `${hours}:${minutes}:${seconds}`;
         if (data.heartRate) {
           setHRData(data.heartRate.slice(-7));
         }
@@ -288,13 +283,9 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
       }
     };
 
-    // socket.emit("connectDashboard", patientId);
-    // socket.on("updateVitals", updateCharts);
     socket.on("updatedVitals", updateCharts);
     return () => {
       socket.off("updatedVitals", updateCharts);
-      // socket.off("updateVitals", updateCharts);
-      // socket.emit("disconnectDashboard", patientId);
     };
   }, []);
 

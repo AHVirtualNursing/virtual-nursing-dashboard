@@ -120,6 +120,7 @@ export default function Wards() {
     const sortedBeds = combined.map((x) => x.bed);
     const sortedVitals = combined.map((x) => x.vital);
     const sortedAlerts = combined.map((x) => x.alerts);
+    console.log("sorting alerts");
     if (
       sortedBeds.length !== data.length ||
       !sortedBeds.every((element, index) => element === data[index])
@@ -249,12 +250,27 @@ export default function Wards() {
       setSocketPatient(data.patient);
     };
 
+    const handleAlertUpdate = (data: any) => {
+      setData((prevData) => {
+        const updatedData = prevData.map((bed) => {
+          console.log(data.patient);
+          if (bed.patient && (bed.patient as Patient)?._id === data.patient) {
+            console.log("ENTER");
+            return { ...bed, alert: data };
+          }
+          return bed;
+        });
+        return updatedData;
+      });
+    };
+
     socket.on("updatedSmartbed", refreshContent);
     socket.on("updatedPatient", refreshPatientInfo);
     socket.on("updatedVitals", refreshPatientVitals);
     socket.on("dischargePatient", discharge);
     socket.on("patientAlertAdded", handleAlertIncoming);
     socket.on("patientAlertDeleted", handleDeleteAlert);
+    socket.on("updatedAlert", handleAlertUpdate);
     return () => {
       socket.off("updatedSmartbed", refreshContent);
       socket.off("updatedPatient", refreshPatientInfo);
@@ -262,6 +278,7 @@ export default function Wards() {
       socket.off("dischargePatient", discharge);
       socket.off("patientAlertAdded", handleAlertIncoming);
       socket.off("patientAlertDeleted", handleDeleteAlert);
+      socket.on("updatedAlert", handleAlertUpdate);
     };
   }, []);
 
