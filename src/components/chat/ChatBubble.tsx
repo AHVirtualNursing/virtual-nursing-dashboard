@@ -1,11 +1,6 @@
 import { Message } from "@/types/chat";
 import { VirtualNurse } from "@/types/virtualNurse";
-import {
-  darkBlue,
-  lighterBlue,
-  lightBlue,
-  white,
-} from "@/styles/colorTheme";
+import { darkBlue, lighterBlue, lightBlue, white } from "@/styles/colorTheme";
 import { Box, IconButton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
@@ -14,7 +9,6 @@ import { getFileByPresignedURL } from "@/pages/api/chat_api";
 import Image from "next/image";
 import { Patient } from "@/types/patient";
 import { Alert } from "@/types/alert";
-import profilePic from "../../public/profilepic.png";
 
 type ChatBubbleProps = {
   message: Message | undefined;
@@ -191,7 +185,7 @@ const ChatBubble = ({
                   </>
                 ) : (
                   <Image
-                    src={profilePic}
+                    src={"profilepic.png"}
                     alt="Picture"
                     width={80}
                     height={80}

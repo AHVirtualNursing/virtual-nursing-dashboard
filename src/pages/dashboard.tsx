@@ -82,6 +82,7 @@ export default function Dashboard() {
         <PatientSummary
           selectedWard={selectedOption}
           selectedTime={selectedTime}
+          wards={wards}
         />
       </div>
       <div className="bg-white rounded-2xl h-4/6 p-3 shadow-lg">

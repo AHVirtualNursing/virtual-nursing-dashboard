@@ -20,6 +20,7 @@ type AcuityPatientMap = {
 type PatientSummaryProps = {
   selectedWard: string;
   selectedTime: string;
+  wards: Ward[];
 };
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
@@ -27,6 +28,7 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 const PatientSummary = ({
   selectedWard,
   selectedTime,
+  wards,
 }: PatientSummaryProps) => {
   const [fallRiskData, setFallRiskData] = useState<FallRiskPatientMap[]>([]);
   const [acuityData, setAcuityData] = useState<AcuityPatientMap[]>([]);
@@ -48,46 +50,41 @@ const PatientSummary = ({
 
     let numPatients = 0;
 
-    fetchWardsByVirtualNurse(sessionData?.user.id).then((wards) => {
-      let wardsToView = [];
-      if (selectedWard === "") {
-        wardsToView = wards;
-      } else {
-        wardsToView = wards.filter(
-          (ward: Ward) => ward.wardNum === selectedWard
-        );
+    let wardsToView: Ward[] = [],
+      wardPatientsPromises: any[] = [];
+    if (selectedWard === "") {
+      wardsToView = wards;
+    } else {
+      wardsToView = wards.filter((ward) => ward.wardNum === selectedWard);
+    }
+
+    wardPatientsPromises = wardsToView.map((ward) =>
+      fetchBedsByWardId(ward._id)
+    );
+
+    Promise.all(wardPatientsPromises).then((res) => {
+      const beds: SmartBed[] = [].concat(...res);
+      for (const bed of beds) {
+        if (bed.bedStatus !== "occupied") continue;
+        const { patient } = bed;
+        numPatients += 1;
+        const num1 = fallRisks.get((patient as Patient)?.fallRisk);
+        fallRisks.set((patient as Patient)?.fallRisk, num1 + 1);
+
+        const num2 = acuityLevels.get((patient as Patient)?.acuityLevel);
+        acuityLevels.set((patient as Patient)?.acuityLevel, num2 + 1);
       }
 
-      let promises: any[] = [];
-
-      wardsToView.map((ward: Ward) =>
-        promises.push(fetchBedsByWardId(ward._id))
+      setFallRiskData(
+        Array.from(fallRisks, ([name, value]) => ({ name, value }))
+      );
+      setAcuityData(
+        Array.from(acuityLevels, ([name, value]) => ({ name, value }))
       );
 
-      Promise.all(promises).then((res) => {
-        const beds: SmartBed[] = [].concat(...res);
-        for (const bed of beds) {
-          if (bed.bedStatus !== "occupied") continue;
-          const { patient } = bed;
-          numPatients += 1;
-          const num1 = fallRisks.get((patient as Patient)?.fallRisk);
-          fallRisks.set((patient as Patient)?.fallRisk, num1 + 1);
-
-          const num2 = acuityLevels.get((patient as Patient)?.acuityLevel);
-          acuityLevels.set((patient as Patient)?.acuityLevel, num2 + 1);
-        }
-
-        setFallRiskData(
-          Array.from(fallRisks, ([name, value]) => ({ name, value }))
-        );
-        setAcuityData(
-          Array.from(acuityLevels, ([name, value]) => ({ name, value }))
-        );
-
-        setPatients(numPatients);
-      });
+      setPatients(numPatients);
     });
-  }, [selectedWard, sessionData?.user.id]);
+  }, [selectedWard, sessionData?.user.id, wards]);
 
   return (
     <div className="flex flex-col w-1/2 h-full p-3 gap-y-2">

@@ -17,7 +17,6 @@ const AlertsSummary = ({
   wards,
 }: AlertsSummaryProps) => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
-  console.log("wards", wards);
 
   // fetch all alerts of patients in selected ward, then filter by selected time
   useEffect(() => {

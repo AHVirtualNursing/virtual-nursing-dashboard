@@ -84,7 +84,7 @@ const Alerts = () => {
         </div>
       </div>
       {/* <AlertsTable alerts={alerts} /> */}
-      <div className="overflow-auto scrollbar bg-white rounded-lg shadow-lg p-4 h-auto max-h-[700px] space-y-3">
+      <div className="overflow-auto scrollbar bg-white rounded-lg shadow-lg p-4 h-auto max-h-[720px] space-y-3">
         {shown && (
           <AlertDetailsModal
             pressed={shown}
