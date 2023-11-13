@@ -35,46 +35,48 @@ const VitalTiles = ({ data, cardLayout, patient }: VitalProps) => {
         setPatientConfig(res?.data);
       });
     }
-    console.log(patientConfig);
+    // console.log(patientConfig);
   }, [patientConfig]);
 
   function getColour(reading: number | number[], configType: string) {
     let config: number[] = [];
     let bpsys: number[] = [];
-    if (configType == "rr") {
-      config = patientConfig!.rrConfig!;
-    } else if (configType == "hr") {
-      config = patientConfig!.hrConfig!;
-    } else if (configType == "bp") {
-      config = patientConfig!.bpDiaConfig!;
-      bpsys = patientConfig!.bpSysConfig!;
-    } else if (configType == "sp") {
-      config = patientConfig!.spO2Config!;
-    } else if (configType == "temp") {
-      config = patientConfig!.temperatureConfig!;
-    }
-    console.log(bpsys);
-    console.log(config);
-    console.log(reading);
-    if (bpsys.length > 0) {
-      if (
-        ((reading as number[])[0] <= bpsys[0] ||
-          (reading as number[])[0] >= bpsys[1]) &&
-        ((reading as number[])[1] <= config[0] ||
-          (reading as number[])[1] >= config[1])
-      ) {
-        return "bg-red-400";
-      } else {
-        return "bg-emerald-400";
+    if (patientConfig) {
+      if (configType == "rr") {
+        config = patientConfig.rrConfig;
+      } else if (configType == "hr") {
+        config = patientConfig.hrConfig;
+      } else if (configType == "bp") {
+        config = patientConfig.bpDiaConfig;
+        bpsys = patientConfig.bpSysConfig;
+      } else if (configType == "sp") {
+        config = patientConfig.spO2Config;
+      } else if (configType == "temp") {
+        config = patientConfig.temperatureConfig;
       }
-    } else {
-      if (
-        (reading as number) <= config[0] ||
-        (reading as number) >= config[1]
-      ) {
-        return "bg-red-400";
+      // console.log(bpsys);
+      // console.log(config);
+      // console.log(reading);
+      if (bpsys.length > 0) {
+        if (
+          ((reading as number[])[0] <= bpsys[0] ||
+            (reading as number[])[0] >= bpsys[1]) &&
+          ((reading as number[])[1] <= config[0] ||
+            (reading as number[])[1] >= config[1])
+        ) {
+          return "bg-red-400";
+        } else {
+          return "bg-emerald-400";
+        }
       } else {
-        return "bg-emerald-400";
+        if (
+          (reading as number) <= config[0] ||
+          (reading as number) >= config[1]
+        ) {
+          return "bg-red-400";
+        } else {
+          return "bg-emerald-400";
+        }
       }
     }
   }
