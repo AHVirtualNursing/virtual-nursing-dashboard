@@ -1,6 +1,5 @@
-export const lighterIndigo = "#e0e7ff";
-export const lightIndigo = "#c7d2fe";
-export const darkIndigo = "#312e81";
-export const darkerIndigo = "#172554";
-export const indigo = "#818cf8";
-export const midIndigo = "#3730a3";
+export const lighterBlue = "#dbeafe";
+export const white = "#FFF";
+export const darkBlue = "#172554";
+export const lightBlue = "#60a5fa";
+export const blue = "#1e3a8a";

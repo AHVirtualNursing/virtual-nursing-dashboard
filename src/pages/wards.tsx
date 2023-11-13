@@ -9,7 +9,7 @@ import {
 } from "./api/nurse_api";
 import { fetchBedByBedId } from "./api/smartbed_api";
 import autoAnimate from "@formkit/auto-animate";
-import profilePic from "../../public/profilepic.jpg";
+import profilePic from "../../public/profilepic.png";
 import VitalTiles from "@/components/VitalTiles";
 import TileCustomisationModal from "@/components/TileCustomisationModal";
 import BedTiles from "@/components/BedTiles";
@@ -383,7 +383,12 @@ export default function Wards() {
             >
               <div className="flex items-start justify-start">
                 <div className="w-1/2 flex items-start justify-start">
-                  <img width={60} src={profilePic.src} />
+                  <img
+                    style={{ borderRadius: "50%" }}
+                    width={60}
+                    src={profilePic.src}
+                  />
+
                   <div className="text-left px-4">
                     <h3>{(pd.patient as Patient)?.name}</h3>
                     <p>
