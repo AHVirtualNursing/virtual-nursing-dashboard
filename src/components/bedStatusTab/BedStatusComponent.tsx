@@ -28,12 +28,12 @@ const BedStatusComponent = ({ bed }: BedProp) => {
       setSocketData(data);
     };
 
-    socket.on("update-patient", handleUpdatedPatient);
-    socket.on("update-smartbed", handleUpdatedSmartbed);
+    socket.on("updatedPatient", handleUpdatedPatient);
+    socket.on("updatedSmartbed", handleUpdatedSmartbed);
 
     return () => {
-      socket.off("update-patient", handleUpdatedPatient);
-      socket.off("update-smartbed", handleUpdatedSmartbed);
+      socket.off("updatedPatient", handleUpdatedPatient);
+      socket.off("updatedSmartbed", handleUpdatedSmartbed);
     };
   }, [socket]);
 
