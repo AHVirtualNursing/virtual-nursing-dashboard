@@ -49,13 +49,13 @@ function BedTiles({ cardLayout, smartbed }: layoutProp) {
           </div>
           {smartbed?.isPatientOnBed ? (
             <img
-              src={bed.src}
+              src={"/bed_stock.png"}
               alt="Top down view of bed"
               className="object-contain w-full"
             />
           ) : (
             <img
-              src={bed.src}
+              src={"bed_stock.png"}
               alt="Top down view of bed"
               className="object-contain w-full"
               style={{

@@ -27,10 +27,23 @@ const Alerts = () => {
   const [selectedWard, setSelectedWard] = useState<string>("");
   const [shown, setShown] = useState(false);
   const [wards, setWards] = useState<Ward[]>([]);
+  const [socketData, setSocketData] = useState<Alert>();
   const { data: sessionData } = useSession();
   const socket = useContext(SocketContext);
 
-  useEffect(() => {}, [socket]);
+  console.log(socket);
+
+  useEffect(() => {
+    const handleUpdatedAlert = (data: any) => {
+      console.log(data);
+      setSocketData(data);
+    };
+    socket.on("updatedAlert", handleUpdatedAlert);
+    return () => {
+      socket.off("updatedAlert");
+    };
+  }, [socket]);
+
   // get wards assigned to virtual nurse
   // then get alerts for each ward
   // for each alert, map the alert to the patient
@@ -69,7 +82,7 @@ const Alerts = () => {
         });
       });
     });
-  }, [alerts?.length, selectedWard, sessionData?.user.id]);
+  }, [socketData, selectedWard, sessionData?.user.id]);
 
   const handleViewAlertDetails = (alertMapping: AlertPatientMapping) => {
     setSelectedAlert(alertMapping);
