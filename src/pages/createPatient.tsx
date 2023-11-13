@@ -11,7 +11,7 @@ import {
   createFilterOptions,
 } from "@mui/material";
 import router from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
 import { SmartBed } from "@/types/smartbed";
 import { Patient } from "@/types/patient";
 import { fetchAllWards, fetchBedsByWardId } from "./api/wards_api";
@@ -161,7 +161,7 @@ export default function CreatePatient() {
   };
 
   const handleExistingPatientSelection = (
-    event,
+    event: SyntheticEvent<Element, Event>,
     selectedPatientNRIC: string | null
   ) => {
     if (selectedPatientNRIC?.startsWith("Create")) {
@@ -179,7 +179,9 @@ export default function CreatePatient() {
     }
   };
 
-  const handleNameChange = (event: SelectChangeEvent) => {
+  const handleNameChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     // Update the customName state with the user's input
     setPatientName(event.target.value);
   };
@@ -194,8 +196,7 @@ export default function CreatePatient() {
             component="form"
             onSubmit={handleSubmit}
             noValidate
-            sx={{ mt: 1 }}
-          >
+            sx={{ mt: 1 }}>
             <Autocomplete
               options={allPatientsData.map((patient) => patient.nric)}
               value={selectedPatient ? selectedPatient.nric : newPatientNRIC}
@@ -237,8 +238,7 @@ export default function CreatePatient() {
               label="Name of Patient"
               name="patientName"
               value={patientName}
-              onChange={handleNameChange}
-            ></TextField>
+              onChange={handleNameChange}></TextField>
             <TextField
               margin="normal"
               required
@@ -246,8 +246,7 @@ export default function CreatePatient() {
               id="condition"
               label="Patient Condition"
               name="condition"
-              sx={{ paddingBottom: "10px" }}
-            ></TextField>
+              sx={{ paddingBottom: "10px" }}></TextField>
             <InputLabel sx={{ textAlign: "left" }} id="wardRoomBedLabel">
               Selected Bed
             </InputLabel>
@@ -255,8 +254,7 @@ export default function CreatePatient() {
               fullWidth
               value={bedAssigned}
               onChange={handleChange}
-              required
-            >
+              required>
               {vacantBeds.every((bedData) => bedData.smartbeds.length === 0) ? (
                 <MenuItem key="no-beds" disabled>
                   No available/vacant beds
@@ -278,8 +276,7 @@ export default function CreatePatient() {
               type="submit"
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-              className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full border-none"
-            >
+              className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full border-none">
               Assign Patient
             </Button>
             {showSuccessMessage ? (
