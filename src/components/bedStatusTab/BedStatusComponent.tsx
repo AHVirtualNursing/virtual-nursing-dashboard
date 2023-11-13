@@ -14,22 +14,35 @@ const BedStatusComponent = ({ bed }: BedProp) => {
   const [fallRisk, setFallRisk] = useState<string | undefined>();
   const [reasonAdded, setReasonAdded] = useState<boolean>(false);
   const [inputReason, setInputReason] = useState<string>("");
+  const [socketData, setSocketData] = useState();
   const socket = useContext(SocketContext);
+
+  useEffect(() => {
+    const handleUpdatedPatient = (data: any) => {
+      console.log("updated patient", data);
+      setSocketData(data);
+    };
+
+    const handleUpdatedSmartbed = (data: any) => {
+      console.log("updated smartbed", data);
+      setSocketData(data);
+    };
+
+    socket.on("update-patient", handleUpdatedPatient);
+    socket.on("update-smartbed", handleUpdatedSmartbed);
+
+    return () => {
+      socket.off("update-patient", handleUpdatedPatient);
+      socket.off("update-smartbed", handleUpdatedSmartbed);
+    };
+  }, [socket]);
 
   useEffect(() => {
     //fetch patient to set fall risk correctly
     fetchPatientByPatientId((bed?.patient as Patient)?._id).then((patient) =>
       setFallRisk(patient.fallRisk)
     );
-
-    socket.on("newFallRisk", (fallRiskValue) => {
-      setFallRisk(fallRiskValue);
-    });
-
-    return () => {
-      socket.off("newFallRisk");
-    };
-  }, [bed?.patient, socket]);
+  }, [bed?.patient, socketData]);
 
   const handleConfirm = () => {
     setReasonAdded(true);
