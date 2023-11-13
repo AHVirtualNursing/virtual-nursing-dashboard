@@ -499,40 +499,46 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           </FormGroup>
         </Grid>
         <Box sx={{ height: 400 }} id="chart1">
-          <Line
-            data={vitals ? updateChartData("chart1") : []}
-            options={{
-              ...updateChartOptions(
-                selectedVitals,
-                selectedIndicators,
-                {
-                  min: 0,
-                  max: 7,
-                },
-                "chart1"
-              ),
-              maintainAspectRatio: false,
-              aspectRatio: 1,
-            }}
-          />
+          {vitals && (
+            <Line
+              data={updateChartData("chart1")}
+              options={{
+                ...updateChartOptions(
+                  selectedVitals,
+                  selectedIndicators,
+                  {
+                    min: 0,
+                    max: 7,
+                  },
+                  "chart1"
+                ),
+                maintainAspectRatio: false,
+                aspectRatio: 1,
+              }}
+            />
+          )}
         </Box>
         <Box sx={{ height: 400 }} id="chart2">
-          <Line
-            data={vitals ? updateChartData("chart2") : []}
-            options={{
-              ...updateChartOptions(
-                selectedVitals,
-                selectedIndicators,
-                {
-                  min: 0,
-                  max: 7,
-                },
-                "chart2"
-              ),
-              maintainAspectRatio: false,
-              aspectRatio: 1,
-            }}
-          />
+          {vitals ? (
+            <Line
+              data={updateChartData("chart2")}
+              options={{
+                ...updateChartOptions(
+                  selectedVitals,
+                  selectedIndicators,
+                  {
+                    min: 0,
+                    max: 7,
+                  },
+                  "chart2"
+                ),
+                maintainAspectRatio: false,
+                aspectRatio: 1,
+              }}
+            />
+          ) : (
+            "No vitals recorded for patient"
+          )}
         </Box>
         <ToggleButtonGroup
           value={selectedTimeRange}
