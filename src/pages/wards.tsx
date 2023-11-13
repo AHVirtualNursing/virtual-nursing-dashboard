@@ -14,7 +14,7 @@ import VitalTiles from "@/components/VitalTiles";
 import TileCustomisationModal from "@/components/TileCustomisationModal";
 import BedTiles from "@/components/BedTiles";
 import { VirtualNurse } from "@/types/virtualNurse";
-import { Link } from "@mui/material";
+import Link from "next/link";
 import { Ward } from "@/types/ward";
 import { SocketContext } from "@/pages/layout";
 import { Alert } from "@/types/alert";
