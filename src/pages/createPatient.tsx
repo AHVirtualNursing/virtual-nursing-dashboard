@@ -88,6 +88,11 @@ function createPatient() {
     });
   }, [vacantBeds.length]);
 
+  const handleChange = (event: SelectChangeEvent) => {
+    setAssignedBed(event.target.value);
+    setShowBedErrorMessage(false);
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -98,8 +103,12 @@ function createPatient() {
     const patientNric = data.get("patientNric") as string;
     console.log(patientNric);
     const nricRegex = /^[STGFstgf]\d{7}[A-Za-z]$/;
+
+    let hasErrors = false;
+
     if (!patientName) {
       setShowNameErrorMessage(true);
+      hasErrors = true;
       console.log("Incorrect Name");
     } else {
       setShowNameErrorMessage(false);
@@ -108,28 +117,26 @@ function createPatient() {
       console.log(patientNric);
       setShowNricErrorMessage(true);
       console.log("Incorrect NRIC");
+      hasErrors = true;
     } else {
       setShowNricErrorMessage(false);
     }
     if (bedAssigned == "") {
       setShowBedErrorMessage(true);
       console.log("nobed selected");
-      console.log(showBedErrorMessage);
+      hasErrors = true;
     } else {
       setShowBedErrorMessage(false);
     }
     if (!condition) {
       setShowConditionErrorMessage(true);
       console.log("noCondition");
+      hasErrors = true;
     } else {
       setShowConditionErrorMessage(false);
     }
-    if (
-      showNameErrorMessage ||
-      showBedErrorMessage ||
-      showNricErrorMessage ||
-      showConditionErrorMessage
-    ) {
+
+    if (hasErrors) {
       console.log("haserror");
       return;
     }
@@ -149,10 +156,50 @@ function createPatient() {
         setShowConditionErrorMessage(false);
         setTimeout(() => {
           router.push("/dashboard");
-        }, 1500);
+        }, 1000);
       }
     }
   };
+
+  useEffect(() => {
+    console.log(showBedErrorMessage);
+    console.log(showNameErrorMessage);
+    console.log(showNricErrorMessage);
+    console.log(showConditionErrorMessage);
+    // if (
+    //   showNameErrorMessage ||
+    //   showBedErrorMessage ||
+    //   showNricErrorMessage ||
+    //   showConditionErrorMessage
+    // ) {
+    //   console.log("haserror");
+    //   return;
+    // }
+    // console.log("DETAILS VALID");
+    // const res = await createNewPatient(patientName, patientNric, condition);
+    // console.log(res?.status);
+    // if (res?.status === 200) {
+    //   const updateBedRes = await updateSmartbedByBedId(
+    //     bedAssigned,
+    //     res.data.data._id
+    //   );
+    //   if (updateBedRes?.status == 200) {
+    //     setShowSuccessMessage(true);
+    //     setShowNricErrorMessage(false);
+    //     setShowNameErrorMessage(false);
+    //     setShowBedErrorMessage(false);
+    //     setShowConditionErrorMessage(false);
+    //     setTimeout(() => {
+    //       router.push("/dashboard");
+    //     }, 1500);
+    //   }
+    // }
+  }, [
+    showBedErrorMessage,
+    showNameErrorMessage,
+    showNricErrorMessage,
+    showConditionErrorMessage,
+  ]);
 
   const ErrorMessage = (message: string) => {
     return (
