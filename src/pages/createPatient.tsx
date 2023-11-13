@@ -1,5 +1,3 @@
-import DashboardSideBar from "@/components/DashboardSideBar";
-import Header from "@/components/Header";
 import {
   Autocomplete,
   Box,
@@ -10,11 +8,8 @@ import {
   Select,
   SelectChangeEvent,
   TextField,
-  Typography,
   createFilterOptions,
 } from "@mui/material";
-import styles from "@/styles/Dashboard.module.css";
-import { Inter } from "next/font/google";
 import router from "next/router";
 import React, { useEffect, useState } from "react";
 import { SmartBed } from "@/types/smartbed";
@@ -97,11 +92,8 @@ function createPatient() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const patientName = data.get("patientName") as string;
-    console.log(patientName);
     const condition = data.get("condition") as string;
-    console.log(condition);
     const patientNric = data.get("patientNric") as string;
-    console.log(patientNric);
     const nricRegex = /^[STGFstgf]\d{7}[A-Za-z]$/;
 
     let hasErrors = false;
@@ -109,7 +101,7 @@ function createPatient() {
     if (!patientName) {
       setShowNameErrorMessage(true);
       hasErrors = true;
-      console.log("Incorrect Name");
+      console.log("Missing Name");
     } else {
       setShowNameErrorMessage(false);
     }
@@ -123,21 +115,21 @@ function createPatient() {
     }
     if (bedAssigned == "") {
       setShowBedErrorMessage(true);
-      console.log("nobed selected");
+      console.log("No Bed Selected");
       hasErrors = true;
     } else {
       setShowBedErrorMessage(false);
     }
     if (!condition) {
       setShowConditionErrorMessage(true);
-      console.log("noCondition");
+      console.log("Missing Condition");
       hasErrors = true;
     } else {
       setShowConditionErrorMessage(false);
     }
 
     if (hasErrors) {
-      console.log("haserror");
+      console.log("DETAILS INVALID");
       return;
     }
     console.log("DETAILS VALID");
@@ -160,46 +152,6 @@ function createPatient() {
       }
     }
   };
-
-  useEffect(() => {
-    console.log(showBedErrorMessage);
-    console.log(showNameErrorMessage);
-    console.log(showNricErrorMessage);
-    console.log(showConditionErrorMessage);
-    // if (
-    //   showNameErrorMessage ||
-    //   showBedErrorMessage ||
-    //   showNricErrorMessage ||
-    //   showConditionErrorMessage
-    // ) {
-    //   console.log("haserror");
-    //   return;
-    // }
-    // console.log("DETAILS VALID");
-    // const res = await createNewPatient(patientName, patientNric, condition);
-    // console.log(res?.status);
-    // if (res?.status === 200) {
-    //   const updateBedRes = await updateSmartbedByBedId(
-    //     bedAssigned,
-    //     res.data.data._id
-    //   );
-    //   if (updateBedRes?.status == 200) {
-    //     setShowSuccessMessage(true);
-    //     setShowNricErrorMessage(false);
-    //     setShowNameErrorMessage(false);
-    //     setShowBedErrorMessage(false);
-    //     setShowConditionErrorMessage(false);
-    //     setTimeout(() => {
-    //       router.push("/dashboard");
-    //     }, 1500);
-    //   }
-    // }
-  }, [
-    showBedErrorMessage,
-    showNameErrorMessage,
-    showNricErrorMessage,
-    showConditionErrorMessage,
-  ]);
 
   const ErrorMessage = (message: string) => {
     return (
@@ -356,8 +308,6 @@ function createPatient() {
         </div>
       </div>
     </div>
-    //   </Box>
-    // </main>
   );
 }
 
