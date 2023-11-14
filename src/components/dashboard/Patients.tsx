@@ -178,6 +178,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
     };
 
     const refreshPatientVitals = (updatedVitals: any) => {
+      console.log("ENTER");
       const vitalObj = updatedVitals.vital;
       const patientId = updatedVitals.patient;
       setData((prevData) => {
@@ -226,7 +227,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
       socket.off("patientAlertAdded", handleAlertIncoming);
       socket.off("patientAlertDeleted", handleDeleteAlert);
     };
-  }, [socket]);
+  }, []);
 
   useEffect(() => {
     fetchWardsByVirtualNurse(sessionData?.user.id).then((wards) => {

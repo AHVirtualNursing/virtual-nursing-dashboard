@@ -1,7 +1,7 @@
 import React from "react";
 import GroupIcon from "@mui/icons-material/Group";
-import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import Link from "next/link";
 import { ChatBox } from "./chat/ChatBox";
 
@@ -19,9 +19,9 @@ export default function Sidebar() {
         dest={"alerts"}
       />
       <SidebarTab
-        name={"Reports"}
+        name={"Discharge Reports"}
         icon={<AssignmentIndIcon style={{ color: "white" }} />}
-        dest={"reports"}
+        dest={"dischargeReports"}
       />
       <ChatBox />
     </div>

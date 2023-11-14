@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart,
@@ -14,6 +14,8 @@ import {
 import zoomPlugin from "chartjs-plugin-zoom";
 import annotationPlugin from "chartjs-plugin-annotation";
 import { usePDF } from "react-to-pdf";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import { Patient } from "@/types/patient";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import {
@@ -26,12 +28,18 @@ import {
   Grid,
   InputAdornment,
   Modal,
+  Snackbar,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
+import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import SettingsIcon from "@mui/icons-material/Settings";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import {
   getGradient,
   updateBorderDash,
@@ -41,6 +49,7 @@ import {
   getDateTime,
 } from "./utils";
 import { ModalBoxStyle } from "@/styles/StyleTemplates";
+import { callCreateReportApi } from "@/pages/api/report_api";
 
 interface PatientChartProps {
   patient?: Patient;
@@ -65,6 +74,13 @@ interface VitalData {
   temperature: VitalReading[];
   respRate: VitalReading[];
 }
+
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref
+) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
   Chart.register(
@@ -110,10 +126,13 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     useState(false);
 
   const [pdfDetails, setPdfDetails] = useState({
-    name: `${patient?.name} Vitals Charts`,
+    name: `${patient?.name} Event Report`,
     notes: "",
   });
-  const [showSavePdfModal, setShowSavePdfModal] = useState(false);
+  const [showChartOptionsModal, setShowChartOptionsModal] = useState(false);
+
+  const [uploading, setUploading] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const { toPDF, targetRef } = usePDF({
     filename: pdfDetails.name + ".pdf",
@@ -293,8 +312,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     );
   };
 
-  const handleShowSavePdfModal = () => {
-    setShowSavePdfModal((prevState) => !prevState);
+  const handleShowChartOptionsModal = () => {
+    setShowChartOptionsModal((prevState) => !prevState);
   };
 
   const handlePdfDetails = (
@@ -307,24 +326,72 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
     });
   };
 
-  const handleSavePdf = () => {
-    handleShowSavePdfModal();
-    toPDF();
+  const resetChart = () => {
+    setSelectedVitals({
+      heartRate: true,
+      bloodPressure: false,
+      spO2: false,
+      temperature: false,
+      respRate: false,
+    });
+
+    setSelectedIndicators({
+      threshold: false,
+      exceedance: false,
+      increasingTrend: false,
+    });
+
+    setSelectedTimeRange("1D");
+
     setPdfDetails({
-      ...pdfDetails,
+      name: `${patient?.name} Event Report`,
       notes: "",
     });
   };
 
+  const handleSavePdf = () => {
+    handleShowChartOptionsModal();
+    toPDF();
+  };
+
+  const uploadChart = (componentRef: any) => {
+    const pdf = new jsPDF("p", "mm", "a4");
+    if (componentRef && patient) {
+      html2canvas(componentRef).then(async (canvas) => {
+        setUploading(true);
+        const imgData = canvas.toDataURL("image/png");
+        pdf.addImage(imgData, "PNG", 10, 10, 180, 140);
+        const blob = new Blob([pdf.output("blob")], {
+          type: "application/pdf",
+        });
+        const fileName = `${pdfDetails.name}`;
+        const pdfFile = new File([blob], fileName, {
+          type: "application/pdf",
+        });
+        await callCreateReportApi(patient._id, fileName, "event", pdfFile);
+        setOpenSnackbar(true);
+        handleShowChartOptionsModal();
+        setUploading(false);
+      });
+    }
+  };
+
+  const handleCloseSnackbar = (_?: SyntheticEvent | Event, reason?: string) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
+
   return (
     <>
-      <Box ref={targetRef}>
+      <Box ref={targetRef} sx={{ padding: 10 }}>
+        <h3 className="text-left mb-5">Patient Analytics Chart</h3>
         <Grid item xs={6}>
           <FormGroup id="vitals" sx={{ flexDirection: "row" }}>
             <FormLabel
               sx={{ display: "flex", alignItems: "center", marginRight: 2 }}
-              component="legend"
-            >
+              component="legend">
               Vitals
             </FormLabel>
             <FormControlLabel
@@ -380,10 +447,15 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
             <div className="ml-auto">
               <Button
                 className="ml-auto"
-                startIcon={<FileDownloadIcon />}
-                onClick={handleShowSavePdfModal}
-              >
-                Save As PDF
+                startIcon={<RestartAltIcon />}
+                onClick={resetChart}>
+                Reset Chart
+              </Button>
+              <Button
+                className="ml-auto"
+                startIcon={<SettingsIcon />}
+                onClick={handleShowChartOptionsModal}>
+                Chart Options
               </Button>
             </div>
           </FormGroup>
@@ -392,8 +464,7 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           <FormGroup id="indicators" sx={{ flexDirection: "row" }}>
             <FormLabel
               sx={{ display: "flex", alignItems: "center", marginRight: 2 }}
-              component="legend"
-            >
+              component="legend">
               Indicators
             </FormLabel>
             <FormControlLabel
@@ -429,47 +500,52 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           </FormGroup>
         </Grid>
         <Box sx={{ height: 400 }} id="chart1">
-          <Line
-            data={updateChartData("chart1")}
-            options={{
-              ...updateChartOptions(
-                selectedVitals,
-                selectedIndicators,
-                {
-                  min: 0,
-                  max: 7,
-                },
-                "chart1"
-              ),
-              maintainAspectRatio: false,
-              aspectRatio: 1,
-            }}
-          />
+          {vitals && (
+            <Line
+              data={updateChartData("chart1")}
+              options={{
+                ...updateChartOptions(
+                  selectedVitals,
+                  selectedIndicators,
+                  {
+                    min: 0,
+                    max: 7,
+                  },
+                  "chart1"
+                ),
+                maintainAspectRatio: false,
+                aspectRatio: 1,
+              }}
+            />
+          )}
         </Box>
         <Box sx={{ height: 400 }} id="chart2">
-          <Line
-            data={updateChartData("chart2")}
-            options={{
-              ...updateChartOptions(
-                selectedVitals,
-                selectedIndicators,
-                {
-                  min: 0,
-                  max: 7,
-                },
-                "chart2"
-              ),
-              maintainAspectRatio: false,
-              aspectRatio: 1,
-            }}
-          />
+          {vitals ? (
+            <Line
+              data={updateChartData("chart2")}
+              options={{
+                ...updateChartOptions(
+                  selectedVitals,
+                  selectedIndicators,
+                  {
+                    min: 0,
+                    max: 7,
+                  },
+                  "chart2"
+                ),
+                maintainAspectRatio: false,
+                aspectRatio: 1,
+              }}
+            />
+          ) : (
+            "No vitals recorded for patient"
+          )}
         </Box>
         <ToggleButtonGroup
           value={selectedTimeRange}
           exclusive
           onChange={handleSelectedTimeRangeChange}
-          aria-label="text alignment"
-        >
+          aria-label="text alignment">
           <ToggleButton value="12H" aria-label="left aligned">
             12H
           </ToggleButton>
@@ -490,19 +566,25 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
               selectedTimeRange.match(
                 /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}),(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/g
               ) != null
-            }
-          >
+            }>
             Custom
           </ToggleButton>
         </ToggleButtonGroup>
-        <Box marginTop={2}>
-          <Typography>Nurse Notes: {pdfDetails.notes}</Typography>
+        <Box
+          marginTop={2}
+          padding={2}
+          borderRadius={8}
+          bgcolor="#f5f5f5"
+          height={200}>
+          <Typography variant="h6" gutterBottom>
+            Nurse Notes:
+          </Typography>
+          <Typography variant="body1">{pdfDetails.notes}</Typography>
         </Box>
       </Box>
       <Modal
         open={showCustomDateRangeModal}
-        onClose={handleShowCustomDateRangeModal}
-      >
+        onClose={handleShowCustomDateRangeModal}>
         <Box sx={ModalBoxStyle}>
           <Typography variant="h6" component="h2" sx={{ marginBottom: 2 }}>
             Select Date Range
@@ -546,14 +628,13 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           <Grid item xs={12} sx={{ marginTop: 2 }}>
             <Button
               variant="contained"
-              onClick={() => handleUpdateCustomDateRange()}
-            >
+              onClick={() => handleUpdateCustomDateRange()}>
               Set Range
             </Button>
           </Grid>
         </Box>
       </Modal>
-      <Modal open={showSavePdfModal} onClose={handleShowSavePdfModal}>
+      <Modal open={showChartOptionsModal} onClose={handleShowChartOptionsModal}>
         <Box sx={ModalBoxStyle}>
           <TextField
             label="PDF Name"
@@ -574,13 +655,37 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
             value={pdfDetails.notes}
             onChange={handlePdfDetails}
           />
-          <Box marginTop={2}>
-            <Button variant="contained" onClick={() => handleSavePdf()}>
-              Save as PDF
+          <Box
+            marginTop={2}
+            sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+            <Button
+              startIcon={<FileDownloadIcon />}
+              variant="contained"
+              onClick={() => handleSavePdf()}>
+              Download PDF
             </Button>
+            <LoadingButton
+              startIcon={<CloudUploadIcon />}
+              variant="contained"
+              loading={uploading}
+              loadingPosition="start"
+              onClick={() => uploadChart(targetRef.current)}>
+              Upload Report
+            </LoadingButton>
           </Box>
         </Box>
       </Modal>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="success"
+          sx={{ width: "100%" }}>
+          Report uploaded successfully.
+        </Alert>
+      </Snackbar>
     </>
   );
 }

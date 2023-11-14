@@ -8,8 +8,8 @@ import AlertsSummary from "@/components/dashboard/AlertsSummary";
 import PatientSummary from "@/components/dashboard/PatientSummary";
 import GridViewIcon from "@mui/icons-material/GridView";
 import ListIcon from "@mui/icons-material/List";
-import { Link } from "@mui/material";
 import SelectFilter from "@/components/SelectFilter";
+import Link from "next/link";
 
 export default function Dashboard() {
   const router = useRouter();

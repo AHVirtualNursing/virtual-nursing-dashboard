@@ -42,19 +42,27 @@ const DashboardAlertIcon = ({
   return (
     <div id="iconBadgeContainer" className="relative">
       {lastVitalAlert && lastVitalAlert.status === "open" ? (
-        <CampaignIcon style={{ color: "red" }} />
+        <CampaignIcon
+          style={{ color: "red", paddingRight: "10px", fontSize: "40" }}
+        />
       ) : null}
 
       {lastVitalAlert && lastVitalAlert.status === "handling" ? (
-        <CampaignIcon style={{ color: "orange" }} />
+        <CampaignIcon
+          style={{ color: "orange", paddingRight: "10px", fontSize: "40" }}
+        />
       ) : null}
 
       {lastBedAlert && lastBedAlert.status === "open" ? (
-        <HotelIcon style={{ color: "red" }} />
+        <HotelIcon
+          style={{ color: "red", paddingLeft: "10px", fontSize: "40" }}
+        />
       ) : null}
 
       {lastBedAlert && lastBedAlert.status === "handling" ? (
-        <HotelIcon style={{ color: "orange" }} />
+        <HotelIcon
+          style={{ color: "orange", paddingLeft: "10px", fontSize: "40" }}
+        />
       ) : null}
     </div>
   );
