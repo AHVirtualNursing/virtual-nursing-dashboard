@@ -43,6 +43,7 @@ export default function Wards() {
   const socket = useContext(SocketContext);
   const [socketAlertList, setSocketAlertList] = useState<Alert[]>();
   const [socketPatient, setSocketPatient] = useState<Patient>();
+  const hasDisplayedToast = useRef(false);
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
@@ -201,23 +202,19 @@ export default function Wards() {
 
   useEffect(() => {
     const refreshContent = (updatedBed: any) => {
-      console.log("enter");
       setData((prevData) => {
-        console.log(prevData);
         const index = prevData.findIndex((bed) => bed._id === updatedBed._id);
         if (index !== -1) {
           const updatedBeds = [...prevData];
           updatedBeds[index] = updatedBed;
-          console.log(updatedBeds);
           return updatedBeds;
-        } else {
-          console.log("bed not found");
-          console.log(updatedBed.bedStatus);
-          if (updatedBed.bedStatus === "occupied") {
-            console.log("ENTER");
-            const message = `${updatedBed.patient.name} has been admitted.`;
-            toast.success(<AlertToast message={message} />);
-          }
+        } else if (
+          updatedBed.bedStatus === "occupied" &&
+          !hasDisplayedToast.current
+        ) {
+          hasDisplayedToast.current = true;
+          const message = `${updatedBed.patient.name} has been admitted.`;
+          toast.success(<AlertToast message={message} />);
         }
         return prevData;
       });
