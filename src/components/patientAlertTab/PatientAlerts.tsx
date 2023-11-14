@@ -5,6 +5,7 @@ import React, { useContext, useEffect, useState } from "react";
 import AlertsTableRow from "../alerts/AlertsTableRow";
 import { SocketContext } from "@/pages/layout";
 import AlertDetailsModal from "../alerts/AlertDetailsModal";
+import SelectFilter from "../SelectFilter";
 
 interface PatientProp {
   patient: Patient | undefined;
@@ -70,7 +71,7 @@ const PatientAlerts = (patientProp: PatientProp) => {
         <tbody>
           <tr id="subheaders">
             <td id="status-filter">
-              <select
+              {/* <select
                 name="status-select"
                 className="bg-white p-1 rounded-lg w-auto"
                 value={statusCriteria}
@@ -80,36 +81,36 @@ const PatientAlerts = (patientProp: PatientProp) => {
                 <option value="open">Open</option>
                 <option value="handling">Handling</option>
                 <option value="complete">Complete</option>
-              </select>
+              </select> */}
+              <SelectFilter
+                name="statusSelect"
+                options={["all", "open", "handling", "complete"]}
+                changeSelectedOption={setStatusCriteria}
+                inTable={true}
+              />
             </td>
             <td id="alertType-filter">
-              <select
-                name="alertType-select"
-                className="bg-white p-1 w-auto rounded-lg"
-                value={alertTypeCriteria}
-                onChange={(e) => {
-                  setAlertTypeCriteria(e.target.value);
-                }}
-              >
-                <option value="">All</option>
-                <option value="Vital">Vital</option>
-                <option value="SmartBed">SmartBed</option>
-              </select>
+              <SelectFilter
+                name="alertTypeSelect"
+                options={["all", "vital", "smartbed"]}
+                changeSelectedOption={setAlertTypeCriteria}
+                inTable={true}
+              />
             </td>
             <td id="vital-filter">
-              <select
-                name="vital-select"
-                className="bg-white p-1 w-auto rounded-lg"
-                value={vitalCriteria}
-                onChange={(e) => setVitalCriteria(e.target.value)}
-              >
-                <option value="">All Vitals</option>
-                <option value="Heart Rate">HR</option>
-                <option value="Blood Pressure">BP</option>
-                <option value="Respiratory Rate">RR</option>
-                <option value="SPO2">SPO2</option>
-                <option value="Temperature">Temp</option>
-              </select>
+              <SelectFilter
+                name="vitalFilter"
+                options={[
+                  "all vitals",
+                  "heart rate",
+                  "blood pressure",
+                  "respiratory rate",
+                  "spo2",
+                  "temperature",
+                ]}
+                changeSelectedOption={setVitalCriteria}
+                inTable={true}
+              />
             </td>
 
             <td id="vital-reading" className="text-sm underline">
@@ -136,11 +137,15 @@ const PatientAlerts = (patientProp: PatientProp) => {
                 alert.status.toLowerCase().includes(statusCriteria)
               )
               .filter((alert) => alert.alertType.includes(alertTypeCriteria))
-              .filter((alert) =>
-                alert.alertVitals.some((alertVital) =>
-                  (alertVital as AlertVitals).vital.includes(vitalCriteria)
-                )
-              )
+              .filter((alert) => {
+                return vitalCriteria === ""
+                  ? true
+                  : alert.alertVitals.some((alertVital) =>
+                      (alertVital as AlertVitals).vital
+                        .toLowerCase()
+                        .includes(vitalCriteria)
+                    );
+              })
               .map((alert, index) => (
                 <tr key={index} onClick={() => handleViewAlertDetails(alert)}>
                   <td

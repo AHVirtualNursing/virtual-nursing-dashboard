@@ -31,8 +31,6 @@ const Alerts = () => {
   const { data: sessionData } = useSession();
   const socket = useContext(SocketContext);
 
-  console.log(socket);
-
   useEffect(() => {
     const handleUpdatedAlert = (data: any) => {
       console.log(data);
@@ -68,6 +66,7 @@ const Alerts = () => {
         const patientIds = alertsList.map(
           (alert: Alert) => alert.patient as string
         );
+
         let patientPromises = patientIds.map((id: string) =>
           fetchPatientByPatientId(id)
         );
@@ -78,6 +77,7 @@ const Alerts = () => {
               patient: res[index].name,
             })
           );
+          console.log("alerttopatientmapping", alertToPatientMappings);
           setAlerts(alertToPatientMappings);
         });
       });
@@ -212,13 +212,15 @@ const Alerts = () => {
                     .toLowerCase()
                     .includes(alertTypeCriteria)
                 )
-                .filter((alertMapping) =>
-                  alertMapping.alert.alertVitals.some((alertVital) =>
-                    (alertVital as AlertVitals).vital
-                      .toLowerCase()
-                      .includes(vitalCriteria)
-                  )
-                )
+                .filter((alertMapping) => {
+                  return vitalCriteria === ""
+                    ? true
+                    : alertMapping.alert.alertVitals.some((alertVital) =>
+                        (alertVital as AlertVitals).vital
+                          .toLowerCase()
+                          .includes(vitalCriteria)
+                      );
+                })
                 .map((alertMapping, index) => (
                   <tr
                     key={index}
