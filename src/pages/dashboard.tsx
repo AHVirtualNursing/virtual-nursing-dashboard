@@ -50,7 +50,7 @@ export default function Dashboard() {
           htmlFor="ward-select"
           className="text-sm font-medium text-gray-900"
         >
-          Beds
+          Wards
         </label>
         <select
           name="wardSelect"
@@ -69,7 +69,12 @@ export default function Dashboard() {
             </option>
           ))}
         </select>
-
+        <label
+          htmlFor="timeSelect"
+          className="text-sm font-medium text-gray-900"
+        >
+          Time
+        </label>
         <select
           name="timeSelect"
           id="time-select"

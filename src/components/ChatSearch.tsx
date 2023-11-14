@@ -1,5 +1,5 @@
 import { Chat } from "@/types/chat";
-import { lightIndigo } from "@/styles/colorTheme";
+import { white } from "@/styles/colorTheme";
 import { Box } from "@mui/material";
 import { Dispatch, SetStateAction, useState } from "react";
 import ChatPreview from "./ChatPreview";
@@ -20,7 +20,7 @@ const Search = ({ selectedChat, setSelectedChat, chats, handleDeleteChat }: Sear
       <Box
         sx={{
           borderBottom: "1px solid",
-          borderColor: lightIndigo,
+          borderColor: white,
           height: 30,
           marginTop: "10px",
           marginBottom: "20px",
@@ -36,7 +36,7 @@ const Search = ({ selectedChat, setSelectedChat, chats, handleDeleteChat }: Sear
           style={{
             backgroundColor: "transparent",
             border: "none",
-            color: lightIndigo,
+            color: white,
             outline: "none",
             fontSize: 14,
           }}

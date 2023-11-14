@@ -6,6 +6,7 @@ import AlertsTableRow from "../AlertsTableRow";
 
 interface PatientProp {
   patient: Patient | undefined;
+  forDischargeReport?: boolean;
 }
 
 const PatientAlerts = (patientProp: PatientProp) => {

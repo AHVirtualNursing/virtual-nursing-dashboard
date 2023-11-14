@@ -44,7 +44,7 @@ const RangeSlider = ({
 
   const handleChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]);
-    handleThresholds(value);
+    handleThresholds(newValue);
   };
   const [start, end] = value;
 
