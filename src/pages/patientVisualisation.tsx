@@ -102,12 +102,12 @@ const patientVisualisationPage = () => {
                 <br />
                 <p>
                   Additional Notes:
-                  {/* {(selectedBed?.patient as Patient)?.infoLogs[0]?.info} */}
+                  {(selectedBed?.patient as Patient)?.infoLogs[0]?.info}
                 </p>
-                <p>
+                {/* <p>
                   Patient is homesick and wants to be discharged as soon as
                   possible
-                </p>
+                </p> */}
                 <button
                   className={`${
                     (selectedBed?.patient as Patient)?.fallRisk === "High"

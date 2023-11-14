@@ -354,16 +354,20 @@ export default function Patients({ selectedWard }: PatientListProps) {
                 .toLowerCase()
                 .includes(searchCondition)
             )
-            .filter((bed) =>
-              (bed.patient as Patient).fallRisk
-                .toLowerCase()
-                .includes(selectedFallRisk)
-            )
-            .filter((bed) =>
-              (bed.patient as Patient).acuityLevel
-                .toLowerCase()
-                .includes(selectedAcuity)
-            )
+            .filter((bed) => {
+              return selectedFallRisk === ""
+                ? true
+                : (bed.patient as Patient).fallRisk
+                    ?.toLowerCase()
+                    .includes(selectedFallRisk);
+            })
+            .filter((bed) => {
+              return selectedAcuity === ""
+                ? true
+                : (bed.patient as Patient).acuityLevel
+                    ?.toLowerCase()
+                    .includes(selectedAcuity);
+            })
             .map((pd, index) => (
               <tr className="text-left" key={pd._id}>
                 <td className="w-1/12 text-center">
