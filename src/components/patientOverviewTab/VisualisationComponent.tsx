@@ -7,18 +7,7 @@ import { useRouter } from "next/router";
 import { Vital } from "@/types/vital";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import LastUpdatedVital from "./LastUpdatedVital";
-import {
-  Button,
-  Divider,
-  Drawer,
-  IconButton,
-  List,
-  Toolbar,
-} from "@mui/material";
-import { styled, useTheme } from "@mui/material/styles";
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
+import { Button, Divider, IconButton, List } from "@mui/material";
 import {
   CartesianGrid,
   Line,
@@ -43,9 +32,6 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
   const [drawerOrder, setDrawerOrder] = useState<string[]>([]);
   const [changesMade, setChangeMade] = useState(false);
   const socket = useContext(SocketContext);
-
-  console.log(order);
-  console.log(drawerOrder);
 
   useEffect(() => {
     if (patient !== undefined) {
@@ -117,91 +103,6 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
     setChangeMade(false);
   }
 
-  function Charts({ order }: { order: string[] }) {
-    return (
-      <ul>
-        {order.map((chartType, index) => (
-          <div>
-            <li className="flex items-center justify-start">
-              <div className="w-1/5">
-                <LastUpdatedVital
-                  data={
-                    chartType == "rr"
-                      ? rrData
-                      : chartType == "hr"
-                      ? hrData
-                      : chartType == "bpSys"
-                      ? bpSysData
-                      : chartType == "bpDia"
-                      ? bpDiaData
-                      : chartType == "temp"
-                      ? tempData
-                      : chartType == "spo2"
-                      ? spO2Data
-                      : placeholder_data
-                  }
-                  vital={chartType}
-                />
-              </div>
-              <div className="w-4/5">
-                <ResponsiveContainer aspect={7}>
-                  <LineChart
-                    data={
-                      chartType == "rr"
-                        ? rrData
-                        : chartType == "hr"
-                        ? hrData
-                        : chartType == "bpSys"
-                        ? bpSysData
-                        : chartType == "bpDia"
-                        ? bpDiaData
-                        : chartType == "temp"
-                        ? tempData
-                        : chartType == "spo2"
-                        ? spO2Data
-                        : placeholder_data
-                    }
-                  >
-                    <Line
-                      type="monotone"
-                      dataKey="reading"
-                      stroke={colours[chartType]}
-                      strokeWidth={3}
-                    />
-                    <CartesianGrid stroke="#ccc" strokeDasharray="1" />
-                    <XAxis dataKey="datetime"></XAxis>
-                    <YAxis />
-                    <Tooltip />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              <IconButton
-                size="small"
-                onClick={() => moveChartUp(chartType)}
-                disabled={index === 0}
-              >
-                <ArrowDropUpIcon />
-              </IconButton>
-              <IconButton
-                size="small"
-                onClick={() => moveChartDown(chartType)}
-                disabled={index === order.length - 1}
-              >
-                <ArrowDropDownIcon />
-              </IconButton>
-              <IconButton
-                size="small"
-                onClick={() => removeChartType(chartType)}
-              >
-                <ClearIcon />
-              </IconButton>
-            </li>
-          </div>
-        ))}
-      </ul>
-    );
-  }
-
   const [rrData, setRRData] = useState(placeholder_data);
   const [hrData, setHRData] = useState(placeholder_data);
   const [bpSysData, setBpSysData] = useState(placeholder_data);
@@ -244,15 +145,6 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
     }
   }, [patientVitals]);
 
-  interface SocketData {
-    datetime: string;
-    patientId: string;
-    heartRate?: number;
-    bloodPressureSys?: number;
-    bloodPressureDia?: number;
-    spO2?: number;
-  }
-
   const router = useRouter();
 
   useEffect(() => {
@@ -262,11 +154,6 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
       const patientId = router.query.patientId;
       const patientIdFromSocket = vitalAndPatientId.patient;
       if (patientId === patientIdFromSocket) {
-        // const datetime = new Date(data.datetime);
-        // const hours = datetime.getHours().toString().padStart(2, "0");
-        // const minutes = datetime.getMinutes().toString().padStart(2, "0");
-        // const seconds = datetime.getSeconds().toString().padStart(2, "0");
-        // const formattedDateTime = `${hours}:${minutes}:${seconds}`;
         if (data.heartRate) {
           setHRData(data.heartRate.slice(-7));
         }
@@ -288,109 +175,98 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
       }
     };
 
-    // socket.emit("connectDashboard", patientId);
-    // socket.on("updateVitals", updateCharts);
     socket.on("updatedVitals", updateCharts);
     return () => {
       socket.off("updatedVitals", updateCharts);
-      // socket.off("updateVitals", updateCharts);
-      // socket.emit("disconnectDashboard", patientId);
     };
   }, []);
 
-  const [open, setOpen] = React.useState(false);
-
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
-  const drawerWidth = 240;
-  const theme = useTheme();
-
-  const ChartsContainer = styled("main", {
-    shouldForwardProp: (prop) => prop !== "open",
-  })<{
-    open?: boolean;
-  }>(({ theme, open }) => ({
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    ...(open && {
-      transition: theme.transitions.create("margin", {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginRight: `${drawerWidth}px`,
-    }),
-  }));
-
-  interface AppBarProps extends MuiAppBarProps {
-    open?: boolean;
-  }
-
-  const AppBar = styled(MuiAppBar, {
-    shouldForwardProp: (prop) => prop !== "open",
-  })<AppBarProps>(({ theme, open }) => ({
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    ...(open && {
-      width: `calc(100% - ${drawerWidth}px)`,
-      marginRight: `${drawerWidth}px`,
-      transition: theme.transitions.create(["margin", "width"], {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-    }),
-  }));
-
   return (
-    <div className="relative overflow-hidden">
-      <AppBar position="static" color="inherit" elevation={0} open={open}>
-        <Toolbar className="flex justify-end">
-          <Button disabled={!changesMade} onClick={saveLayout}>
-            Save Layout
-          </Button>
-          <IconButton
-            size="small"
-            edge="start"
-            color="inherit"
-            onClick={handleDrawerOpen}
-            sx={{ mr: 2, ...(open && { display: "none" }) }}
-          >
-            <MenuIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-            position: "absolute",
-          },
-        }}
-        variant="persistent"
-        anchor="right"
-        open={open}
-      >
-        <div className="flex items-center">
-          <IconButton size="small" onClick={handleDrawerClose}>
-            <ChevronRightIcon />
-          </IconButton>
-          <p>Graphs</p>
-        </div>
-        <Divider />
+    <div className="flex">
+      <ul className="w-11/12">
+        {order.map((chartType, index) => (
+          <div>
+            <li className="flex items-center justify-start">
+              <div className="w-2/12">
+                <LastUpdatedVital
+                  data={
+                    chartType == "rr"
+                      ? rrData
+                      : chartType == "hr"
+                      ? hrData
+                      : chartType == "bpSys"
+                      ? bpSysData
+                      : chartType == "bpDia"
+                      ? bpDiaData
+                      : chartType == "temp"
+                      ? tempData
+                      : chartType == "spo2"
+                      ? spO2Data
+                      : placeholder_data
+                  }
+                  vital={chartType}
+                />
+              </div>
+              <div className="w-10/12">
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart
+                    data={
+                      chartType == "rr"
+                        ? rrData
+                        : chartType == "hr"
+                        ? hrData
+                        : chartType == "bpSys"
+                        ? bpSysData
+                        : chartType == "bpDia"
+                        ? bpDiaData
+                        : chartType == "temp"
+                        ? tempData
+                        : chartType == "spo2"
+                        ? spO2Data
+                        : placeholder_data
+                    }
+                  >
+                    <Line
+                      type="monotone"
+                      dataKey="reading"
+                      stroke={colours[chartType]}
+                      strokeWidth={3}
+                    />
+                    <CartesianGrid stroke="#ccc" strokeDasharray="1" />
+                    <XAxis dataKey="datetime" minTickGap={80}></XAxis>
+                    <YAxis />
+                    <Tooltip />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="w-1/12">
+                <IconButton
+                  size="small"
+                  onClick={() => moveChartUp(chartType)}
+                  disabled={index === 0}
+                >
+                  <ArrowDropUpIcon />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => moveChartDown(chartType)}
+                  disabled={index === order.length - 1}
+                >
+                  <ArrowDropDownIcon />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => removeChartType(chartType)}
+                >
+                  <ClearIcon />
+                </IconButton>
+              </div>
+            </li>
+          </div>
+        ))}
+      </ul>
+      <div className="w-1/12 border-0 border-l-2 border-slate-200 border-solid">
+        <p className="text-slate-500">Graphs to show</p>
         {drawerOrder.map((chartType, index) => (
           <div>
             <List className="flex justify-center items-center">
@@ -402,10 +278,10 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
             <Divider />
           </div>
         ))}
-      </Drawer>
-      <ChartsContainer open={open}>
-        <Charts order={order} />
-      </ChartsContainer>
+        <Button disabled={!changesMade} onClick={saveLayout}>
+          Save Layout
+        </Button>
+      </div>
     </div>
   );
 }
