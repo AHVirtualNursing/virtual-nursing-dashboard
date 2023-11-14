@@ -1,16 +1,12 @@
 import { Chat } from "@/types/chat";
-import {
-  white,
-  lightBlue,
-  darkBlue,
-  lighterBlue,
-} from "@/styles/colorTheme";
+import { white, lightBlue, darkBlue, lighterBlue } from "@/styles/colorTheme";
 import { Box, IconButton, Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { getFileByPresignedURL } from "@/pages/api/chat_api";
 import { BedSideNurse } from "@/types/bedsideNurse";
+import profilePic from "../../public/profilepic.png";
 
 type ChatPreviewProps = {
   chat: Chat;
@@ -115,14 +111,16 @@ const ChatPreview = ({
           />
         </>
       ) : (
-        <Box
-          sx={{
-            width: 50,
-            height: 50,
-            borderRadius: "100%",
-            backgroundColor: white,
+        <Image
+          src={profilePic}
+          alt="Picture"
+          width={50}
+          height={50}
+          style={{
+            borderRadius: "50%",
+            objectFit: "cover",
           }}
-        ></Box>
+        />
       )}
 
       <Box sx={{ marginLeft: "20px" }}>
