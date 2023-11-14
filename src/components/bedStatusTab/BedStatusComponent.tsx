@@ -1,6 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import WarningIcon from "@mui/icons-material/Warning";
-import { updateProtocolBreachReason } from "@/pages/api/smartbed_api";
+import ReportIcon from "@mui/icons-material/Report";
+import {
+  fetchBedByBedId,
+  updateProtocolBreachReason,
+} from "@/pages/api/smartbed_api";
 import { SmartBed } from "@/types/smartbed";
 import { SocketContext } from "@/pages/layout";
 import { fetchPatientByPatientId } from "@/pages/api/patients_api";
@@ -12,8 +16,9 @@ interface BedProp {
 
 const BedStatusComponent = ({ bed }: BedProp) => {
   const [fallRisk, setFallRisk] = useState<string | undefined>();
+  const [currBed, setCurrBed] = useState<SmartBed>();
   const [reasonAdded, setReasonAdded] = useState<boolean>(false);
-  const [inputReason, setInputReason] = useState<string>("");
+  const [inputReason, setInputReason] = useState<string | undefined>("");
   const [socketData, setSocketData] = useState();
   const socket = useContext(SocketContext);
 
@@ -42,19 +47,35 @@ const BedStatusComponent = ({ bed }: BedProp) => {
     fetchPatientByPatientId((bed?.patient as Patient)?._id).then((patient) =>
       setFallRisk(patient.fallRisk)
     );
-  }, [bed?.patient, socketData]);
+    fetchBedByBedId(bed?._id).then((bed: SmartBed) => {
+      setCurrBed(bed);
+      setInputReason(bed?.bedAlarmProtocolBreachReason);
+    });
+  }, [bed?.patient, socketData, bed?._id]);
 
   const handleConfirm = () => {
     setReasonAdded(true);
-    updateProtocolBreachReason(bed?._id, inputReason);
+    updateProtocolBreachReason(currBed?._id, inputReason as string);
   };
 
   const BedAlarmWarning = () => {
     return (
       <>
-        {fallRisk === "High" && !bed?.isBedExitAlarmOn && (
-          <WarningIcon color={reasonAdded ? "warning" : "error"} />
-        )}
+        {fallRisk === "High" &&
+          !currBed?.isBedExitAlarmOn &&
+          // <WarningIcon
+          //   style={{
+          //     color:
+          //       reasonAdded || currBed?.bedAlarmProtocolBreachReason
+          //         ? "orange"
+          //         : "red",
+          //   }}
+          // />
+          (reasonAdded || currBed?.bedAlarmProtocolBreachReason ? (
+            <ReportIcon color="warning" />
+          ) : (
+            <WarningIcon color="error" />
+          ))}
       </>
     );
   };
@@ -63,7 +84,8 @@ const BedStatusComponent = ({ bed }: BedProp) => {
     return (
       <>
         {fallRisk === "High" &&
-          !bed?.isBedExitAlarmOn &&
+          !currBed?.isBedExitAlarmOn &&
+          !currBed?.bedAlarmProtocolBreachReason &&
           reasonAdded === false && (
             <button className="float-right p-1" onClick={handleConfirm}>
               Confirm
@@ -79,12 +101,12 @@ const BedStatusComponent = ({ bed }: BedProp) => {
         <div id="left-rails" className="flex gap-5 justify-evenly pt-4">
           <BedRailCard
             id="upper-left"
-            info={bed?.isLeftUpperRail}
+            info={currBed?.isLeftUpperRail}
             rail="Left Upper"
           />
           <BedRailCard
             id="lower-left"
-            info={bed?.isLeftLowerRail}
+            info={currBed?.isLeftLowerRail}
             rail="Left Lower"
           />
         </div>
@@ -95,18 +117,24 @@ const BedStatusComponent = ({ bed }: BedProp) => {
           alt="Patient lying in bed"
           loading="lazy"
           decoding="async"
-          className="h-auto w-auto max-h-[300px] max-w-[300px]"
+          className="object-contain w-full max-h-[600px] max-w-[600px]"
+          style={{
+            filter: currBed?.isPatientOnBed ? "" : "grayscale(100%)",
+            backgroundColor: currBed?.isPatientOnBed
+              ? ""
+              : "rgba(255, 0, 0, 0.5)",
+          }}
         />
 
         <div id="right-rails" className="flex gap-5 justify-evenly pb-4">
           <BedRailCard
             id="upper-right"
-            info={bed?.isRightUpperRail}
+            info={currBed?.isRightUpperRail}
             rail="Right Upper"
           />
           <BedRailCard
             id="lower-right"
-            info={bed?.isRightLowerRail}
+            info={currBed?.isRightLowerRail}
             rail="Right Lower"
           />
         </div>
@@ -130,17 +158,18 @@ const BedStatusComponent = ({ bed }: BedProp) => {
           Fall Risk: {fallRisk}
         </div>
         <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
-          Bed Position: {bed?.bedPosition}
+          Bed Position: {currBed?.bedPosition}
         </div>
         <div className="bg-slate-200 font-bold rounded-lg uppercase flex gap-x-10 px-2 py-1 items-center ">
-          <p>
-            Bed Lowest Position:{" "}
-            {bed?.isLowestPosition ? "lowest" : "not lowest"}
-          </p>
-          {!bed?.isLowestPosition && <WarningIcon color="warning" />}
+          Bed Lowest Position:{" "}
+          {currBed?.isLowestPosition ? "lowest" : "not lowest"}
+          {!currBed?.isLowestPosition && (
+            <WarningIcon style={{ color: "orange" }} />
+          )}
         </div>
-        <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
-          Brake Wheels: {bed?.isBrakeSet ? "Locked" : "Not Locked"}
+        <div className="bg-slate-200 font-bold rounded-lg uppercase flex gap-x-10 px-2 py-1 items-center ">
+          Bed Brakes: {currBed?.isBrakeSet ? "Set" : "Not Set"}
+          {!currBed?.isBrakeSet && <WarningIcon style={{ color: "orange" }} />}
         </div>
         <div className="bg-slate-200 font-bold rounded-lg uppercase flex gap-x-10 px-2 py-1 items-center ">
           {/* - when fall risk high, bed alarm not turned on, red alert, input box and confirm appears
@@ -148,17 +177,21 @@ const BedStatusComponent = ({ bed }: BedProp) => {
               - if bed alarm ON, or fall risk drop to medium/low, warning sign and input disappear
           */}
           <p>
-            Bed Exit Alarm: {bed?.isBedExitAlarmOn ? "On" : "Not Turned On"}
+            Bed Exit Alarm: {currBed?.isBedExitAlarmOn ? "On" : "Not Turned On"}
           </p>
           <BedAlarmWarning />
         </div>
-        {fallRisk === "High" && !bed?.isBedExitAlarmOn && (
+        {fallRisk === "High" && !currBed?.isBedExitAlarmOn && (
           <textarea
             value={inputReason}
             name="reason-input"
             placeholder="Please input reason for protocol breach"
             className=" focus:border-red-400 p-1 w-full"
-            disabled={reasonAdded ? true : false}
+            disabled={
+              reasonAdded || currBed?.bedAlarmProtocolBreachReason
+                ? true
+                : false
+            }
             onChange={(event) => setInputReason(event.target.value)}
           />
         )}
@@ -179,7 +212,7 @@ const BedRailCard = ({ id, info, rail }: BedRailCardProps) => {
     <div
       id={id}
       className={`${
-        info ? "bg-emerald-400" : "bg-red-400"
+        info ? "bg-emerald-400" : "bg-orange-400"
       } rounded-lg py-3 px-10`}
     >
       <p>{rail}</p>
