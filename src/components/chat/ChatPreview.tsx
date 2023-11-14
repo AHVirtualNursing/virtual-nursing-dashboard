@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { getFileByPresignedURL } from "@/pages/api/chat_api";
 import { BedSideNurse } from "@/types/bedsideNurse";
+import profilePic from "../../public/profilepic.png";
 
 type ChatPreviewProps = {
   chat: Chat;
