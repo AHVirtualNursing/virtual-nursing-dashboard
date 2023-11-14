@@ -233,7 +233,7 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
                       strokeWidth={3}
                     />
                     <CartesianGrid stroke="#ccc" strokeDasharray="1" />
-                    <XAxis dataKey="datetime"></XAxis>
+                    <XAxis dataKey="datetime" minTickGap={80}></XAxis>
                     <YAxis />
                     <Tooltip />
                   </LineChart>
