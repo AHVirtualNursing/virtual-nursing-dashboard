@@ -53,7 +53,7 @@ const AlertDetailsModal = ({
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <div className="overflow-auto scrollbar absolute p-4 max-h-[500px] border-2 border-solid top-1/4 left-1/4  shadow-lg bg-white w-[600px] ">
+        <div className="overflow-auto scrollbar absolute p-4 max-h-[500px] border-2 border-solid top-1/4 left-1/4  shadow-lg bg-white w-[600px] space-y-4 ">
           <div className="flex justify-between">
             <Typography id="modal-modal-title" variant="h6" component="h2">
               Alert Details
@@ -62,7 +62,7 @@ const AlertDetailsModal = ({
           </div>
           <div className="space-y-6">
             <div className="flex justify-between items-center font-bold text-lg">
-              <p>{patientName}</p>
+              {patientName && <p>{patientName}</p>}
               <p
                 className={`${
                   status === "open" ? "text-red-500" : "text-orange-500"
