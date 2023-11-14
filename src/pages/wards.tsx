@@ -25,6 +25,7 @@ import GridViewIcon from "@mui/icons-material/GridView";
 import ListIcon from "@mui/icons-material/List";
 import { fetchBedsideNursesByBedId } from "./api/chat_api";
 import { BedSideNurse } from "@/types/bedsideNurse";
+import { toast } from "react-toastify";
 
 export default function Wards() {
   const router = useRouter();
@@ -42,6 +43,7 @@ export default function Wards() {
   const socket = useContext(SocketContext);
   const [socketAlertList, setSocketAlertList] = useState<Alert[]>();
   const [socketPatient, setSocketPatient] = useState<Patient>();
+  const hasDisplayedToast = useRef(false);
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
@@ -192,17 +194,27 @@ export default function Wards() {
     }
   }, [data]);
 
+  const AlertToast = ({ message }: any) => (
+    <div>
+      <p>{message}</p>
+    </div>
+  );
+
   useEffect(() => {
     const refreshContent = (updatedBed: any) => {
-      console.log("enter");
       setData((prevData) => {
-        console.log(prevData);
         const index = prevData.findIndex((bed) => bed._id === updatedBed._id);
         if (index !== -1) {
           const updatedBeds = [...prevData];
           updatedBeds[index] = updatedBed;
-          console.log(updatedBeds);
           return updatedBeds;
+        } else if (
+          updatedBed.bedStatus === "occupied" &&
+          !hasDisplayedToast.current
+        ) {
+          hasDisplayedToast.current = true;
+          const message = `${updatedBed.patient.name} has been admitted.`;
+          toast.success(<AlertToast message={message} />);
         }
         return prevData;
       });
@@ -263,27 +275,12 @@ export default function Wards() {
       setSocketPatient(data.patient);
     };
 
-    const handleAlertUpdate = (data: any) => {
-      setData((prevData) => {
-        const updatedData = prevData.map((bed) => {
-          console.log(data.patient);
-          if (bed.patient && (bed.patient as Patient)?._id === data.patient) {
-            console.log("ENTER");
-            return { ...bed, alert: data };
-          }
-          return bed;
-        });
-        return updatedData;
-      });
-    };
-
     socket.on("updatedSmartbed", refreshContent);
     socket.on("updatedPatient", refreshPatientInfo);
     socket.on("updatedVitals", refreshPatientVitals);
     socket.on("dischargePatient", discharge);
     socket.on("patientAlertAdded", handleAlertIncoming);
     socket.on("patientAlertDeleted", handleDeleteAlert);
-    socket.on("updatedAlert", handleAlertUpdate);
     return () => {
       socket.off("updatedSmartbed", refreshContent);
       socket.off("updatedPatient", refreshPatientInfo);
@@ -291,7 +288,6 @@ export default function Wards() {
       socket.off("dischargePatient", discharge);
       socket.off("patientAlertAdded", handleAlertIncoming);
       socket.off("patientAlertDeleted", handleDeleteAlert);
-      socket.on("updatedAlert", handleAlertUpdate);
     };
   }, []);
 
