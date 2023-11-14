@@ -23,6 +23,8 @@ import DashboardAlertIcon from "@/components/DashboardAlertIcon";
 import { fetchAlertsByPatientId } from "./api/patients_api";
 import GridViewIcon from "@mui/icons-material/GridView";
 import ListIcon from "@mui/icons-material/List";
+import { fetchBedsideNursesByBedId } from "./api/chat_api";
+import { BedSideNurse } from "@/types/bedsideNurse";
 
 export default function Wards() {
   const router = useRouter();
@@ -30,7 +32,8 @@ export default function Wards() {
   const [wards, setWards] = useState<Ward[]>([]);
   const [vitals, setVitals] = useState<any[]>([]);
   const [alerts, setAlerts] = useState<any[]>([]);
-  const [nurse, setNurse] = useState<VirtualNurse>();
+  const [nurses, setNurses] = useState<any[]>([]); // bedside nurse
+  const [nurse, setNurse] = useState<VirtualNurse>(); // virtualnurse
   const [searchPatient, setSearchPatient] = useState<string>("");
   const [selectedWard, setSelectedWard] = useState("assigned-wards");
   const [vitalFilterCriteria, setVitalFilterCriteria] = useState("all");
@@ -63,6 +66,7 @@ export default function Wards() {
   const fetchPatientVitals = async () => {
     let patientVitalsArr: any[] = [];
     let patientAlertsArr: any[] = [];
+    let patientNursesArr: any[] = [];
     for (const bedData of data) {
       let patientVitals = (bedData.patient as Patient)?.vital;
       if (patientVitals) {
@@ -87,12 +91,15 @@ export default function Wards() {
       const lastBedEntryStatus =
         bedAlerts[bedAlerts.length - 1]?.status || "none";
       patientAlertsArr.push([lastVitalEntryStatus, lastBedEntryStatus]);
+      const nurse = await fetchBedsideNursesByBedId(bedData._id);
+      patientNursesArr.push(nurse);
     }
 
     const combined = data.map((bedData, index) => ({
       bed: bedData,
       vital: patientVitalsArr[index],
       alerts: patientAlertsArr[index],
+      nurse: patientNursesArr[index],
     }));
 
     combined.sort((bed1, bed2) => {
@@ -120,6 +127,8 @@ export default function Wards() {
     const sortedBeds = combined.map((x) => x.bed);
     const sortedVitals = combined.map((x) => x.vital);
     const sortedAlerts = combined.map((x) => x.alerts);
+    const sortedNurses = combined.map((x) => x.nurse);
+    console.log("sorting alerts");
     if (
       sortedBeds.length !== data.length ||
       !sortedBeds.every((element, index) => element === data[index])
@@ -137,6 +146,12 @@ export default function Wards() {
       !sortedAlerts.every((element, index) => element === alerts[index])
     ) {
       setAlerts(sortedAlerts);
+    }
+    if (
+      sortedNurses.length !== nurses.length ||
+      !sortedNurses.every((element, index) => element === nurses[index])
+    ) {
+      setNurses(sortedNurses);
     }
   };
 
@@ -227,11 +242,10 @@ export default function Wards() {
     const discharge = (patient: any) => {
       console.log("enter");
       setData((prevData) => {
-        const updatedData = prevData.map((bed) => {
-          if (bed.patient && (bed.patient as Patient)?._id === patient._id) {
-            return { ...bed, bedStatus: "vacant", patient: undefined };
-          }
-          return bed;
+        const updatedData = prevData.filter((bed) => {
+          return !(
+            bed.patient && (bed.patient as Patient)?._id === patient._id
+          );
         });
         return updatedData;
       });
@@ -249,12 +263,27 @@ export default function Wards() {
       setSocketPatient(data.patient);
     };
 
+    const handleAlertUpdate = (data: any) => {
+      setData((prevData) => {
+        const updatedData = prevData.map((bed) => {
+          console.log(data.patient);
+          if (bed.patient && (bed.patient as Patient)?._id === data.patient) {
+            console.log("ENTER");
+            return { ...bed, alert: data };
+          }
+          return bed;
+        });
+        return updatedData;
+      });
+    };
+
     socket.on("updatedSmartbed", refreshContent);
     socket.on("updatedPatient", refreshPatientInfo);
     socket.on("updatedVitals", refreshPatientVitals);
     socket.on("dischargePatient", discharge);
     socket.on("patientAlertAdded", handleAlertIncoming);
     socket.on("patientAlertDeleted", handleDeleteAlert);
+    socket.on("updatedAlert", handleAlertUpdate);
     return () => {
       socket.off("updatedSmartbed", refreshContent);
       socket.off("updatedPatient", refreshPatientInfo);
@@ -262,6 +291,7 @@ export default function Wards() {
       socket.off("dischargePatient", discharge);
       socket.off("patientAlertAdded", handleAlertIncoming);
       socket.off("patientAlertDeleted", handleDeleteAlert);
+      socket.on("updatedAlert", handleAlertUpdate);
     };
   }, []);
 
@@ -283,6 +313,29 @@ export default function Wards() {
       }
     }
   }
+
+  const filteredOutIndex: number[] = [];
+
+  const filteredData = data.filter((bed, index) => {
+    const include =
+      (bed.patient as Patient)?.name.toLowerCase().includes(searchPatient) &&
+      filteredByAlerts(index);
+    if (!include) {
+      filteredOutIndex.push(index);
+    }
+    return include;
+  });
+  console.log(filteredData);
+  console.log(filteredOutIndex);
+  const filteredVital = vitals.filter(
+    (_, index) => !filteredOutIndex.includes(index)
+  );
+  console.log(filteredVital);
+
+  const filteredNurses = nurses.filter(
+    (_, index) => !filteredOutIndex.includes(index)
+  );
+  console.log(filteredNurses);
 
   return (
     <div className="flex flex-col p-8 gap-6 w-full shadow-lg bg-slate-100">
@@ -389,75 +442,77 @@ export default function Wards() {
         />
       </div>
       <div className="grid grid-cols-2 gap-4 flex" ref={parent}>
-        {data
-          .filter(
-            (bed, index) =>
-              (bed.patient as Patient)?.name
-                .toLowerCase()
-                .includes(searchPatient) && filteredByAlerts(index)
-          )
-          .map((pd, index) => (
-            <div
-              className="bg-white rounded-2xl p-4 shadow-lg hover:cursor-pointer hover:bg-blue-100"
-              onClick={() =>
-                viewPatientVisualisation((pd.patient as Patient)?._id, pd._id)
-              }
-              key={pd._id}
-            >
-              <div className="flex items-start justify-start">
-                <div className="w-1/2 flex items-start justify-start">
-                  <img
-                    style={{ borderRadius: "50%" }}
-                    width={60}
-                    src={profilePic.src}
-                  />
-
-                  <div className="text-left px-4">
-                    <h3>{(pd.patient as Patient)?.name}</h3>
+        {filteredData.map((pd, index) => (
+          <div
+            className="bg-white rounded-2xl p-4 shadow-lg hover:cursor-pointer hover:bg-blue-100"
+            onClick={() =>
+              viewPatientVisualisation((pd.patient as Patient)?._id, pd._id)
+            }
+            key={pd._id}
+          >
+            <div className="flex items-start justify-start">
+              <div className="w-1/2 flex items-start justify-start">
+                <img
+                  style={{ borderRadius: "50%" }}
+                  width={60}
+                  src={profilePic.src}
+                />
+                <div className="text-left px-4">
+                  <h3>{(pd.patient as Patient)?.name}</h3>
+                  <p>
+                    Ward: {(pd.ward as Ward)?.wardNum} Bed: {pd.bedNum}
+                  </p>
+                  {filteredNurses[index]?.length > 0 ? (
                     <p>
-                      Ward: {(pd.ward as Ward)?.wardNum} Bed: {pd.bedNum}
+                      Nurse:{" "}
+                      {filteredNurses[index]
+                        .map((nurse: BedSideNurse) => nurse.name)
+                        .join(", ")}
                     </p>
-                  </div>
-                </div>
-                <div className="w-1/2 flex items-start justify-around">
-                  <DashboardAlertIcon
-                    patientId={(pd.patient as Patient)?._id}
-                    socketData={
-                      socketPatient?._id === (pd.patient as Patient)?._id
-                        ? socketAlertList
-                        : null
-                    }
-                  />
-                  {nurse?.cardLayout.fallRisk ? (
-                    <div>
-                      <p>Fall Risk</p>
-                      <div className="flex items-center justify-center">
-                        <p>{(pd.patient as Patient)?.fallRisk}</p>
-                      </div>
-                    </div>
-                  ) : null}
-                  {nurse?.cardLayout.news2 ? (
-                    <div>
-                      <p>NEWS2</p>
-                      <p>
-                        {
-                          vitals[index]?.news2Score[
-                            vitals[index]?.news2Score.length - 1
-                          ]?.reading
-                        }
-                      </p>
-                    </div>
-                  ) : null}
+                  ) : (
+                    "-"
+                  )}
                 </div>
               </div>
-              <BedTiles cardLayout={nurse?.cardLayout} smartbed={pd} />
-              <VitalTiles
-                cardLayout={nurse?.cardLayout}
-                data={vitals[index]}
-                patient={pd.patient as Patient}
-              />
+              <div className="w-1/2 flex items-start justify-around">
+                <DashboardAlertIcon
+                  patientId={(pd.patient as Patient)?._id}
+                  socketData={
+                    socketPatient?._id === (pd.patient as Patient)?._id
+                      ? socketAlertList
+                      : null
+                  }
+                />
+                {nurse?.cardLayout.fallRisk ? (
+                  <div>
+                    <p>Fall Risk</p>
+                    <div className="flex items-center justify-center">
+                      <p>{(pd.patient as Patient)?.fallRisk}</p>
+                    </div>
+                  </div>
+                ) : null}
+                {nurse?.cardLayout.news2 ? (
+                  <div>
+                    <p>NEWS2</p>
+                    <p>
+                      {filteredVital[index]?.news2Score?.length > 0
+                        ? filteredVital[index]?.news2Score[
+                            filteredVital[index]?.news2Score.length - 1
+                          ]?.reading || "-"
+                        : "-"}
+                    </p>
+                  </div>
+                ) : null}
+              </div>
             </div>
-          ))}
+            <BedTiles cardLayout={nurse?.cardLayout} smartbed={pd} />
+            <VitalTiles
+              cardLayout={nurse?.cardLayout}
+              data={filteredVital[index]}
+              patient={pd.patient as Patient}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
