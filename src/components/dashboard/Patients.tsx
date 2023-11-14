@@ -193,12 +193,12 @@ export default function Patients({ selectedWard }: PatientListProps) {
     };
 
     const discharge = (patient: any) => {
+      console.log("enter");
       setData((prevData) => {
-        const updatedData = prevData.map((bed) => {
-          if (bed.patient && (bed.patient as Patient)?._id === patient._id) {
-            return { ...bed, bedStatus: "vacant", patient: undefined };
-          }
-          return bed;
+        const updatedData = prevData.filter((bed) => {
+          return !(
+            bed.patient && (bed.patient as Patient)?._id === patient._id
+          );
         });
         return updatedData;
       });
@@ -261,6 +261,33 @@ export default function Patients({ selectedWard }: PatientListProps) {
       fetchPatientVitals();
     }
   }, [data]);
+
+  const filteredOutIndex: number[] = [];
+
+  const filteredData = data.filter((bed, index) => {
+    const include =
+      (bed.patient as Patient)?.name.toLowerCase().includes(searchPatient) &&
+      (bed.patient as Patient)?.condition
+        .toLowerCase()
+        .includes(searchCondition) &&
+      (bed.patient as Patient).fallRisk
+        .toLowerCase()
+        .includes(selectedFallRisk) &&
+      (bed.patient as Patient).acuityLevel
+        .toLowerCase()
+        .includes(selectedAcuity);
+
+    if (!include) {
+      filteredOutIndex.push(index);
+    }
+    return include;
+  });
+  console.log(filteredData);
+  console.log(filteredOutIndex);
+  const filteredVital = vitals.filter(
+    (_, index) => !filteredOutIndex.includes(index)
+  );
+  console.log(filteredVital);
 
   return (
     <div className="h-full overflow-auto scrollbar w-full">
@@ -343,165 +370,140 @@ export default function Patients({ selectedWard }: PatientListProps) {
           </tr>
 
           {/* ------ data rows ------*/}
-          {data
-            .filter((bed) =>
-              (bed.patient as Patient).name
-                .toLowerCase()
-                .includes(searchPatient)
-            )
-            .filter((bed) =>
-              (bed.patient as Patient).condition
-                .toLowerCase()
-                .includes(searchCondition)
-            )
-            .filter((bed) => {
-              return selectedFallRisk === ""
-                ? true
-                : (bed.patient as Patient).fallRisk
-                    ?.toLowerCase()
-                    .includes(selectedFallRisk);
-            })
-            .filter((bed) => {
-              return selectedAcuity === ""
-                ? true
-                : (bed.patient as Patient).acuityLevel
-                    ?.toLowerCase()
-                    .includes(selectedAcuity);
-            })
-            .map((pd, index) => (
-              <tr className="text-left" key={pd._id}>
-                <td className="w-1/12 text-center">
-                  <div className="flex items-center justify-center">
-                    <Link
-                      href={`/patientVisualisation?patientId=${
-                        (pd.patient as Patient)?._id
-                      }&bedId=${pd._id}&viewAlerts=true`}
-                      as={`/patientVisualisation?patientId=${
-                        (pd.patient as Patient)?._id
-                      }&bedId=${pd._id}`}
-                    >
-                      <DashboardAlertIcon
-                        patientId={(pd.patient as Patient)?._id}
-                        socketData={
-                          socketPatient?._id === (pd.patient as Patient)?._id
-                            ? socketAlertList
-                            : null
-                        }
-                      />
-                    </Link>
-                  </div>
-                </td>
-                <td
-                  id="patientName"
-                  className="text-sm p-2 w-1/8 border-solid border-0 border-l border-slate-400 hover:cursor-pointer hover:bg-blue-100 hover:rounded-lg"
-                  onClick={() =>
-                    viewPatientVisualisation(
-                      (pd.patient as Patient)?._id,
-                      pd._id
-                    )
-                  }
-                >
-                  {(pd.patient as Patient)?.name}
-                </td>
-                <TableDataRow
-                  id="patientCondition"
-                  width="1/8"
-                  data={(pd.patient as Patient)?.condition}
-                />
-                <TableDataRow
-                  id="acuity"
-                  width="1/12"
-                  data={(pd.patient as Patient)?.acuityLevel}
-                />
-                <TableDataRow
-                  id="fall-risk"
-                  width="1/12"
-                  data={(pd.patient as Patient)?.fallRisk}
-                />
-                <TableDataRow id="bedNum" width="1/12" data={pd.bedNum} />
-                <TableDataRow
-                  id="wardNum"
-                  width="1/12"
-                  data={(pd.ward as Ward)?.wardNum}
-                />
-                <TableDataRow
-                  id="right-upper-rail"
-                  width="1/12"
-                  data={pd.isRightUpperRail ? "Up" : "Down"}
-                />
-                <TableDataRow
-                  id="right-lower-rail"
-                  width="1/12"
-                  data={pd.isRightLowerRail ? "Up" : "Down"}
-                />
-                <TableDataRow
-                  id="left-upper-rail"
-                  width="1/12"
-                  data={pd.isLeftUpperRail ? "Up" : "Down"}
-                />
-                <TableDataRow
-                  id="left-lower-rail"
-                  width="1/12"
-                  data={pd.isLeftLowerRail ? "Up" : "Down"}
-                />
-                <TableDataRow
-                  id="bed-brakes"
-                  width="1/12"
-                  data={pd.isBrakeSet ? "Set" : "Not Set"}
-                />
-                <TableDataRow
-                  id="lowest-position"
-                  width="1/12"
-                  data={pd.isLowestPosition ? "Yes" : "No"}
-                />
-                <TableDataRow
-                  id="bp-reading"
-                  width="1/12"
-                  data={[
-                    vitals[index]?.bloodPressureSys[
-                      vitals[index]?.bloodPressureSys.length - 1
-                    ]?.reading,
-                    vitals[index]?.bloodPressureDia[
-                      vitals[index]?.bloodPressureDia.length - 1
-                    ]?.reading,
-                  ]}
-                />
+          {filteredData.map((pd, index) => (
+            <tr className="text-left" key={pd._id}>
+              <td className="w-1/12 text-center">
+                <div className="flex items-center justify-center">
+                  <Link
+                    href={`/patientVisualisation?patientId=${
+                      (pd.patient as Patient)?._id
+                    }&bedId=${pd._id}&viewAlerts=true`}
+                    as={`/patientVisualisation?patientId=${
+                      (pd.patient as Patient)?._id
+                    }&bedId=${pd._id}`}
+                  >
+                    <DashboardAlertIcon
+                      patientId={(pd.patient as Patient)?._id}
+                      socketData={
+                        socketPatient?._id === (pd.patient as Patient)?._id
+                          ? socketAlertList
+                          : null
+                      }
+                    />
+                  </Link>
+                </div>
+              </td>
+              <td
+                id="patientName"
+                className="text-sm p-2 w-1/8 border-solid border-0 border-l border-slate-400 hover:cursor-pointer hover:bg-blue-100 hover:rounded-lg"
+                onClick={() =>
+                  viewPatientVisualisation((pd.patient as Patient)?._id, pd._id)
+                }
+              >
+                {(pd.patient as Patient)?.name}
+              </td>
+              <TableDataRow
+                id="patientCondition"
+                width="1/8"
+                data={(pd.patient as Patient)?.condition}
+              />
+              <TableDataRow
+                id="acuity"
+                width="1/12"
+                data={(pd.patient as Patient)?.acuityLevel}
+              />
+              <TableDataRow
+                id="fall-risk"
+                width="1/12"
+                data={(pd.patient as Patient)?.fallRisk}
+              />
+              <TableDataRow id="bedNum" width="1/12" data={pd.bedNum} />
+              <TableDataRow
+                id="wardNum"
+                width="1/12"
+                data={(pd.ward as Ward)?.wardNum}
+              />
+              <TableDataRow
+                id="right-upper-rail"
+                width="1/12"
+                data={pd.isRightUpperRail ? "Up" : "Down"}
+              />
+              <TableDataRow
+                id="right-lower-rail"
+                width="1/12"
+                data={pd.isRightLowerRail ? "Up" : "Down"}
+              />
+              <TableDataRow
+                id="left-upper-rail"
+                width="1/12"
+                data={pd.isLeftUpperRail ? "Up" : "Down"}
+              />
+              <TableDataRow
+                id="left-lower-rail"
+                width="1/12"
+                data={pd.isLeftLowerRail ? "Up" : "Down"}
+              />
+              <TableDataRow
+                id="bed-brakes"
+                width="1/12"
+                data={pd.isBrakeSet ? "Set" : "Not Set"}
+              />
+              <TableDataRow
+                id="lowest-position"
+                width="1/12"
+                data={pd.isLowestPosition ? "Yes" : "No"}
+              />
+              <TableDataRow
+                id="bp-reading"
+                width="1/12"
+                data={[
+                  filteredVital[index]?.bloodPressureSys[
+                    filteredVital[index]?.bloodPressureSys.length - 1
+                  ]?.reading,
+                  filteredVital[index]?.bloodPressureDia[
+                    filteredVital[index]?.bloodPressureDia.length - 1
+                  ]?.reading,
+                ]}
+              />
 
-                <TableDataRow
-                  id="hr-reading"
-                  width="1/12"
-                  data={Math.round(
-                    vitals[index]?.heartRate[
-                      vitals[index]?.heartRate.length - 1
-                    ]?.reading
-                  )}
-                />
-                <TableDataRow
-                  id="resp-reading"
-                  width="1/5"
-                  data={
-                    vitals[index]?.respRate[vitals[index]?.respRate.length - 1]
-                      ?.reading
-                  }
-                />
+              <TableDataRow
+                id="hr-reading"
+                width="1/12"
+                data={Math.round(
+                  filteredVital[index]?.heartRate[
+                    filteredVital[index]?.heartRate.length - 1
+                  ]?.reading
+                )}
+              />
+              <TableDataRow
+                id="resp-reading"
+                width="1/5"
+                data={
+                  filteredVital[index]?.respRate[
+                    filteredVital[index]?.respRate.length - 1
+                  ]?.reading
+                }
+              />
 
-                <TableDataRow
-                  id="spo2-reading"
-                  data={
-                    vitals[index]?.spO2[vitals[index]?.spO2.length - 1]?.reading
-                  }
-                />
+              <TableDataRow
+                id="spo2-reading"
+                data={
+                  filteredVital[index]?.spO2[
+                    filteredVital[index]?.spO2.length - 1
+                  ]?.reading
+                }
+              />
 
-                <TableDataRow
-                  id="temp-reading"
-                  data={
-                    vitals[index]?.temperature[
-                      vitals[index]?.temperature.length - 1
-                    ]?.reading
-                  }
-                />
-              </tr>
-            ))}
+              <TableDataRow
+                id="temp-reading"
+                data={
+                  filteredVital[index]?.temperature[
+                    filteredVital[index]?.temperature.length - 1
+                  ]?.reading
+                }
+              />
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
