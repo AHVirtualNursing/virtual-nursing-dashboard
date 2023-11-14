@@ -25,6 +25,7 @@ import GridViewIcon from "@mui/icons-material/GridView";
 import ListIcon from "@mui/icons-material/List";
 import { fetchBedsideNursesByBedId } from "./api/chat_api";
 import { BedSideNurse } from "@/types/bedsideNurse";
+import { toast } from "react-toastify";
 
 export default function Wards() {
   const router = useRouter();
@@ -192,6 +193,12 @@ export default function Wards() {
     }
   }, [data]);
 
+  const AlertToast = ({ message }: any) => (
+    <div>
+      <p>{message}</p>
+    </div>
+  );
+
   useEffect(() => {
     const refreshContent = (updatedBed: any) => {
       console.log("enter");
@@ -203,6 +210,14 @@ export default function Wards() {
           updatedBeds[index] = updatedBed;
           console.log(updatedBeds);
           return updatedBeds;
+        } else {
+          console.log("bed not found");
+          console.log(updatedBed.bedStatus);
+          if (updatedBed.bedStatus === "occupied") {
+            console.log("ENTER");
+            const message = `${updatedBed.patient.name} has been admitted.`;
+            toast.success(<AlertToast message={message} />);
+          }
         }
         return prevData;
       });
@@ -263,27 +278,12 @@ export default function Wards() {
       setSocketPatient(data.patient);
     };
 
-    const handleAlertUpdate = (data: any) => {
-      setData((prevData) => {
-        const updatedData = prevData.map((bed) => {
-          console.log(data.patient);
-          if (bed.patient && (bed.patient as Patient)?._id === data.patient) {
-            console.log("ENTER");
-            return { ...bed, alert: data };
-          }
-          return bed;
-        });
-        return updatedData;
-      });
-    };
-
     socket.on("updatedSmartbed", refreshContent);
     socket.on("updatedPatient", refreshPatientInfo);
     socket.on("updatedVitals", refreshPatientVitals);
     socket.on("dischargePatient", discharge);
     socket.on("patientAlertAdded", handleAlertIncoming);
     socket.on("patientAlertDeleted", handleDeleteAlert);
-    socket.on("updatedAlert", handleAlertUpdate);
     return () => {
       socket.off("updatedSmartbed", refreshContent);
       socket.off("updatedPatient", refreshPatientInfo);
@@ -291,7 +291,6 @@ export default function Wards() {
       socket.off("dischargePatient", discharge);
       socket.off("patientAlertAdded", handleAlertIncoming);
       socket.off("patientAlertDeleted", handleDeleteAlert);
-      socket.on("updatedAlert", handleAlertUpdate);
     };
   }, []);
 
