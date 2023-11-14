@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { Box, Button, Tab, Tabs } from "@mui/material";
 import { useRouter } from "next/router";
 import Image from "next/image";

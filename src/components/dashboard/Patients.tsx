@@ -270,12 +270,16 @@ export default function Patients({ selectedWard }: PatientListProps) {
       (bed.patient as Patient)?.condition
         .toLowerCase()
         .includes(searchCondition) &&
-      (bed.patient as Patient).fallRisk
-        .toLowerCase()
-        .includes(selectedFallRisk) &&
-      (bed.patient as Patient).acuityLevel
-        .toLowerCase()
-        .includes(selectedAcuity);
+      (selectedAcuity === ""
+        ? true
+        : (bed.patient as Patient).fallRisk
+            ?.toLowerCase()
+            .includes(selectedFallRisk)) &&
+      (selectedFallRisk === ""
+        ? true
+        : (bed.patient as Patient).acuityLevel
+            ?.toLowerCase()
+            .includes(selectedAcuity));
 
     if (!include) {
       filteredOutIndex.push(index);

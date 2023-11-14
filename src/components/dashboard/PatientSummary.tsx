@@ -76,10 +76,15 @@ const PatientSummary = ({
       }
 
       setFallRiskData(
-        Array.from(fallRisks, ([name, value]) => ({ name, value }))
+        Array.from(fallRisks, ([name, value]) => ({
+          name,
+          value,
+        })).filter((element) => element.name !== undefined)
       );
       setAcuityData(
-        Array.from(acuityLevels, ([name, value]) => ({ name, value }))
+        Array.from(acuityLevels, ([name, value]) => ({ name, value })).filter(
+          (element) => element.name !== undefined
+        )
       );
 
       setPatients(numPatients);
