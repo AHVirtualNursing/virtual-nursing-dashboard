@@ -190,12 +190,12 @@ export default function Patients({ selectedWard }: PatientListProps) {
     };
 
     const discharge = (patient: any) => {
+      console.log("enter");
       setData((prevData) => {
-        const updatedData = prevData.map((bed) => {
-          if (bed.patient && (bed.patient as Patient)?._id === patient._id) {
-            return { ...bed, bedStatus: "vacant", patient: undefined };
-          }
-          return bed;
+        const updatedData = prevData.filter((bed) => {
+          return !(
+            bed.patient && (bed.patient as Patient)?._id === patient._id
+          );
         });
         return updatedData;
       });
