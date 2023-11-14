@@ -11,13 +11,15 @@ type AlertPatientMapping = {
 type AlertDetailsModalProps = {
   pressed: boolean;
   setShown: Function;
-  alertPatientMapping: AlertPatientMapping | undefined;
+  alertPatientMapping?: AlertPatientMapping | undefined;
+  alert?: Alert;
 };
 
 const AlertDetailsModal = ({
   pressed,
   setShown,
   alertPatientMapping,
+  alert,
 }: AlertDetailsModalProps) => {
   const style = {
     position: "absolute" as "absolute",
@@ -36,7 +38,7 @@ const AlertDetailsModal = ({
 
   const patientName = alertPatientMapping?.patient;
   const { status, alertVitals, description, handledBy, createdAt, notes } =
-    alertPatientMapping?.alert || {};
+    alertPatientMapping?.alert || alert || {};
 
   const [open, setOpen] = useState(pressed);
   const handleClose = () => {

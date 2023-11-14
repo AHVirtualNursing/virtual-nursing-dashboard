@@ -4,6 +4,7 @@ import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
 import React, { useContext, useEffect, useState } from "react";
 import AlertsTableRow from "../alerts/AlertsTableRow";
 import { SocketContext } from "@/pages/layout";
+import AlertDetailsModal from "../alerts/AlertDetailsModal";
 
 interface PatientProp {
   patient: Patient | undefined;
@@ -17,6 +18,8 @@ const PatientAlerts = (patientProp: PatientProp) => {
   const [nurseSearch, setNurseSearch] = useState("");
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [socketData, setSocketData] = useState<Alert>();
+  const [shown, setShown] = useState(false);
+  const [selectedAlert, setSelectedAlert] = useState<Alert>();
   const socket = useContext(SocketContext);
 
   useEffect(() => {
@@ -37,8 +40,20 @@ const PatientAlerts = (patientProp: PatientProp) => {
     });
   }, [patientProp.patient?._id, socketData]);
 
+  const handleViewAlertDetails = (alert: Alert) => {
+    setSelectedAlert(alert);
+    setShown(true);
+  };
+
   return (
     <div className="overflow-auto scrollbar bg-white rounded-lg shadow-lg p-4 h-auto max-h-[700px] space-y-3">
+      {shown && (
+        <AlertDetailsModal
+          pressed={shown}
+          setShown={setShown}
+          alert={selectedAlert}
+        />
+      )}
       <table className="table-auto md:table-fixed border-collapse w-full">
         <thead className="text-sm bg-slate-100">
           {/* ------ column headers ------ */}
@@ -127,7 +142,7 @@ const PatientAlerts = (patientProp: PatientProp) => {
                 )
               )
               .map((alert, index) => (
-                <tr key={index}>
+                <tr key={index} onClick={() => handleViewAlertDetails(alert)}>
                   <td
                     className={`text-sm border-solid border-0 border-b border-slate-400`}
                   >
