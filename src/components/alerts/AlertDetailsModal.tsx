@@ -1,6 +1,7 @@
 import { Alert, AlertVitals } from "@/types/alert";
 import { Box, Modal, Typography } from "@mui/material";
 import React, { useState } from "react";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 type AlertPatientMapping = {
   alert: Alert;
@@ -29,6 +30,8 @@ const AlertDetailsModal = ({
     boxShadow: 24,
     p: 4,
     borderRadius: 10,
+    maxHeight: "500px",
+    overflow: "auto",
   };
 
   const patientName = alertPatientMapping?.patient;
@@ -48,10 +51,13 @@ const AlertDetailsModal = ({
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Alert Details
-          </Typography>
+        <div className="overflow-auto scrollbar absolute p-4 max-h-[500px] border-2 border-solid top-1/4 left-1/4  shadow-lg bg-white w-[600px] ">
+          <div className="flex justify-between">
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Alert Details
+            </Typography>
+            <CancelIcon fontSize="small" onClick={handleClose} />
+          </div>
           <div className="space-y-6">
             <div className="flex justify-between items-center font-bold text-lg">
               <p>{patientName}</p>
@@ -65,7 +71,7 @@ const AlertDetailsModal = ({
             </div>
             <p className="text-gray-600">{description}</p>
             <p className="text-lg">
-              Nurse: {handledBy ? handledBy.addedBy : "-"}
+              Nurse: {handledBy ? handledBy?.addedBy : "-"}
             </p>
             <p className="text-lg">
               Notes:{" "}
@@ -92,19 +98,13 @@ const AlertDetailsModal = ({
                 ))}
             </div>
             <button
-              className="float-right p-2 rounded-lg bg-blue-900 text-white"
-              onClick={handleClose}
-            >
-              Redelegate
-            </button>
-            <button
               className="float-right p-2 mx-2 rounded-lg bg-white text-black"
               onClick={handleClose}
             >
               Close
             </button>
           </div>
-        </Box>
+        </div>
       </Modal>
     </div>
   );
