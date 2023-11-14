@@ -18,6 +18,7 @@ const BedStatusComponent = ({ bed }: BedProp) => {
   const [fallRisk, setFallRisk] = useState<string | undefined>();
   const [currBed, setCurrBed] = useState<SmartBed>();
   const [reasonAdded, setReasonAdded] = useState<boolean>(false);
+  const [showError, setShowError] = useState<boolean>(false);
   const [inputReason, setInputReason] = useState<string | undefined>("");
   const [socketData, setSocketData] = useState();
   const socket = useContext(SocketContext);
@@ -54,8 +55,13 @@ const BedStatusComponent = ({ bed }: BedProp) => {
   }, [bed?.patient, socketData, bed?._id]);
 
   const handleConfirm = () => {
-    setReasonAdded(true);
-    updateProtocolBreachReason(currBed?._id, inputReason as string);
+    if (inputReason !== "") {
+      setShowError(false);
+      setReasonAdded(true);
+      updateProtocolBreachReason(currBed?._id, inputReason as string);
+    } else {
+      setShowError(true);
+    }
   };
 
   const BedAlarmWarning = () => {
@@ -72,9 +78,9 @@ const BedStatusComponent = ({ bed }: BedProp) => {
           //   }}
           // />
           (reasonAdded || currBed?.bedAlarmProtocolBreachReason ? (
-            <ReportIcon color="warning" />
+            <WarningIcon style={{ color: "orange" }} />
           ) : (
-            <WarningIcon color="error" />
+            <WarningIcon style={{ color: "red" }} />
           ))}
       </>
     );
@@ -96,7 +102,7 @@ const BedStatusComponent = ({ bed }: BedProp) => {
   };
 
   return (
-    <div className="flex max-h-[470px] overflow-auto scrollbar p-2 gap-5">
+    <div className="flex max-h-[470px] overflow-auto scrollbar p-2 gap-5 items-center">
       <div id="bed-image" className="flex-1 p-2">
         <div id="left-rails" className="flex gap-5 justify-evenly pt-4">
           <BedRailCard
@@ -139,23 +145,18 @@ const BedStatusComponent = ({ bed }: BedProp) => {
           />
         </div>
         <div
-          id="legend-green"
+          id="legend-bed-rail"
           className="flex gap-2 justify-center items-center text-sm p-3"
         >
           <div className="bg-emerald-400 w-4 h-4"></div>
           <p>Rail Up</p>
-        </div>
-        <div
-          id="legend-orange"
-          className="flex gap-2 justify-center items-center text-sm p-2"
-        >
           <div className="bg-orange-400 w-4 h-4"></div>
           <p>Rail Down</p>
         </div>
       </div>
       <div id="bed-info" className="bg-white flex-1 space-y-4 p-2 text-left">
         <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
-          Fall Risk: {fallRisk}
+          Fall Risk: {fallRisk ? fallRisk : "-"}
         </div>
         <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
           Bed Position: {currBed?.bedPosition}
@@ -195,7 +196,17 @@ const BedStatusComponent = ({ bed }: BedProp) => {
             onChange={(event) => setInputReason(event.target.value)}
           />
         )}
+        {showError && <p className="text-red text-sm">Please enter a reason</p>}
         <ConfirmButton />
+        <div
+          id="legend-bed-tabs"
+          className="flex gap-2 justify-center items-center text-sm p-3"
+        >
+          <WarningIcon style={{ color: "orange" }} />
+          <p>To Be Monitored</p>
+          <WarningIcon style={{ color: "red" }} />
+          <p>Requires Immediate Attention</p>
+        </div>
       </div>
     </div>
   );

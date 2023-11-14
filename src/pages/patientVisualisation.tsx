@@ -109,7 +109,7 @@ const patientVisualisationPage = () => {
                   Patient is homesick and wants to be discharged as soon as
                   possible
                 </p> */}
-                <button
+                {/* <button
                   className={`${
                     (selectedBed?.patient as Patient)?.fallRisk === "High"
                       ? "bg-red-400"
@@ -122,7 +122,7 @@ const patientVisualisationPage = () => {
                 </button>
                 <button className="pointer-events-none text-white font-bold p-1 border-none mr-4 bg-orange-400 mt-4 w-1/5">
                   Acuity Level: {(selectedBed?.patient as Patient)?.acuityLevel}
-                </button>
+                </button> */}
               </div>
               <div></div>
             </Box>
