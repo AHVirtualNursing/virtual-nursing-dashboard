@@ -25,7 +25,6 @@ import GridViewIcon from "@mui/icons-material/GridView";
 import ListIcon from "@mui/icons-material/List";
 import { fetchBedsideNursesByBedId } from "./api/chat_api";
 import { BedSideNurse } from "@/types/bedsideNurse";
-import { toast } from "react-toastify";
 
 export default function Wards() {
   const router = useRouter();
@@ -43,7 +42,6 @@ export default function Wards() {
   const socket = useContext(SocketContext);
   const [socketAlertList, setSocketAlertList] = useState<Alert[]>();
   const [socketPatient, setSocketPatient] = useState<Patient>();
-  const hasDisplayedToast = useRef(false);
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
@@ -194,12 +192,6 @@ export default function Wards() {
     }
   }, [data]);
 
-  const AlertToast = ({ message }: any) => (
-    <div>
-      <p>{message}</p>
-    </div>
-  );
-
   useEffect(() => {
     const refreshContent = (updatedBed: any) => {
       setData((prevData) => {
@@ -208,13 +200,6 @@ export default function Wards() {
           const updatedBeds = [...prevData];
           updatedBeds[index] = updatedBed;
           return updatedBeds;
-        } else if (
-          updatedBed.bedStatus === "occupied" &&
-          !hasDisplayedToast.current
-        ) {
-          hasDisplayedToast.current = true;
-          const message = `${updatedBed.patient.name} has been admitted.`;
-          toast.success(<AlertToast message={message} />);
         }
         return prevData;
       });

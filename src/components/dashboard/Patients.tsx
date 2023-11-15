@@ -13,11 +13,9 @@ import Link from "next/link";
 import DashboardAlertIcon from "./DashboardAlertIcon";
 import { Alert } from "@/types/alert";
 import { Patient } from "@/types/patient";
-import HotelIcon from "@mui/icons-material/Hotel";
 import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
 import { SocketContext } from "@/pages/layout";
 import SelectFilter from "../SelectFilter";
-import { toast } from "react-toastify";
 
 type PatientListProps = {
   /**
@@ -40,7 +38,6 @@ export default function Patients({ selectedWard }: PatientListProps) {
   const socket = useContext(SocketContext);
   const [socketAlertList, setSocketAlertList] = useState<Alert[]>();
   const [socketPatient, setSocketPatient] = useState<Patient>();
-  const hasDisplayedToast = useRef(false);
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
@@ -147,12 +144,6 @@ export default function Patients({ selectedWard }: PatientListProps) {
     }
   };
 
-  const AlertToast = ({ message }: any) => (
-    <div>
-      <p>{message}</p>
-    </div>
-  );
-
   useEffect(() => {
     const refreshContent = (updatedBed: any) => {
       setData((prevData) => {
@@ -161,13 +152,6 @@ export default function Patients({ selectedWard }: PatientListProps) {
           const updatedBeds = [...prevData];
           updatedBeds[index] = updatedBed;
           return updatedBeds;
-        } else if (
-          updatedBed.bedStatus === "occupied" &&
-          !hasDisplayedToast.current
-        ) {
-          hasDisplayedToast.current = true;
-          const message = `${updatedBed.patient.name} has been admitted.`;
-          toast.success(<AlertToast message={message} />);
         }
         return prevData;
       });

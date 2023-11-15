@@ -65,6 +65,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       }
     };
 
+    const admitPatientToast = (data: any) => {
+      console.log("admitting patient toast");
+      const message = `${data.patient.name} has been admitted.`;
+      toast.success(<AlertToast message={message} />);
+    };
+
     const dischargePatientToast = (data: any) => {
       console.log("toasting discharge patient");
       const message = `${data.name} has been discharged.`;
@@ -73,10 +79,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     socket.on("alertIncoming", handleAlertIncoming);
     socket.on("dischargePatient", dischargePatientToast);
+    socket.on("admitPatient", admitPatientToast);
     // Clean up the event listener when the component unmounts
     return () => {
       socket.off("alertIncoming", handleAlertIncoming);
       socket.off("dischargePatient", dischargePatientToast);
+      socket.off("admitPatient", admitPatientToast);
     };
   }, [nurseId]);
 
