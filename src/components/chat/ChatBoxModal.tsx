@@ -214,7 +214,7 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
       beds.push(...smartbeds);
     }
     beds = beds.filter(
-      (bed) => bed.patient !== undefined || bed.patient !== null
+      (bed) => bed.patient !== undefined && bed.patient !== null
     );
 
     setBedsWithPatientsData(beds);
