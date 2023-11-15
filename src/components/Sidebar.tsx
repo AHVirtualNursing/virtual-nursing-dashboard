@@ -11,7 +11,7 @@ export default function Sidebar() {
       <SidebarTab
         name={"Patients"}
         icon={<GroupIcon style={{ color: "white" }} />}
-        dest={"dashboard"}
+        dest={"wards"}
       />
       <SidebarTab
         name={"Alerts"}

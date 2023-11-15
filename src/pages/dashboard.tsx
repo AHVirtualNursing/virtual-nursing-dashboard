@@ -26,7 +26,7 @@ export default function Dashboard() {
   }, [nurseId]);
 
   return (
-    <div className="flex flex-col p-8 gap-6 w-full shadow-lg bg-slate-100">
+    <div className="flex flex-col p-8 gap-3 w-full shadow-lg bg-slate-100">
       <div className="flex justify-between">
         <h4>Virtual Nurse Dashboard</h4>
         <button
@@ -73,7 +73,7 @@ export default function Dashboard() {
           defaultValue="today"
         />
       </div>
-      <div className="bg-white rounded-2xl h-2/6 p-4 flex shadow-lg ">
+      <div className="bg-white rounded-2xl h-2/6 p-4 flex shadow-lg overflow-x-auto scrollbar">
         <AlertsSummary
           selectedWard={selectedOption}
           selectedTime={selectedTime}
@@ -85,7 +85,7 @@ export default function Dashboard() {
           wards={wards}
         />
       </div>
-      <div className="bg-white rounded-2xl h-4/6 p-3 shadow-lg">
+      <div className="bg-white rounded-2xl h-4/6 p-3 mt-5 shadow-lg">
         <Patients selectedWard={selectedOption} />
       </div>
     </div>

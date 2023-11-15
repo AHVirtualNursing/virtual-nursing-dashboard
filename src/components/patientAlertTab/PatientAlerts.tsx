@@ -136,7 +136,9 @@ const PatientAlerts = (patientProp: PatientProp) => {
               .filter((alert) =>
                 alert.status.toLowerCase().includes(statusCriteria)
               )
-              .filter((alert) => alert.alertType.includes(alertTypeCriteria))
+              .filter((alert) =>
+                alert.alertType.toLowerCase().includes(alertTypeCriteria)
+              )
               .filter((alert) => {
                 return vitalCriteria === ""
                   ? true

@@ -1,5 +1,4 @@
 import { Alert } from "@/types/alert";
-import { fetchAllAlerts } from "@/pages/api/alerts_api";
 import React, { useEffect, useState } from "react";
 import { BarChart, Bar, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Ward } from "@/types/ward";
@@ -57,19 +56,19 @@ const AlertsSummary = ({
   ];
 
   return (
-    <div className="flex flex-col w-1/2 p-4 gap-y-4">
-      <h3 className="text-center">Alerts Summary</h3>
+    <div className="flex flex-col w-1/2 p-4 gap-y-4 align-middle">
+      <h4 className="text-left">Alerts Summary</h4>
       <div className="h-full flex gap-x-5">
-        <div className="w-1/4 rounded-md bg-pink-200 flex items-center justify-center p-3">
+        <div className="w-1/6 rounded-md bg-pink-200 flex items-center justify-center p-3">
           <p>Total: {alerts && alerts.length}</p>
         </div>
         <div className="w-3/4">
-          <ResponsiveContainer width="80%" height="100%">
+          <ResponsiveContainer width="80%" height="90%">
             <BarChart
-              width={150}
+              width={100}
               height={40}
               data={alertsData}
-              maxBarSize={30}
+              maxBarSize={20}
               layout="vertical"
             >
               <XAxis type="number" hide />
