@@ -282,12 +282,12 @@ export default function Patients({ selectedWard }: PatientListProps) {
       (bed.patient as Patient)?.condition
         .toLowerCase()
         .includes(searchCondition) &&
-      (selectedAcuity === ""
+      (selectedFallRisk === ""
         ? true
         : (bed.patient as Patient).fallRisk
             ?.toLowerCase()
             .includes(selectedFallRisk)) &&
-      (selectedFallRisk === ""
+      (selectedAcuity === ""
         ? true
         : (bed.patient as Patient).acuityLevel
             ?.toLowerCase()
@@ -298,7 +298,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
     }
     return include;
   });
-  console.log(filteredData);
+  console.log("filteredData", filteredData);
   console.log(filteredOutIndex);
   const filteredVital = vitals.filter(
     (_, index) => !filteredOutIndex.includes(index)
