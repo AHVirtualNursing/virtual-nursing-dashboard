@@ -1,10 +1,9 @@
 import { Vital } from "@/types/vital";
 import axios from "axios";
-import { Layout, Layouts } from "react-grid-layout";
 
 export const fetchAllPatients = async () => {
   try {
-    const res = await axios.get("http://localhost:3001/patient/");
+    const res = await axios.get(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/patient/`);
     return res.data;
   } catch (error) {
     console.log(error);
@@ -16,7 +15,7 @@ export const fetchAlertsByPatientId = async (
 ) => {
   try {
     const res = await axios.get(
-      `http://localhost:3001/patient/${patientId}/alerts`
+      process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/patient/${patientId}/alerts`
     );
     return res.data;
   } catch (error) {
@@ -28,7 +27,7 @@ export const fetchPatientByPatientId = async (
   patientId: string | string[] | undefined
 ) => {
   try {
-    const res = await axios.get(`http://localhost:3001/patient/${patientId}`);
+    const res = await axios.get(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/patient/${patientId}`);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -39,7 +38,7 @@ export const fetchPatientByPatientNRIC = async (
   patientNRIC: string | string[] | undefined
 ) => {
   try {
-    const res = await axios.get(`http://localhost:3001/patient/nric/${patientNRIC}`);
+    const res = await axios.get(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/patient/nric/${patientNRIC}`);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -51,7 +50,7 @@ export const updatePatientConditionByPatientId = async (
   condition: string
 ) => {
   try {
-    const res = await axios.put(`http://localhost:3001/patient/${patientId}`, {
+    const res = await axios.put(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/patient/${patientId}`, {
       condition: condition,
     });
     return res;
@@ -65,7 +64,7 @@ export const updatePatientLayoutByPatientId = async (
   order: string[]
 ) => {
   try {
-    const res = await axios.put(`http://localhost:3001/patient/${patientId}`, {
+    const res = await axios.put(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/patient/${patientId}`, {
       order: order,
     });
     return res;
@@ -81,7 +80,7 @@ export const createNewPatient = async (
   smartbedId: string
 ) => {
   try {
-    const res = await axios.post(`http://localhost:3001/patient`, {
+    const res = await axios.post(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/patient`, {
       name: patientName,
       nric: patientNric,
       condition: condition,
@@ -99,7 +98,7 @@ export const getVitalByPatientId = async (
   var vital: Vital | null = null;
   try {
     const response = await fetch(
-      `http://localhost:3001/patient/${patientId}/vital`,
+      process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/patient/${patientId}/vital`,
       {
         method: "GET",
         headers: { "Content-type": "application/json" },

@@ -13,7 +13,7 @@ export default NextAuth({
       },
       async authorize(credentials) {
         const res = await axios.post(
-          `http://localhost:3001/auth/login`,
+          process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/auth/login`,
           {
             identifier: credentials?.identifier,
             password: credentials?.password,

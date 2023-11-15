@@ -25,7 +25,7 @@ export const fetchVirtualNurseByNurseId = async (
   nurseId: string | string[] | undefined
 ) => {
   try {
-    const res = await axios.get(`http://localhost:3001/user/${nurseId}`, {
+    const res = await axios.get(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/user/${nurseId}`, {
       headers,
     });
     // console.log(res);
@@ -42,7 +42,7 @@ export const fetchWardsByVirtualNurse = async (
 ) => {
   try {
     const res = await axios.get(
-      `http://localhost:3001/virtualNurse/${nurseId}/wards`
+      process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/virtualNurse/${nurseId}/wards`
     );
     return res.data;
   } catch (error) {
@@ -55,7 +55,7 @@ export const updateVirtualNurseCardLayoutByNurseId = async (
   cardLayout: layout
 ) => {
   try {
-    const res = await axios.put(`http://localhost:3001/virtualNurse/${nurseId}`, {
+    const res = await axios.put(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/virtualNurse/${nurseId}`, {
       cardLayout: cardLayout,
     });
     return res;

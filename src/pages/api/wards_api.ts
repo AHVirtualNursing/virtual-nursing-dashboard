@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const fetchAllWards = async () => {
   try {
-    const res = await axios.get("http://localhost:3001/ward");
+    const res = await axios.get(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/ward`);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -12,7 +12,7 @@ export const fetchAllWards = async () => {
 export const fetchBedsByWardId = async (wardId: string) => {
   try {
     const res = await axios.get(
-      `http://localhost:3001/ward/${wardId}/smartbeds`
+      process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/ward/${wardId}/smartbeds`
     );
     return res.data;
   } catch (error) {
@@ -22,7 +22,7 @@ export const fetchBedsByWardId = async (wardId: string) => {
 
 export const fetchAlertsByWardId = async (wardId: string) => {
   try {
-    const res = await axios.get(`http://localhost:3001/ward/${wardId}/alerts`);
+    const res = await axios.get(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/ward/${wardId}/alerts`);
     return res.data;
   } catch (error) {
     console.error(error);

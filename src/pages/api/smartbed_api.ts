@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const fetchAllSmartBeds = async () => {
   try {
-    const res = await axios.get("http://localhost:3001/smartbed/");
+    const res = await axios.get(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/smartbed/`);
     return res.data;
   } catch (error) {
     console.log(error);
@@ -11,7 +11,7 @@ export const fetchAllSmartBeds = async () => {
 
 export const fetchBedByBedId = async (bedId: string | string[] | undefined) => {
   try {
-    const res = await axios.get(`http://localhost:3001/smartbed/${bedId}`);
+    const res = await axios.get(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/smartbed/${bedId}`);
     // console.log(res);
     return res.data;
   } catch (error) {
@@ -24,7 +24,7 @@ export const updateSmartbedByBedId = async (
   patientId: string
 ) => {
   try {
-    const res = await axios.put(`http://localhost:3001/smartbed/${bedId}/`, {
+    const res = await axios.put(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/smartbed/${bedId}/`, {
       patient: patientId,
     });
     return res;
@@ -38,7 +38,7 @@ export const updateProtocolBreachReason = async (
   reason: string
 ) => {
   try {
-    const res = await axios.put(`http://localhost:3001/smartbed/${bedId}/`, {
+    const res = await axios.put(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/smartbed/${bedId}/`, {
       bedAlarmProtocolBreachReason: reason,
     });
     return res;

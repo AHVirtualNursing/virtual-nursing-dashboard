@@ -6,11 +6,11 @@ export const fetchAlertConfigByPatientId = async (
 ) => {
   try {
     const response1 = await axios.get(
-      `http://localhost:3001/patient/${patientId}`
+      process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/patient/${patientId}`
     );
     const configId = response1.data.alertConfig;
     const response2 = await axios.get(
-      `http://localhost:3001/alertConfig/${configId}`
+      process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/alertConfig/${configId}`
     );
     return Promise.resolve(response2);
   } catch (error) {
@@ -24,7 +24,7 @@ export const updateAlertConfig = async (
 ) => {
   try {
     const res = await axios.put(
-      `http://localhost:3001/alertConfig/${configId}`,
+      process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/alertConfig/${configId}`,
       alertConfig
     );
     return res.data;

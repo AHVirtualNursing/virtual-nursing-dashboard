@@ -10,7 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { redelegateAlert } from "./api/alerts_api";
 
 const inter = Inter({ subsets: ["latin"] });
-const socket = io("http://localhost:3001");
+const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT_DEV!);
 export const SocketContext = createContext<Socket>(socket);
 const SocketProvider = ({ children }: any) => {
   return (

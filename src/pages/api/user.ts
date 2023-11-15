@@ -6,7 +6,7 @@ export const callChangePasswordApi = async (
   newPassword: string
 ) => {
   const res = await axios.post(
-    `http://localhost:3001/user/changePassword/${userId}`,
+    process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + `/user/changePassword/${userId}`,
     {
       oldPassword: oldPassword,
       newPassword: newPassword,
