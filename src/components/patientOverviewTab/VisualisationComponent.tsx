@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from "react";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -185,7 +186,7 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
     <div className="flex">
       <ul className="w-11/12">
         {order.map((chartType, index) => (
-          <div>
+          <div key={index}>
             <li className="flex items-center justify-start">
               <div className="w-2/12">
                 <LastUpdatedVital
@@ -268,7 +269,7 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
       <div className="w-1/12 border-0 border-l-2 border-slate-200 border-solid">
         <p className="text-slate-500">Graphs to show</p>
         {drawerOrder.map((chartType, index) => (
-          <div>
+          <div key={index}>
             <List className="flex justify-center items-center">
               <p>{chartType}</p>
               <IconButton size="small" onClick={() => addChartType(chartType)}>

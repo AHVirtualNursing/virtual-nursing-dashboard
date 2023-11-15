@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Box, TableContainer, Table, TableRow, TableCell } from "@mui/material";
@@ -173,8 +174,8 @@ export default function PatientDischargeReport({
                       <strong>Added By</strong>
                     </TableCell>
                   </TableRow>
-                  {patient?.infoLogs?.map((infoLog) => (
-                    <TableRow>
+                  {patient?.infoLogs?.map((infoLog, index) => (
+                    <TableRow key={index}>
                       <TableCell>{infoLog.info}</TableCell>
                       <TableCell>{infoLog.datetime}</TableCell>
                       <TableCell>{infoLog.addedBy}</TableCell>
@@ -194,8 +195,8 @@ export default function PatientDischargeReport({
         "Blood Pressure Diastolic",
         "Temperature",
         "Blood Oxygen",
-      ].map((chartType) => (
-        <div className="mb-16 mt-16">
+      ].map((chartType, index) => (
+        <div className="mb-16 mt-16" key={index}>
           <ResponsiveContainer width={"99%"} height={300}>
             <LineChart
               data={

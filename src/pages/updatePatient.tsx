@@ -28,7 +28,7 @@ const handleSideBarTabClick = (key: string) => {
   router.push({ pathname: "/dashboard", query: { state: key } }, "/dashboard");
 };
 
-function updatePatient() {
+function UpdatePatient() {
   const router = useRouter();
   const patientId = router.query["patientId"];
   const [patientSelected, setSelectedPatient] = useState<Patient>();
@@ -136,4 +136,4 @@ function updatePatient() {
     </div>
   );
 }
-export default updatePatient;
+export default UpdatePatient;

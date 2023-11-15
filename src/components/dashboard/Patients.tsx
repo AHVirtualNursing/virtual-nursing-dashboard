@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import { fetchBedByBedId } from "@/pages/api/smartbed_api";

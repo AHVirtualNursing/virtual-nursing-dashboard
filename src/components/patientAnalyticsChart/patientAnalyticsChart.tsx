@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {

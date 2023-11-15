@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @next/next/no-img-element */
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -373,7 +376,9 @@ export default function Wards() {
           >
             <option value="assigned-wards">Assigned Wards</option>
             {wards.map((ward) => (
-              <option value={`${ward.wardNum}`}>Ward {ward.wardNum}</option>
+              <option key={ward._id} value={`${ward.wardNum}`}>
+                Ward {ward.wardNum}
+              </option>
             ))}
           </select>
           <label

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React from "react";
 import bed from "../../public/bed_stock.png";
 import { Cancel, CheckCircle, Man } from "@mui/icons-material";

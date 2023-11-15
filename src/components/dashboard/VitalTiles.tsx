@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { fetchAlertConfigByPatientId } from "@/pages/api/alertConfigs_api";
 import { AlertConfig } from "@/types/alertConfig";
 import { Patient } from "@/types/patient";

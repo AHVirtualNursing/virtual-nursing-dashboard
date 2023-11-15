@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from "react";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
