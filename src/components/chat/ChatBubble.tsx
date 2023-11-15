@@ -185,7 +185,7 @@ const ChatBubble = ({
                   </>
                 ) : (
                   <Image
-                    src={"profilepic.png"}
+                    src={"/profilepic.png"}
                     alt="Picture"
                     width={80}
                     height={80}
