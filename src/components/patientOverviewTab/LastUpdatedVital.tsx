@@ -1,3 +1,4 @@
+import { getDateTime } from "../patientAnalyticsChart/utils";
 interface dataInterface {
   datetime: string;
   reading: number;
@@ -21,12 +22,22 @@ export default function LastUpdatedVital({
 }) {
   return (
     <div>
-      <h3>{vitals[vital][0]}</h3>
-      <div className="flex items-center justify-center">
-        <h1>{data[data.length - 1]?.reading}</h1>
-        <p>{vitals[vital][1]}</p>
-      </div>
-      <p>Last logged at {data[data.length - 1]?.datetime}</p>
+      {data.length > 0 ? (
+        <div>
+          <h3>{vitals[vital][0]}</h3>
+          <div className="flex items-center justify-center">
+            <h1>{data[data.length - 1]?.reading}</h1>
+            <p>{vitals[vital][1]}</p>
+          </div>
+        </div>
+      ) : null}
+
+      {data.length > 0 ? (
+        <p className="py-40">
+          Last logged at{" "}
+          {getDateTime(new Date(data[data.length - 1]?.datetime))}
+        </p>
+      ) : null}
     </div>
   );
 }
