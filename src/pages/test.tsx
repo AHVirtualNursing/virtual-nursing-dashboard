@@ -1,7 +1,7 @@
 import React from "react";
 import { redelegateAlert } from "./api/alerts_api";
 
-function test() {
+function Test() {
   const id = "6553aa198656cefcd9f717c0";
   const handleRedelegateClick = () => {
     redelegateAlert(id)
@@ -19,4 +19,4 @@ function test() {
   );
 }
 
-export default test;
+export default Test;
