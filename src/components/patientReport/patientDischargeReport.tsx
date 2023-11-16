@@ -51,11 +51,11 @@ export default function PatientDischargeReport({
     setAlertConfigs(alertConfigs);
   };
 
-  const fetchData = async() => {
+  const fetchData = async () => {
     await fetchPatient();
     await fetchVitals();
-    await fetchAlertConfig(); 
-  }
+    await fetchAlertConfig();
+  };
 
   const colours: { [key: string]: string } = {
     "Respiratory Rate": "rgb(255, 102, 102)",
@@ -81,7 +81,8 @@ export default function PatientDischargeReport({
             border: "2px solid black",
             margin: "0 24px",
             width: "95%",
-          }}>
+          }}
+        >
           <TableRow>
             <TableCell style={{ border: "2px solid black" }}>
               <strong>Patient Details</strong>
@@ -92,7 +93,8 @@ export default function PatientDischargeReport({
           </TableRow>
           <TableRow>
             <TableCell
-              style={{ borderRight: "2px solid black", verticalAlign: "top" }}>
+              style={{ borderRight: "2px solid black", verticalAlign: "top" }}
+            >
               <strong>Patient Name:</strong> {patient?.name}
               <br />
               <strong>Patient NRIC:</strong> {patient?.nric}
@@ -173,8 +175,8 @@ export default function PatientDischargeReport({
                       <strong>Added By</strong>
                     </TableCell>
                   </TableRow>
-                  {patient?.infoLogs?.map((infoLog) => (
-                    <TableRow>
+                  {patient?.infoLogs?.map((infoLog, index) => (
+                    <TableRow key={index}>
                       <TableCell>{infoLog.info}</TableCell>
                       <TableCell>{infoLog.datetime}</TableCell>
                       <TableCell>{infoLog.addedBy}</TableCell>
@@ -194,8 +196,8 @@ export default function PatientDischargeReport({
         "Blood Pressure Diastolic",
         "Temperature",
         "Blood Oxygen",
-      ].map((chartType) => (
-        <div className="mb-16 mt-16">
+      ].map((chartType, index) => (
+        <div className="mb-16 mt-16" key={index}>
           <ResponsiveContainer width={"99%"} height={300}>
             <LineChart
               data={
@@ -242,7 +244,8 @@ export default function PatientDischargeReport({
                       };
                     })
                   : []
-              }>
+              }
+            >
               <Line
                 type="monotone"
                 dataKey="reading"

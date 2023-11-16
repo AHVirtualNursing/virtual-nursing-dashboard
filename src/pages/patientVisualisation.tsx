@@ -8,21 +8,21 @@ import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/types/smartbed";
 import VisualisationComponent from "@/components/patientOverviewTab/VisualisationComponent";
 import dynamic from "next/dynamic";
-import PatientReport from "@/components/patientReport/patientReport";
+import PatientReport from "@/components/patientReport/PatientReports";
 import AlertTabComponent from "@/components/patientAlertTab/AlertTabComponent";
 import BedStatusComponent from "@/components/bedStatusTab/BedStatusComponent";
 import { CloudUpload } from "@mui/icons-material";
 import { VisuallyHiddenInput } from "@/styles/Components";
 import { callUploadAndParseMockDataFromS3Api } from "./api/s3_api";
 const PatientChart = dynamic(
-  () => import("@/components/patientAnalyticsChart/patientAnalyticsChart"),
+  () => import("@/components/patientAnalyticsChart/PatientAnalyticsChart"),
   { ssr: false }
 );
 import autoAnimate from "@formkit/auto-animate";
 import { Patient } from "@/types/patient";
 import { Ward } from "@/types/ward";
 
-const patientVisualisationPage = () => {
+const PatientVisualisationPage = () => {
   const router = useRouter();
   console.log("router query", router.query);
   const { patientId, bedId, viewAlerts } = router.query;
@@ -62,7 +62,7 @@ const patientVisualisationPage = () => {
   };
 
   return (
-    <div className="flex flex-col p-8 gap-8 bg-slate-100 w-full shadow-lg">
+    <div className="flex flex-col p-8 gap-5 bg-slate-100 w-full shadow-lg">
       <div className="flex flex-start">
         <h4>Patient Dashboard</h4>
       </div>
@@ -109,7 +109,7 @@ const patientVisualisationPage = () => {
                   Patient is homesick and wants to be discharged as soon as
                   possible
                 </p> */}
-                {/* <button
+                <button
                   className={`${
                     (selectedBed?.patient as Patient)?.fallRisk === "High"
                       ? "bg-red-400"
@@ -122,7 +122,7 @@ const patientVisualisationPage = () => {
                 </button>
                 <button className="pointer-events-none text-white font-bold p-1 border-none mr-4 bg-orange-400 mt-4 w-1/5">
                   Acuity Level: {(selectedBed?.patient as Patient)?.acuityLevel}
-                </button> */}
+                </button>
               </div>
               <div></div>
             </Box>
@@ -183,4 +183,4 @@ const patientVisualisationPage = () => {
   );
 };
 
-export default patientVisualisationPage;
+export default PatientVisualisationPage;
