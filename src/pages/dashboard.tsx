@@ -73,7 +73,7 @@ export default function Dashboard() {
           defaultValue="today"
         />
       </div>
-      <div className="bg-white rounded-2xl h-2/6 p-4 flex shadow-lg overflow-x-auto scrollbar">
+      <div className="bg-white rounded-2xl h-auto p-4 flex shadow-lg overflow-x-auto scrollbar">
         <AlertsSummary
           selectedWard={selectedOption}
           selectedTime={selectedTime}
@@ -85,7 +85,7 @@ export default function Dashboard() {
           wards={wards}
         />
       </div>
-      <div className="bg-white rounded-2xl h-4/6 p-3 mt-5 shadow-lg">
+      <div className="bg-white rounded-2xl h-auto p-3 mt-5 shadow-lg">
         <Patients selectedWard={selectedOption} />
       </div>
     </div>

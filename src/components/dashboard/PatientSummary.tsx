@@ -76,14 +76,12 @@ const PatientSummary = ({
         const num2 = acuityLevels.get((patient as Patient)?.acuityLevel);
         acuityLevels.set((patient as Patient)?.acuityLevel, num2 + 1);
       }
-      console.log(fallRisks);
       setFallRiskData(
         Array.from(fallRisks, ([name, value]) => ({
           name,
           value,
         }))
       );
-      console.log(fallRisks);
       setAcuityData(
         Array.from(acuityLevels, ([name, value]) => ({ name, value }))
       );
@@ -99,12 +97,11 @@ const PatientSummary = ({
       <div className="flex gap-x-5">
         <div>
           <p className="underline text-sm">Fall Risk of Patients</p>
-          <PieChart title="Fall Risks" width={300} height={140}>
+          <PieChart title="Fall Risks" width={300} height={150}>
             <Pie
-              isAnimationActive={false}
               data={fallRiskData}
               cx="50%"
-              cy="50%"
+              cy="55%"
               labelLine={false}
               label={(entry) =>
                 entry.value === 0
@@ -113,7 +110,7 @@ const PatientSummary = ({
                   ? "Pending, " + entry.value
                   : entry.name + ", " + entry.value
               }
-              outerRadius={50}
+              outerRadius={40}
               dataKey="value"
             >
               {fallRiskData.map((entry, index) => (
@@ -128,12 +125,11 @@ const PatientSummary = ({
         <div>
           <p className="underline text-sm">Acuity Level of Patients</p>
 
-          <PieChart title="Acuity Levels" width={300} height={140}>
+          <PieChart title="Acuity Levels" width={300} height={150}>
             <Pie
-              isAnimationActive={false}
               data={acuityData}
               cx="50%"
-              cy="50%"
+              cy="55%"
               labelLine={false}
               label={(entry) =>
                 entry.value === 0
@@ -142,7 +138,7 @@ const PatientSummary = ({
                   ? "Pending, " + entry.value
                   : entry.name + ", " + entry.value
               }
-              outerRadius={50}
+              outerRadius={40}
               dataKey="value"
             >
               {acuityData.map((entry, index) => (
