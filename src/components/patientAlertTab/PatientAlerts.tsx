@@ -141,8 +141,12 @@ const PatientAlerts = (patientProp: PatientProp) => {
               <td></td>
             </tr>
 
-            {filteredAlerts.map((alert, index) => (
-              <tr key={index} onClick={() => handleViewAlertDetails(alert)}>
+            {filteredAlerts?.map((alert, index) => (
+              <tr
+                key={index}
+                onClick={() => handleViewAlertDetails(alert)}
+                className="hover: cursor-pointer"
+              >
                 <td
                   className={`text-sm border-solid border-0 border-b border-slate-400`}
                 >
