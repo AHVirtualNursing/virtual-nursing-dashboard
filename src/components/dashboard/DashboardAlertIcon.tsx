@@ -54,7 +54,7 @@ const DashboardAlertIcon = ({
   }, []);
 
   return (
-    <div id="iconBadgeContainer" className="relative">
+    <div id="iconBadgeContainer" className="flex">
       {lastVitalAlert && lastVitalAlert.status === "open" ? (
         <CampaignIcon
           style={{ color: "red", paddingRight: "10px", fontSize: "40" }}

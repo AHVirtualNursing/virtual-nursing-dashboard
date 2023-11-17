@@ -373,7 +373,9 @@ export default function Wards() {
           >
             <option value="assigned-wards">Assigned Wards</option>
             {wards.map((ward) => (
-              <option value={`${ward.wardNum}`}>Ward {ward.wardNum}</option>
+              <option key={ward._id} value={`${ward.wardNum}`}>
+                Ward {ward.wardNum}
+              </option>
             ))}
           </select>
           <label

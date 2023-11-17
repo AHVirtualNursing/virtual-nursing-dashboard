@@ -46,3 +46,14 @@ export const updateProtocolBreachReason = async (
     console.error(error);
   }
 };
+
+export const removeProtocolBreachReason = async (bedId: string | undefined) => {
+  try {
+    const res = await axios.put(
+      `http://localhost:3001/smartbed/${bedId}/reason`
+    );
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
+};

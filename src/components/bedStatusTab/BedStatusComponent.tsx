@@ -1,26 +1,37 @@
 import React, { useContext, useEffect, useState } from "react";
 import WarningIcon from "@mui/icons-material/Warning";
-import ReportIcon from "@mui/icons-material/Report";
 import {
   fetchBedByBedId,
+  removeProtocolBreachReason,
   updateProtocolBreachReason,
 } from "@/pages/api/smartbed_api";
 import { SmartBed } from "@/types/smartbed";
 import { SocketContext } from "@/pages/layout";
 import { fetchPatientByPatientId } from "@/pages/api/patients_api";
 import { Patient } from "@/types/patient";
+import { Alert, Snackbar, SnackbarOrigin } from "@mui/material";
 
 interface BedProp {
   bed: SmartBed | undefined;
 }
 
+interface SnackBarState extends SnackbarOrigin {
+  open: boolean;
+}
+
 const BedStatusComponent = ({ bed }: BedProp) => {
-  const [fallRisk, setFallRisk] = useState<string | undefined>();
+  const [fallRisk, setFallRisk] = useState<string>();
   const [currBed, setCurrBed] = useState<SmartBed>();
   const [reasonAdded, setReasonAdded] = useState<boolean>(false);
-  const [showError, setShowError] = useState<boolean>(false);
+  const [inputError, setInputError] = useState<boolean>(false);
   const [inputReason, setInputReason] = useState<string | undefined>("");
   const [socketData, setSocketData] = useState();
+  const [snackBarState, setSnackBarState] = useState<SnackBarState>({
+    open: false,
+    vertical: "bottom",
+    horizontal: "right",
+  });
+  const { vertical, horizontal, open } = snackBarState;
   const socket = useContext(SocketContext);
 
   useEffect(() => {
@@ -45,38 +56,22 @@ const BedStatusComponent = ({ bed }: BedProp) => {
 
   useEffect(() => {
     //fetch patient to set fall risk correctly
-    fetchPatientByPatientId((bed?.patient as Patient)?._id).then((patient) =>
-      setFallRisk(patient.fallRisk)
-    );
+    fetchPatientByPatientId((bed?.patient as Patient)?._id).then((patient) => {
+      setFallRisk(patient.fallRisk);
+      if (patient.fallRisk !== "High") removeProtocolBreachReason(bed?._id);
+    });
     fetchBedByBedId(bed?._id).then((bed: SmartBed) => {
       setCurrBed(bed);
       setInputReason(bed?.bedAlarmProtocolBreachReason);
+      if (bed.isBedExitAlarmOn) removeProtocolBreachReason(bed?._id);
     });
   }, [bed?.patient, socketData, bed?._id]);
-
-  const handleConfirm = () => {
-    if (inputReason !== "") {
-      setShowError(false);
-      setReasonAdded(true);
-      updateProtocolBreachReason(currBed?._id, inputReason as string);
-    } else {
-      setShowError(true);
-    }
-  };
 
   const BedAlarmWarning = () => {
     return (
       <>
         {fallRisk === "High" &&
           !currBed?.isBedExitAlarmOn &&
-          // <WarningIcon
-          //   style={{
-          //     color:
-          //       reasonAdded || currBed?.bedAlarmProtocolBreachReason
-          //         ? "orange"
-          //         : "red",
-          //   }}
-          // />
           (reasonAdded || currBed?.bedAlarmProtocolBreachReason ? (
             <WarningIcon style={{ color: "orange" }} />
           ) : (
@@ -93,12 +88,34 @@ const BedStatusComponent = ({ bed }: BedProp) => {
           !currBed?.isBedExitAlarmOn &&
           !currBed?.bedAlarmProtocolBreachReason &&
           reasonAdded === false && (
-            <button className="float-right p-1" onClick={handleConfirm}>
+            <button
+              className="float-right py-2 px-4 bg-blue-900 hover:bg-blue-700 text-white font-bold rounded-full border-none"
+              onClick={handleConfirm}
+            >
               Confirm
             </button>
           )}
       </>
     );
+  };
+
+  const handleConfirm = () => {
+    if (inputReason !== "" && inputReason !== undefined) {
+      setReasonAdded(true);
+      updateProtocolBreachReason(currBed?._id, inputReason as string);
+      setInputError(false);
+    } else {
+      setInputError(true);
+    }
+    handleSnackBarOpen({ vertical: "bottom", horizontal: "right" });
+  };
+
+  const handleSnackBarOpen = (newState: SnackbarOrigin) => {
+    setSnackBarState({ ...newState, open: true });
+  };
+
+  const handleSnackBarClose = () => {
+    setSnackBarState({ ...snackBarState, open: false });
   };
 
   return (
@@ -156,9 +173,6 @@ const BedStatusComponent = ({ bed }: BedProp) => {
       </div>
       <div id="bed-info" className="bg-white flex-1 space-y-4 p-2 text-left">
         <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
-          Fall Risk: {fallRisk ? fallRisk : "-"}
-        </div>
-        <div className="bg-slate-200 font-bold p-2 rounded-lg uppercase">
           Bed Position: {currBed?.bedPosition}
         </div>
         <div className="bg-slate-200 font-bold rounded-lg uppercase flex gap-x-10 px-2 py-1 items-center ">
@@ -185,9 +199,10 @@ const BedStatusComponent = ({ bed }: BedProp) => {
         {fallRisk === "High" && !currBed?.isBedExitAlarmOn && (
           <textarea
             value={inputReason}
+            // cols={50}
             name="reason-input"
             placeholder="Please input reason for protocol breach"
-            className=" focus:border-red-400 p-1 w-full"
+            className=" focus:border-red-400 p-1 font-serif rounded-lg w-4/5"
             disabled={
               reasonAdded || currBed?.bedAlarmProtocolBreachReason
                 ? true
@@ -196,8 +211,22 @@ const BedStatusComponent = ({ bed }: BedProp) => {
             onChange={(event) => setInputReason(event.target.value)}
           />
         )}
-        {showError && <p className="text-red text-sm">Please enter a reason</p>}
         <ConfirmButton />
+        <Snackbar
+          anchorOrigin={{ vertical, horizontal }}
+          open={open}
+          onClose={handleSnackBarClose}
+        >
+          {inputError ? (
+            <Alert severity="error" sx={{ width: "100%" }}>
+              Please input a valid reason!
+            </Alert>
+          ) : (
+            <Alert severity="success" sx={{ width: "100%" }}>
+              Reason input successfully!
+            </Alert>
+          )}
+        </Snackbar>
         <div
           id="legend-bed-tabs"
           className="flex gap-2 justify-center items-center text-sm p-3"

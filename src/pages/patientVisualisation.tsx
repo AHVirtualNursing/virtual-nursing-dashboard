@@ -15,7 +15,7 @@ import { CloudUpload } from "@mui/icons-material";
 import { VisuallyHiddenInput } from "@/styles/Components";
 import { callUploadAndParseMockDataFromS3Api } from "./api/s3_api";
 const PatientChart = dynamic(
-  () => import("@/components/patientAnalyticsChart/patientAnalyticsChart"),
+  () => import("@/components/patientAnalyticsChart/PatientAnalyticsChart"),
   { ssr: false }
 );
 import autoAnimate from "@formkit/auto-animate";
