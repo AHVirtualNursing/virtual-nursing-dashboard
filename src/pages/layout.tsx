@@ -60,22 +60,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       console.log(data);
       console.log(data.patient);
       console.log(data.alert);
+      console.log(data.smartbed);
       if (data.alert.redelegate) {
         const message = `${data.patient.name}: ${data.alert.description}`;
         toast.error(
           <RedelegatedToast message={message} alertId={data.alert._id} />
         );
-        // call api to redelegate alert :D
       } else {
         const message = `${data.patient.name}: ${data.alert.description}`;
         toast.warning(
-          // <Link
-          //   style={{ textDecoration: "none", color: "black" }}
-          //   href={`/patientVisualisation?patientId=${data.patient._id}&bedId=${data._id}&viewAlers=true`}
-          //   as={`/patientVisualisation?patientId=${data.patient._id}&bedId=${data._id}`}
-          // >
-          <AlertToast message={message} />
-          // </Link>
+          <Link
+            style={{ textDecoration: "none", color: "black" }}
+            href={`/patientVisualisation?patientId=${data.patient._id}&bedId=${data.smartbed[0]._id}&viewAlerts=true`}
+            as={`/patientVisualisation?patientId=${data.patient._id}&bedId=${data.smartbed[0]._id}`}
+          >
+            <AlertToast message={message} />
+          </Link>
         );
       }
     };
@@ -95,7 +95,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     const dischargePatientToast = (data: any) => {
       console.log("toasting discharge patient");
-      const message = `${data.name} has been discharged.`;
+      const message = `${data.name} has been discharged. The discharge report is being generated currently.`;
       toast.info(<AlertToast message={message} />);
     };
 

@@ -15,7 +15,7 @@ import { CloudUpload } from "@mui/icons-material";
 import { VisuallyHiddenInput } from "@/styles/Components";
 import { callUploadAndParseMockDataFromS3Api } from "./api/s3_api";
 const PatientChart = dynamic(
-  () => import("@/components/patientAnalyticsChart/PatientAnalyticsChart"),
+  () => import("@/components/patientAnalyticsChart/patientAnalyticsChart"),
   { ssr: false }
 );
 import autoAnimate from "@formkit/auto-animate";
@@ -96,7 +96,7 @@ const PatientVisualisationPage = () => {
             />
             <h3>
               {(selectedBed?.patient as Patient)?.name} (
-              {(selectedBed?.patient as Patient)?.nric})
+              {(selectedBed?.patient as Patient)?.nric.slice(5)})
             </h3>
           </Box>
           <Box style={{ width: "100%" }}>

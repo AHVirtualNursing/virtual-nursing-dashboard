@@ -204,42 +204,42 @@ export default function PatientDischargeReport({
                 chartType == "Respiratory Rate"
                   ? vitals?.respRate.map((vital) => {
                       return {
-                        datetime: vital.datetime.slice(0, 11),
+                        datetime: vital.datetime.slice(0, 10),
                         reading: vital.reading,
                       };
                     })
                   : chartType == "Heart Rate"
                   ? vitals?.heartRate.map((vital) => {
                       return {
-                        datetime: vital.datetime.slice(0, 11),
+                        datetime: vital.datetime.slice(0, 10),
                         reading: vital.reading,
                       };
                     })
                   : chartType == "Blood Pressure Systolic"
                   ? vitals?.bloodPressureSys.map((vital) => {
                       return {
-                        datetime: vital.datetime.slice(0, 11),
+                        datetime: vital.datetime.slice(0, 10),
                         reading: vital.reading,
                       };
                     })
                   : chartType == "Blood Pressure Diastolic"
                   ? vitals?.bloodPressureDia.map((vital) => {
                       return {
-                        datetime: vital.datetime.slice(0, 11),
+                        datetime: vital.datetime.slice(0, 10),
                         reading: vital.reading,
                       };
                     })
                   : chartType == "Temperature"
                   ? vitals?.temperature.map((vital) => {
                       return {
-                        datetime: vital.datetime.slice(0, 11),
+                        datetime: vital.datetime.slice(0, 10),
                         reading: vital.reading,
                       };
                     })
                   : chartType == "Blood Oxygen"
                   ? vitals?.spO2.map((vital) => {
                       return {
-                        datetime: vital.datetime.slice(0, 11),
+                        datetime: vital.datetime.slice(0, 10),
                         reading: vital.reading,
                       };
                     })
