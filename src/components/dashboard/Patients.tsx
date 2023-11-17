@@ -13,9 +13,9 @@ import Link from "next/link";
 import DashboardAlertIcon from "./DashboardAlertIcon";
 import { Alert } from "@/types/alert";
 import { Patient } from "@/types/patient";
-import HotelIcon from "@mui/icons-material/Hotel";
 import { fetchAlertsByPatientId } from "@/pages/api/patients_api";
 import { SocketContext } from "@/pages/layout";
+import SelectFilter from "../SelectFilter";
 
 type PatientListProps = {
   /**
@@ -30,6 +30,8 @@ export default function Patients({ selectedWard }: PatientListProps) {
   const [data, setData] = useState<SmartBed[]>([]);
   const [searchPatient, setSearchPatient] = useState<string>("");
   const [searchCondition, setSearchCondition] = useState<string>("");
+  const [selectedAcuity, setSelectedAcuity] = useState<string>("");
+  const [selectedFallRisk, setSelectedFallRisk] = useState<string>("");
   const [vitals, setVitals] = useState<any[]>([]);
   const [alerts, setAlerts] = useState<any[]>([]);
   const { data: sessionData } = useSession();
@@ -144,14 +146,11 @@ export default function Patients({ selectedWard }: PatientListProps) {
 
   useEffect(() => {
     const refreshContent = (updatedBed: any) => {
-      console.log("enter");
       setData((prevData) => {
-        console.log(prevData);
         const index = prevData.findIndex((bed) => bed._id === updatedBed._id);
         if (index !== -1) {
           const updatedBeds = [...prevData];
           updatedBeds[index] = updatedBed;
-          console.log(updatedBeds);
           return updatedBeds;
         }
         return prevData;
@@ -231,7 +230,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
       let promises: Promise<SmartBed>[] = [];
       let wardsToView = [];
       let smartBedIds = [];
-      if (selectedWard === "assigned-wards") {
+      if (selectedWard === "") {
         wardsToView = wards;
       } else {
         wardsToView = wards.filter(
@@ -266,13 +265,24 @@ export default function Patients({ selectedWard }: PatientListProps) {
       (bed.patient as Patient)?.name.toLowerCase().includes(searchPatient) &&
       (bed.patient as Patient)?.condition
         .toLowerCase()
-        .includes(searchCondition);
+        .includes(searchCondition) &&
+      (selectedFallRisk === ""
+        ? true
+        : (bed.patient as Patient).fallRisk
+            ?.toLowerCase()
+            .includes(selectedFallRisk)) &&
+      (selectedAcuity === ""
+        ? true
+        : (bed.patient as Patient).acuityLevel
+            ?.toLowerCase()
+            .includes(selectedAcuity));
+
     if (!include) {
       filteredOutIndex.push(index);
     }
     return include;
   });
-  console.log(filteredData);
+  console.log("filteredData", filteredData);
   console.log(filteredOutIndex);
   const filteredVital = vitals.filter(
     (_, index) => !filteredOutIndex.includes(index)
@@ -280,35 +290,37 @@ export default function Patients({ selectedWard }: PatientListProps) {
   console.log(filteredVital);
 
   return (
-    <div className="h-full overflow-auto scrollbar w-full">
-      <table className="table-fixed border-collapse border-spacing-3">
+    <div className="overflow-auto scrollbar">
+      <table className="table-auto xl:table-fixed w-full border-spacing-1">
         <thead className="text-sm text-left">
           {/* ------ column headers ------ */}
           <tr>
-            <th></th>
-            <th className="px-2">Patient</th>
-            <th>Condition</th>
-            <th className="px-2">Acuity Level</th>
-            <th>Fall Risk</th>
-            <th>Bed</th>
-            <th>Ward</th>
-            <th colSpan={4}>Bed Rails</th>
-            <th className="px-1">Bed Brakes</th>
-            <th className="px-1">Bed Lowest</th>
-            <th>Blood Pressure</th>
-            <th>Heart Rate</th>
-            <th className="px-1">Respiratory Rate</th>
-            <th className="px-1">Saturation</th>
-            <th>Temperature</th>
+            <th className="w-1/4 text-xs"></th>
+            <th className="w-1/4 text-xs">Patient</th>
+            <th className="w-1/4 text-xs">Condition</th>
+            <th className="w-1/4 text-xs">Acuity Level</th>
+            <th className="w-1/4 text-xs">Fall Risk</th>
+            <th className="w-1/4 text-xs">Bed</th>
+            <th className="w-1/4 text-xs">Ward</th>
+            <th colSpan={4} className="w-3/4 text-xs">
+              Bed Rails
+            </th>
+            <th className="w-1/4 text-xs break-words">Bed Brakes</th>
+            <th className="w-1/4 text-xs break-words">Bed Lowest</th>
+            <th className="w-1/4 text-xs">Blood Pressure</th>
+            <th className="w-1/4 text-xs">Heart Rate</th>
+            <th className="w-1/4 text-xs">Respiratory Rate</th>
+            <th className="w-1/4 text-xs">Saturation</th>
+            <th className="w-1/4 text-xs">Temperature</th>
           </tr>
         </thead>
         <tbody ref={parent}>
           {/* ------ sub-headers ------ */}
           <tr className="text-left">
-            <td className="text-xs underline text-center">ALERTS</td>
-            <td className="p-2">
+            <td className="text-xs underline text-center p-1">ALERTS</td>
+            <td className="px-1 w-1/5">
               <input
-                className="placeholder:italic placeholder:text-slate-400 w-2/3 rounded-md placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
+                className="placeholder:italic placeholder:text-slate-400 rounded-md placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300 w-2/3"
                 placeholder="Search"
                 type="text"
                 name="search"
@@ -316,9 +328,9 @@ export default function Patients({ selectedWard }: PatientListProps) {
                 onChange={handlePatientSearch}
               />
             </td>
-            <td>
+            <td className="px-1">
               <input
-                className="placeholder:italic placeholder:text-slate-400 w-2/3 rounded-md placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
+                className="placeholder:italic placeholder:text-slate-400 rounded-md w-2/3 placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
                 placeholder="Search"
                 type="text"
                 name="search"
@@ -326,8 +338,24 @@ export default function Patients({ selectedWard }: PatientListProps) {
                 onChange={handleConditionSearch}
               />
             </td>
-            <TableSubHeader subheaderText="" />
-            <TableSubHeader subheaderText="" />
+            <td>
+              <SelectFilter
+                name="acuitySelect"
+                inTable={true}
+                options={["all", "l1", "l2", "l3", "pending", "l4"]}
+                changeSelectedOption={setSelectedAcuity}
+                customStyle="w-2/3 mt-0"
+              />
+            </td>
+            <td>
+              <SelectFilter
+                name="fallRiskSelect"
+                inTable={true}
+                options={["all", "low", "medium", "high", "pending"]}
+                changeSelectedOption={setSelectedFallRisk}
+                customStyle="w-2/3 mt-0"
+              />
+            </td>
             <TableSubHeader subheaderText="Bed No." />
             <TableSubHeader subheaderText="Ward No." />
             <TableSubHeader subheaderText="Right Upper" />
@@ -346,8 +374,8 @@ export default function Patients({ selectedWard }: PatientListProps) {
           {/* ------ data rows ------*/}
           {filteredData.map((pd, index) => (
             <tr className="text-left" key={pd._id}>
-              <td className="w-1/12 text-center">
-                <div className="flex items-center justify-center">
+              <td className="text-center">
+                <div className="flex items-center w-auto justify-center px-2">
                   <Link
                     href={`/patientVisualisation?patientId=${
                       (pd.patient as Patient)?._id
@@ -369,7 +397,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
               </td>
               <td
                 id="patientName"
-                className="text-sm p-2 w-1/8 border-solid border-0 border-l border-slate-400 hover:cursor-pointer hover:bg-blue-100 hover:rounded-lg"
+                className="text-sm p-2 border-solid border-0 border-l border-slate-400 hover:cursor-pointer hover:bg-blue-100 hover:rounded-lg"
                 onClick={() =>
                   viewPatientVisualisation((pd.patient as Patient)?._id, pd._id)
                 }
@@ -378,58 +406,59 @@ export default function Patients({ selectedWard }: PatientListProps) {
               </td>
               <TableDataRow
                 id="patientCondition"
-                width="1/8"
+                // width="1/8"
                 data={(pd.patient as Patient)?.condition}
               />
               <TableDataRow
                 id="acuity"
-                width="1/12"
+                // width="1/12"
+                // width="1/8"
                 data={(pd.patient as Patient)?.acuityLevel}
               />
               <TableDataRow
                 id="fall-risk"
-                width="1/12"
+                //width="1/12"
                 data={(pd.patient as Patient)?.fallRisk}
               />
-              <TableDataRow id="bedNum" width="1/12" data={pd.bedNum} />
+              <TableDataRow id="bedNum" data={pd.bedNum} />
               <TableDataRow
                 id="wardNum"
-                width="1/12"
+                //width="1/12"
                 data={(pd.ward as Ward)?.wardNum}
               />
               <TableDataRow
                 id="right-upper-rail"
-                width="1/12"
+                //width="1/12"
                 data={pd.isRightUpperRail ? "Up" : "Down"}
               />
               <TableDataRow
                 id="right-lower-rail"
-                width="1/12"
+                //width="1/12"
                 data={pd.isRightLowerRail ? "Up" : "Down"}
               />
               <TableDataRow
                 id="left-upper-rail"
-                width="1/12"
+                //width="1/12"
                 data={pd.isLeftUpperRail ? "Up" : "Down"}
               />
               <TableDataRow
                 id="left-lower-rail"
-                width="1/12"
+                //width="1/12"
                 data={pd.isLeftLowerRail ? "Up" : "Down"}
               />
               <TableDataRow
                 id="bed-brakes"
-                width="1/12"
+                //width="1/12"
                 data={pd.isBrakeSet ? "Set" : "Not Set"}
               />
               <TableDataRow
                 id="lowest-position"
-                width="1/12"
+                //width="1/12"
                 data={pd.isLowestPosition ? "Yes" : "No"}
               />
               <TableDataRow
                 id="bp-reading"
-                width="1/12"
+                //width="1/12"
                 data={[
                   filteredVital[index]?.bloodPressureSys[
                     filteredVital[index]?.bloodPressureSys.length - 1
@@ -442,7 +471,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
 
               <TableDataRow
                 id="hr-reading"
-                width="1/12"
+                //width="1/12"
                 data={Math.round(
                   filteredVital[index]?.heartRate[
                     filteredVital[index]?.heartRate.length - 1
@@ -451,7 +480,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
               />
               <TableDataRow
                 id="resp-reading"
-                width="1/5"
+                // width="1/5"
                 data={
                   filteredVital[index]?.respRate[
                     filteredVital[index]?.respRate.length - 1

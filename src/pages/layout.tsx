@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { redelegateAlert } from "./api/alerts_api";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 const socket = io("http://localhost:3001");
@@ -42,42 +43,70 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     return (
       <div>
         <p>{message}</p>
-        <button onClick={handleRedelegateClick}>Redelegate</button>
+        <button
+          className="float-right cursor-pointer bg-blue-900 hover:bg-blue-700 text-white font-bold my-2 py-2 px-4 rounded-full border-none"
+          onClick={handleRedelegateClick}
+        >
+          Redelegate
+        </button>
       </div>
     );
   };
 
   useEffect(() => {
     socket.emit("clientConnections", nurseId);
+
     const handleAlertIncoming = (data: any) => {
       console.log(data);
       console.log(data.patient);
       console.log(data.alert);
+      console.log(data.smartbed);
       if (data.alert.redelegate) {
         const message = `${data.patient.name}: ${data.alert.description}`;
         toast.error(
           <RedelegatedToast message={message} alertId={data.alert._id} />
         );
-        // call api to redelegate alert :D
       } else {
         const message = `${data.patient.name}: ${data.alert.description}`;
-        toast.warning(<AlertToast message={message} />);
+        toast.warning(
+          <Link
+            style={{ textDecoration: "none", color: "black" }}
+            href={`/patientVisualisation?patientId=${data.patient._id}&bedId=${data.smartbed[0]._id}&viewAlerts=true`}
+            as={`/patientVisualisation?patientId=${data.patient._id}&bedId=${data.smartbed[0]._id}`}
+          >
+            <AlertToast message={message} />
+          </Link>
+        );
       }
+    };
+
+    const admitPatientToast = (data: any) => {
+      console.log("admitting patient toast");
+      const message = `${data.patient.name} has been admitted.`;
+      toast.success(
+        <Link
+          style={{ textDecoration: "none", color: "black" }}
+          href={`/patientVisualisation?patientId=${data.patient._id}&bedId=${data._id}`}
+        >
+          <AlertToast message={message} />
+        </Link>
+      );
     };
 
     const dischargePatientToast = (data: any) => {
       console.log("toasting discharge patient");
-      const message = `${data.name} has been discharged.`;
+      const message = `${data.name} has been discharged. The discharge report is being generated currently.`;
       toast.info(<AlertToast message={message} />);
     };
 
     socket.on("alertIncoming", handleAlertIncoming);
     socket.on("dischargePatient", dischargePatientToast);
-
+    socket.on("admitPatient", admitPatientToast);
     // Clean up the event listener when the component unmounts
     return () => {
       socket.off("alertIncoming", handleAlertIncoming);
       socket.off("dischargePatient", dischargePatientToast);
+      socket.off("admitPatient", admitPatientToast);
     };
   }, [nurseId]);
 

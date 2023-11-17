@@ -1,4 +1,4 @@
-import PatientDischargeReportTemplate from "@/components/patientReport/patientDischargeReport";
+import PatientDischargeReportTemplate from "@/components/patientReport/PatientDischargeReport";
 import { useRouter } from "next/router";
 import React from "react";
 

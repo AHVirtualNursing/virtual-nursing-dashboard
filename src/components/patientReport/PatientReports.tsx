@@ -137,7 +137,8 @@ export default function PatientReports({
                       )}
                       <Button
                         onClick={() => handleDownloadReport(report.url)}
-                        startIcon={<DownloadIcon />}></Button>
+                        startIcon={<DownloadIcon />}
+                      ></Button>
                     </TableCell>
                   </TableRow>
 
@@ -151,14 +152,16 @@ export default function PatientReports({
                           onClick={() => handleDeleteReport(report._id)}
                           variant="contained"
                           color="error"
-                          sx={{ mt: 2 }}>
+                          sx={{ mt: 2 }}
+                        >
                           Delete
                         </Button>
                         <Button
                           onClick={handleShowDeleteModal}
                           variant="contained"
                           color="primary"
-                          sx={{ mt: 2, ml: 2 }}>
+                          sx={{ mt: 2, ml: 2 }}
+                        >
                           Cancel
                         </Button>
                       </Box>

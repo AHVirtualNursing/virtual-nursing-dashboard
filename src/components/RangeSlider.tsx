@@ -56,7 +56,7 @@ const RangeSlider = ({
         min={min}
         max={max}
         onChange={handleChange}
-        valueLabelDisplay="auto"
+        valueLabelDisplay="on"
         marks={marks}
         disableSwap
         sx={{

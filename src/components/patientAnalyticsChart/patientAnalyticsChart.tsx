@@ -391,7 +391,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           <FormGroup id="vitals" sx={{ flexDirection: "row" }}>
             <FormLabel
               sx={{ display: "flex", alignItems: "center", marginRight: 2 }}
-              component="legend">
+              component="legend"
+            >
               Vitals
             </FormLabel>
             <FormControlLabel
@@ -448,13 +449,15 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
               <Button
                 className="ml-auto"
                 startIcon={<RestartAltIcon />}
-                onClick={resetChart}>
+                onClick={resetChart}
+              >
                 Reset Chart
               </Button>
               <Button
                 className="ml-auto"
                 startIcon={<SettingsIcon />}
-                onClick={handleShowChartOptionsModal}>
+                onClick={handleShowChartOptionsModal}
+              >
                 Chart Options
               </Button>
             </div>
@@ -464,7 +467,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           <FormGroup id="indicators" sx={{ flexDirection: "row" }}>
             <FormLabel
               sx={{ display: "flex", alignItems: "center", marginRight: 2 }}
-              component="legend">
+              component="legend"
+            >
               Indicators
             </FormLabel>
             <FormControlLabel
@@ -545,7 +549,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           value={selectedTimeRange}
           exclusive
           onChange={handleSelectedTimeRangeChange}
-          aria-label="text alignment">
+          aria-label="text alignment"
+        >
           <ToggleButton value="12H" aria-label="left aligned">
             12H
           </ToggleButton>
@@ -566,7 +571,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
               selectedTimeRange.match(
                 /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}),(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/g
               ) != null
-            }>
+            }
+          >
             Custom
           </ToggleButton>
         </ToggleButtonGroup>
@@ -575,7 +581,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           padding={2}
           borderRadius={8}
           bgcolor="#f5f5f5"
-          height={200}>
+          height={200}
+        >
           <Typography variant="h6" gutterBottom>
             Nurse Notes:
           </Typography>
@@ -584,7 +591,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
       </Box>
       <Modal
         open={showCustomDateRangeModal}
-        onClose={handleShowCustomDateRangeModal}>
+        onClose={handleShowCustomDateRangeModal}
+      >
         <Box sx={ModalBoxStyle}>
           <Typography variant="h6" component="h2" sx={{ marginBottom: 2 }}>
             Select Date Range
@@ -628,7 +636,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           <Grid item xs={12} sx={{ marginTop: 2 }}>
             <Button
               variant="contained"
-              onClick={() => handleUpdateCustomDateRange()}>
+              onClick={() => handleUpdateCustomDateRange()}
+            >
               Set Range
             </Button>
           </Grid>
@@ -657,11 +666,13 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
           />
           <Box
             marginTop={2}
-            sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+            sx={{ display: "flex", flexDirection: "row", gap: 2 }}
+          >
             <Button
               startIcon={<FileDownloadIcon />}
               variant="contained"
-              onClick={() => handleSavePdf()}>
+              onClick={() => handleSavePdf()}
+            >
               Download PDF
             </Button>
             <LoadingButton
@@ -669,7 +680,8 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
               variant="contained"
               loading={uploading}
               loadingPosition="start"
-              onClick={() => uploadChart(targetRef.current)}>
+              onClick={() => uploadChart(targetRef.current)}
+            >
               Upload Report
             </LoadingButton>
           </Box>
@@ -678,11 +690,13 @@ export default function PatientAnalyticsChart({ patient }: PatientChartProps) {
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
-        onClose={handleCloseSnackbar}>
+        onClose={handleCloseSnackbar}
+      >
         <Alert
           onClose={handleCloseSnackbar}
           severity="success"
-          sx={{ width: "100%" }}>
+          sx={{ width: "100%" }}
+        >
           Report uploaded successfully.
         </Alert>
       </Snackbar>

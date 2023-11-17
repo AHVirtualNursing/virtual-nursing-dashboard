@@ -112,7 +112,7 @@ const ChatPreview = ({
         </>
       ) : (
         <Image
-          src={profilePic}
+          src="/profilepic.png"
           alt="Picture"
           width={50}
           height={50}

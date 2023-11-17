@@ -74,7 +74,7 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
       {rr.length > 0 && (
         <RangeSlider
           min={0}
-          max={200}
+          max={50}
           lowerBound={rr[0]}
           upperBound={rr[1]}
           label="Respiratory Rate"
@@ -116,7 +116,7 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
 
       {spo2.length > 0 && (
         <RangeSlider
-          min={0}
+          min={50}
           max={100}
           lowerBound={spo2[0]}
           upperBound={spo2[1]}

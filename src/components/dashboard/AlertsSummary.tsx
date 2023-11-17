@@ -1,31 +1,50 @@
 import { Alert } from "@/types/alert";
-import { fetchAllAlerts } from "@/pages/api/alerts_api";
 import React, { useEffect, useState } from "react";
 import { BarChart, Bar, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { Ward } from "@/types/ward";
+import { fetchAlertsByWardId } from "@/pages/api/wards_api";
 
 type AlertsSummaryProps = {
   selectedWard: string;
   selectedTime: string;
+  wards: Ward[];
 };
 
-const AlertsSummary = ({ selectedWard, selectedTime }: AlertsSummaryProps) => {
+const AlertsSummary = ({
+  selectedWard,
+  selectedTime,
+  wards,
+}: AlertsSummaryProps) => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
 
+  // fetch all alerts of patients in selected ward, then filter by selected time
   useEffect(() => {
-    fetchAllAlerts().then((alerts) => {
-      const alertsList = alerts.data;
-      if (selectedTime === "today") {
-        const todayAlerts = alertsList.filter(
-          (alert: Alert) =>
-            alert.createdAt.replace("T", " ").substring(0, 10) ===
-            new Date().toISOString().slice(0, 10)
-        );
-        setAlerts(todayAlerts);
-      } else {
-        setAlerts(alertsList);
-      }
+    let wardsToView: Ward[] = [],
+      wardAlertsPromises: any[] = [];
+    if (selectedWard === "") {
+      wardsToView = wards;
+    } else {
+      wardsToView = wards.filter((ward) => ward.wardNum === selectedWard);
+    }
+
+    wardAlertsPromises = wardsToView.map((ward) =>
+      fetchAlertsByWardId(ward._id)
+    );
+
+    Promise.all(wardAlertsPromises).then((result) => {
+      const alerts: Alert[] = [].concat(...result);
+      // filter by time
+      selectedTime === ""
+        ? setAlerts(alerts)
+        : setAlerts(
+            alerts.filter(
+              (alert: Alert) =>
+                alert.createdAt.replace("T", " ").substring(0, 10) ===
+                new Date().toISOString().slice(0, 10)
+            )
+          );
     });
-  }, [selectedTime]);
+  }, [selectedTime, selectedWard, wards]);
 
   const alertsData = [
     {
@@ -37,19 +56,19 @@ const AlertsSummary = ({ selectedWard, selectedTime }: AlertsSummaryProps) => {
   ];
 
   return (
-    <div className="flex flex-col w-1/2 p-4 gap-y-4">
-      <h3 className="text-center">Alerts Summary</h3>
+    <div className="flex flex-col w-1/2 p-4 gap-y-4 align-middle">
+      <h4 className="text-left">Alerts Summary</h4>
       <div className="h-full flex gap-x-5">
-        <div className="w-1/4 rounded-md bg-pink-200 flex items-center justify-center p-3">
+        <div className="w-1/6 rounded-md bg-pink-200 flex items-center justify-center p-3">
           <p>Total: {alerts && alerts.length}</p>
         </div>
         <div className="w-3/4">
-          <ResponsiveContainer width="80%" height="100%">
+          <ResponsiveContainer width="80%" height="90%">
             <BarChart
-              width={150}
+              width={100}
               height={40}
               data={alertsData}
-              maxBarSize={30}
+              maxBarSize={20}
               layout="vertical"
             >
               <XAxis type="number" hide />

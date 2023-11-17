@@ -39,6 +39,30 @@ export const addNewMessageToChat = async (
   }
 };
 
+export const addNewAlertMessageToChat = async (
+  chatId: string,
+  message: Message,
+  createdBy: string,
+) => {
+  try {
+    const url = process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + "/chat/message";
+    if (url) {
+      const res = await axios.post(url, {
+        chatId: chatId,
+        alert: (message.alert as string),
+        createdBy: createdBy,
+        content: message.content,
+      });
+
+      const data = await res.data;
+
+      return data.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const addNewPatientMessageToChat = async (
   chatId: string,
   message: Message,

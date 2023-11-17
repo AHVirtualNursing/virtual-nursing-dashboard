@@ -23,6 +23,7 @@ export interface NoteLog {
 }
 
 export interface Alert {
+  _id: string;
   status: string;
   description: string;
   notes: NoteLog[];

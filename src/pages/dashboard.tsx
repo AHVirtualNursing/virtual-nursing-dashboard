@@ -1,18 +1,19 @@
-import Patients from "@/components/Patients";
+import Patients from "@/components/dashboard/Patients";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchWardsByVirtualNurse } from "./api/nurse_api";
 import { Ward } from "@/types/ward";
-import AlertsSummary from "@/components/AlertsSummary";
-import PatientSummary from "@/components/PatientSummary";
+import AlertsSummary from "@/components/dashboard/AlertsSummary";
+import PatientSummary from "@/components/dashboard/PatientSummary";
 import GridViewIcon from "@mui/icons-material/GridView";
 import ListIcon from "@mui/icons-material/List";
+import SelectFilter from "@/components/SelectFilter";
 import Link from "next/link";
 
 export default function Dashboard() {
   const router = useRouter();
-  const [selectedOption, setSelectedOption] = useState("assigned-wards");
+  const [selectedOption, setSelectedOption] = useState("");
   const [selectedTime, setSelectedTime] = useState("today");
   const [wards, setWards] = useState<Ward[]>([]);
   const { data: sessionData } = useSession();
@@ -25,7 +26,7 @@ export default function Dashboard() {
   }, [nurseId]);
 
   return (
-    <div className="flex flex-col p-8 gap-6 w-full shadow-lg bg-slate-100">
+    <div className="flex flex-col p-8 gap-3 shadow-lg w-full bg-slate-100">
       <div className="flex justify-between">
         <h4>Virtual Nurse Dashboard</h4>
         <button
@@ -52,54 +53,39 @@ export default function Dashboard() {
         >
           Wards
         </label>
-        <select
-          name="wardSelect"
-          id="ward-select"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
-          value={selectedOption}
-          onChange={(e) => {
-            console.log("selected option", e.target.value);
-            setSelectedOption(e.target.value);
-          }}
-        >
-          <option value="assigned-wards">Assigned Wards</option>
-          {wards.map((ward) => (
-            <option key={ward._id} value={`${ward.wardNum}`}>
-              Ward {ward.wardNum}
-            </option>
-          ))}
-        </select>
+        <SelectFilter
+          name="wardFilter"
+          inTable={false}
+          changeSelectedOption={setSelectedOption}
+          options={["all"].concat(wards.map((ward) => ward.wardNum))}
+        />
         <label
           htmlFor="timeSelect"
           className="text-sm font-medium text-gray-900"
         >
           Time
         </label>
-        <select
+        <SelectFilter
           name="timeSelect"
-          id="time-select"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
-          value={selectedTime}
-          onChange={(e) => {
-            console.log("selected time", e.target.value);
-            setSelectedTime(e.target.value);
-          }}
-        >
-          <option value="today">Today</option>
-          <option value="all">All</option>
-        </select>
+          inTable={false}
+          changeSelectedOption={setSelectedTime}
+          options={["today", "all"]}
+          defaultValue="today"
+        />
       </div>
-      <div className="bg-white rounded-2xl h-2/6 p-4 flex shadow-lg ">
+      <div className="bg-white rounded-2xl h-auto p-4 flex shadow-lg overflow-x-auto scrollbar">
         <AlertsSummary
           selectedWard={selectedOption}
           selectedTime={selectedTime}
+          wards={wards}
         />
         <PatientSummary
           selectedWard={selectedOption}
           selectedTime={selectedTime}
+          wards={wards}
         />
       </div>
-      <div className="bg-white rounded-2xl h-4/6 p-3 shadow-lg">
+      <div className="bg-white rounded-2xl h-auto p-3 mt-5 shadow-lg">
         <Patients selectedWard={selectedOption} />
       </div>
     </div>

@@ -10,16 +10,16 @@ import {
 import { fetchBedByBedId } from "./api/smartbed_api";
 import autoAnimate from "@formkit/auto-animate";
 import profilePic from "../../public/profilepic.png";
-import VitalTiles from "@/components/VitalTiles";
-import TileCustomisationModal from "@/components/TileCustomisationModal";
-import BedTiles from "@/components/BedTiles";
+import VitalTiles from "@/components/dashboard/VitalTiles";
+import TileCustomisationModal from "@/components/dashboard/TileCustomisationModal";
+import BedTiles from "@/components/dashboard/BedTiles";
 import { VirtualNurse } from "@/types/virtualNurse";
 import Link from "next/link";
 import { Ward } from "@/types/ward";
 import { SocketContext } from "@/pages/layout";
 import { Alert } from "@/types/alert";
 import { Patient } from "@/types/patient";
-import DashboardAlertIcon from "@/components/DashboardAlertIcon";
+import DashboardAlertIcon from "@/components/dashboard/DashboardAlertIcon";
 import { fetchAlertsByPatientId } from "./api/patients_api";
 import GridViewIcon from "@mui/icons-material/GridView";
 import ListIcon from "@mui/icons-material/List";
@@ -194,14 +194,11 @@ export default function Wards() {
 
   useEffect(() => {
     const refreshContent = (updatedBed: any) => {
-      console.log("enter");
       setData((prevData) => {
-        console.log(prevData);
         const index = prevData.findIndex((bed) => bed._id === updatedBed._id);
         if (index !== -1) {
           const updatedBeds = [...prevData];
           updatedBeds[index] = updatedBed;
-          console.log(updatedBeds);
           return updatedBeds;
         }
         return prevData;
@@ -263,27 +260,12 @@ export default function Wards() {
       setSocketPatient(data.patient);
     };
 
-    const handleAlertUpdate = (data: any) => {
-      setData((prevData) => {
-        const updatedData = prevData.map((bed) => {
-          console.log(data.patient);
-          if (bed.patient && (bed.patient as Patient)?._id === data.patient) {
-            console.log("ENTER");
-            return { ...bed, alert: data };
-          }
-          return bed;
-        });
-        return updatedData;
-      });
-    };
-
     socket.on("updatedSmartbed", refreshContent);
     socket.on("updatedPatient", refreshPatientInfo);
     socket.on("updatedVitals", refreshPatientVitals);
     socket.on("dischargePatient", discharge);
     socket.on("patientAlertAdded", handleAlertIncoming);
     socket.on("patientAlertDeleted", handleDeleteAlert);
-    socket.on("updatedAlert", handleAlertUpdate);
     return () => {
       socket.off("updatedSmartbed", refreshContent);
       socket.off("updatedPatient", refreshPatientInfo);
@@ -291,7 +273,6 @@ export default function Wards() {
       socket.off("dischargePatient", discharge);
       socket.off("patientAlertAdded", handleAlertIncoming);
       socket.off("patientAlertDeleted", handleDeleteAlert);
-      socket.on("updatedAlert", handleAlertUpdate);
     };
   }, []);
 
@@ -392,7 +373,9 @@ export default function Wards() {
           >
             <option value="assigned-wards">Assigned Wards</option>
             {wards.map((ward) => (
-              <option value={`${ward.wardNum}`}>Ward {ward.wardNum}</option>
+              <option key={ward._id} value={`${ward.wardNum}`}>
+                Ward {ward.wardNum}
+              </option>
             ))}
           </select>
           <label

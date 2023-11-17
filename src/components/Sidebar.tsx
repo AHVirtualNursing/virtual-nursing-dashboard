@@ -3,15 +3,15 @@ import GroupIcon from "@mui/icons-material/Group";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import Link from "next/link";
-import { ChatBox } from "./ChatBox";
+import { ChatBox } from "./chat/ChatBox";
 
 export default function Sidebar() {
   return (
-    <div className="left-0 flex flex-col h-screen fixed p-3 gap-4 w-14 bg-blue-900">
+    <div className="left-0 flex flex-col h-screen fixed p-3 gap-4 w-14 z-50 bg-blue-900">
       <SidebarTab
         name={"Patients"}
         icon={<GroupIcon style={{ color: "white" }} />}
-        dest={"dashboard"}
+        dest={"wards"}
       />
       <SidebarTab
         name={"Alerts"}
