@@ -3,7 +3,7 @@ import { Box, Button, Tab, Tabs } from "@mui/material";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import profilePic from "../../public/profilepic.png";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/types/smartbed";
 import VisualisationComponent from "@/components/patientOverviewTab/VisualisationComponent";
@@ -21,15 +21,20 @@ const PatientChart = dynamic(
 import autoAnimate from "@formkit/auto-animate";
 import { Patient } from "@/types/patient";
 import { Ward } from "@/types/ward";
+import { SocketContext } from "./layout";
 
 const PatientVisualisationPage = () => {
   const router = useRouter();
   console.log("router query", router.query);
   const { patientId, bedId, viewAlerts } = router.query;
   const [selectedBed, setSelectedBed] = useState<SmartBed>();
+  const [socketData, setSocketData] = useState();
+
   const [currentTab, setCurrentTab] = useState(
     viewAlerts === "true" ? "alerts" : "overview"
   );
+  const socket = useContext(SocketContext);
+
   const parent = useRef(null);
   useEffect(() => {
     parent.current && autoAnimate(parent.current);
@@ -37,8 +42,19 @@ const PatientVisualisationPage = () => {
   const [processingData, setProcessingData] = useState(false);
 
   useEffect(() => {
+    const handleUpdatedPatient = (data: any) => {
+      console.log("updated patient", data);
+      setSocketData(data);
+    };
+    socket.on("updatedPatient", handleUpdatedPatient);
+    return () => {
+      socket.off("updatedPatient", handleUpdatedPatient);
+    };
+  }, [socket]);
+
+  useEffect(() => {
     fetchBedByBedId(bedId).then((res) => setSelectedBed(res));
-  }, [bedId]);
+  }, [bedId, socketData]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     setCurrentTab(newValue);
@@ -105,10 +121,6 @@ const PatientVisualisationPage = () => {
                   Additional Notes:
                   {(selectedBed?.patient as Patient)?.infoLogs[0]?.info}
                 </p>
-                {/* <p>
-                  Patient is homesick and wants to be discharged as soon as
-                  possible
-                </p> */}
                 <button
                   className={`${
                     (selectedBed?.patient as Patient)?.fallRisk === "High"
