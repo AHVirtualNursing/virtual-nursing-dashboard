@@ -8,7 +8,7 @@ import { fetchBedByBedId } from "./api/smartbed_api";
 import { SmartBed } from "@/types/smartbed";
 import VisualisationComponent from "@/components/patientOverviewTab/VisualisationComponent";
 import dynamic from "next/dynamic";
-import PatientReport from "@/components/patientReport/PatientReports";
+import PatientReport from "@/components/patientReport/patientReports";
 import AlertTabComponent from "@/components/patientAlertTab/AlertTabComponent";
 import BedStatusComponent from "@/components/bedStatusTab/BedStatusComponent";
 import { CloudUpload } from "@mui/icons-material";

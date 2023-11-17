@@ -12,6 +12,7 @@ import {
   TableHead,
   TableRow,
   TableCell,
+  TextField,
 } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -35,7 +36,9 @@ export default function PatientReports({
   patientId,
 }: PatientReportsProps) {
   const [reports, setReports] = useState<Report[]>([]);
+  const [filteredReports, setFilteredReports] = useState<Report[]>([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -49,13 +52,32 @@ export default function PatientReports({
         const reportPromises = patient.reports.map((reportId) => {
           return callFetchReportApi(reportId as string);
         });
-        const reports = await Promise.all(reportPromises);
-        setReports(reports);
+        const reportData = await Promise.all(reportPromises);
+        setReports(reportData);
+        setFilteredReports(reportData);
       }
     } else {
-      const reports = await callFetchDischargeReportsApi();
-      setReports(reports);
+      const reportData = await callFetchDischargeReportsApi();
+      setReports(reportData);
+      setFilteredReports(reportData);
     }
+  };
+
+  const handleFilterReports = (searchInput: string) => {
+    setSearchTerm(searchInput);
+    const filteredReports = reports.filter((report) => {
+      if (viewType === "all") {
+        return (
+          report.patientName
+            .toLowerCase()
+            .includes(searchInput.toLowerCase()) ||
+          report.patientNric.toLowerCase().includes(searchInput.toLowerCase())
+        );
+      } else {
+        return report.name.toLowerCase().includes(searchInput.toLowerCase());
+      }
+    });
+    setFilteredReports(filteredReports);
   };
 
   const capitaliseFirstLetter = (word: string) => {
@@ -87,7 +109,19 @@ export default function PatientReports({
       <h3 className="text-left mb-5">
         {viewType == "all" ? "Discharge Reports" : "Patient Reports"}
       </h3>
-      {reports.length > 0 ? (
+      <TextField
+        label={
+          viewType == "all"
+            ? "Search by Patient Name or NRIC"
+            : "Search by Report Name"
+        }
+        variant="outlined"
+        fullWidth
+        onChange={(e) => handleFilterReports(e.target.value)}
+        value={searchTerm}
+        sx={{ mb: 2 }}
+      />
+      {filteredReports.length > 0 ? (
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -104,7 +138,7 @@ export default function PatientReports({
                 <TableCell></TableCell>
               </TableRow>
             </TableHead>
-            {reports
+            {filteredReports
               .sort(
                 (a, b) =>
                   new Date(b.createdAt).getTime() -
@@ -137,8 +171,7 @@ export default function PatientReports({
                       )}
                       <Button
                         onClick={() => handleDownloadReport(report.url)}
-                        startIcon={<DownloadIcon />}
-                      ></Button>
+                        startIcon={<DownloadIcon />}></Button>
                     </TableCell>
                   </TableRow>
 
@@ -152,16 +185,14 @@ export default function PatientReports({
                           onClick={() => handleDeleteReport(report._id)}
                           variant="contained"
                           color="error"
-                          sx={{ mt: 2 }}
-                        >
+                          sx={{ mt: 2 }}>
                           Delete
                         </Button>
                         <Button
                           onClick={handleShowDeleteModal}
                           variant="contained"
                           color="primary"
-                          sx={{ mt: 2, ml: 2 }}
-                        >
+                          sx={{ mt: 2, ml: 2 }}>
                           Cancel
                         </Button>
                       </Box>
