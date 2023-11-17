@@ -290,8 +290,8 @@ export default function Patients({ selectedWard }: PatientListProps) {
   console.log(filteredVital);
 
   return (
-    <div className="h-full overflow-auto scrollbar w-full">
-      <table className="table-fixed border-collapse border-spacing-3">
+    <div className="overflow-auto scrollbar w-full">
+      <table className="table-auto border-collapse">
         <thead className="text-sm text-left">
           {/* ------ column headers ------ */}
           <tr>
@@ -299,26 +299,28 @@ export default function Patients({ selectedWard }: PatientListProps) {
             <th className="px-2">Patient</th>
             <th>Condition</th>
             <th className="px-2">Acuity Level</th>
-            <th>Fall Risk</th>
-            <th>Bed</th>
-            <th>Ward</th>
-            <th colSpan={4}>Bed Rails</th>
-            <th className="px-1">Bed Brakes</th>
-            <th className="px-1">Bed Lowest</th>
-            <th>Blood Pressure</th>
-            <th>Heart Rate</th>
-            <th className="px-1">Respiratory Rate</th>
-            <th className="px-1">Saturation</th>
-            <th>Temperature</th>
+            <th className="px-2">Fall Risk</th>
+            <th className="px-2">Bed</th>
+            <th className="px-2">Ward</th>
+            <th colSpan={4} className="px-2">
+              Bed Rails
+            </th>
+            <th className="px-2">Bed Brakes</th>
+            <th className="px-2">Bed Lowest</th>
+            <th className="px-2">Blood Pressure</th>
+            <th className="px-2">Heart Rate</th>
+            <th className="px-2">Respiratory Rate</th>
+            <th className="px-2">Saturation</th>
+            <th className="px-2">Temperature</th>
           </tr>
         </thead>
         <tbody ref={parent}>
           {/* ------ sub-headers ------ */}
           <tr className="text-left">
-            <td className="text-xs underline text-center">ALERTS</td>
-            <td className="p-2">
+            <td className="text-xs underline text-center p-2">ALERTS</td>
+            <td className="px-1">
               <input
-                className="placeholder:italic placeholder:text-slate-400 w-2/3 rounded-md placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
+                className="placeholder:italic placeholder:text-slate-400 rounded-md placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
                 placeholder="Search"
                 type="text"
                 name="search"
@@ -326,9 +328,9 @@ export default function Patients({ selectedWard }: PatientListProps) {
                 onChange={handlePatientSearch}
               />
             </td>
-            <td>
+            <td className="px-1">
               <input
-                className="placeholder:italic placeholder:text-slate-400 w-2/3 rounded-md placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
+                className="placeholder:italic placeholder:text-slate-400 rounded-md placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
                 placeholder="Search"
                 type="text"
                 name="search"
@@ -340,16 +342,16 @@ export default function Patients({ selectedWard }: PatientListProps) {
               <SelectFilter
                 name="acuitySelect"
                 inTable={true}
-                options={["all", "l1", "l2", "l3"]}
+                options={["all", "l1", "l2", "l3", "pending", "l4"]}
                 changeSelectedOption={setSelectedAcuity}
-                customStyle="w-full mt-0"
+                customStyle=" mt-0"
               />
             </td>
-            <td>
+            <td className="px-1">
               <SelectFilter
                 name="fallRiskSelect"
                 inTable={true}
-                options={["all", "low", "medium", "high"]}
+                options={["all", "low", "medium", "high", "pending"]}
                 changeSelectedOption={setSelectedFallRisk}
                 customStyle="mt-0"
               />
@@ -372,8 +374,8 @@ export default function Patients({ selectedWard }: PatientListProps) {
           {/* ------ data rows ------*/}
           {filteredData.map((pd, index) => (
             <tr className="text-left" key={pd._id}>
-              <td className="w-1/12 text-center">
-                <div className="flex items-center justify-center">
+              <td className="text-center">
+                <div className="flex items-center w-auto justify-center px-2">
                   <Link
                     href={`/patientVisualisation?patientId=${
                       (pd.patient as Patient)?._id
@@ -395,7 +397,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
               </td>
               <td
                 id="patientName"
-                className="text-sm p-2 w-1/8 border-solid border-0 border-l border-slate-400 hover:cursor-pointer hover:bg-blue-100 hover:rounded-lg"
+                className="text-sm p-2 border-solid border-0 border-l border-slate-400 hover:cursor-pointer hover:bg-blue-100 hover:rounded-lg"
                 onClick={() =>
                   viewPatientVisualisation((pd.patient as Patient)?._id, pd._id)
                 }
@@ -404,58 +406,58 @@ export default function Patients({ selectedWard }: PatientListProps) {
               </td>
               <TableDataRow
                 id="patientCondition"
-                width="1/8"
+                // width="1/8"
                 data={(pd.patient as Patient)?.condition}
               />
               <TableDataRow
                 id="acuity"
-                width="1/12"
+                // width="1/12"
                 data={(pd.patient as Patient)?.acuityLevel}
               />
               <TableDataRow
                 id="fall-risk"
-                width="1/12"
+                //width="1/12"
                 data={(pd.patient as Patient)?.fallRisk}
               />
-              <TableDataRow id="bedNum" width="1/12" data={pd.bedNum} />
+              <TableDataRow id="bedNum" data={pd.bedNum} />
               <TableDataRow
                 id="wardNum"
-                width="1/12"
+                //width="1/12"
                 data={(pd.ward as Ward)?.wardNum}
               />
               <TableDataRow
                 id="right-upper-rail"
-                width="1/12"
+                //width="1/12"
                 data={pd.isRightUpperRail ? "Up" : "Down"}
               />
               <TableDataRow
                 id="right-lower-rail"
-                width="1/12"
+                //width="1/12"
                 data={pd.isRightLowerRail ? "Up" : "Down"}
               />
               <TableDataRow
                 id="left-upper-rail"
-                width="1/12"
+                //width="1/12"
                 data={pd.isLeftUpperRail ? "Up" : "Down"}
               />
               <TableDataRow
                 id="left-lower-rail"
-                width="1/12"
+                //width="1/12"
                 data={pd.isLeftLowerRail ? "Up" : "Down"}
               />
               <TableDataRow
                 id="bed-brakes"
-                width="1/12"
+                //width="1/12"
                 data={pd.isBrakeSet ? "Set" : "Not Set"}
               />
               <TableDataRow
                 id="lowest-position"
-                width="1/12"
+                //width="1/12"
                 data={pd.isLowestPosition ? "Yes" : "No"}
               />
               <TableDataRow
                 id="bp-reading"
-                width="1/12"
+                //width="1/12"
                 data={[
                   filteredVital[index]?.bloodPressureSys[
                     filteredVital[index]?.bloodPressureSys.length - 1
@@ -468,7 +470,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
 
               <TableDataRow
                 id="hr-reading"
-                width="1/12"
+                //width="1/12"
                 data={Math.round(
                   filteredVital[index]?.heartRate[
                     filteredVital[index]?.heartRate.length - 1
@@ -477,7 +479,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
               />
               <TableDataRow
                 id="resp-reading"
-                width="1/5"
+                // width="1/5"
                 data={
                   filteredVital[index]?.respRate[
                     filteredVital[index]?.respRate.length - 1
