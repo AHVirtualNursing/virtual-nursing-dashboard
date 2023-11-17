@@ -1,4 +1,4 @@
-import PatientReports from "@/components/patientReport/PatientReports";
+import PatientReports from "@/components/patientReport/patientReports";
 import React from "react";
 
 export default function DischargeReportsPage() {
