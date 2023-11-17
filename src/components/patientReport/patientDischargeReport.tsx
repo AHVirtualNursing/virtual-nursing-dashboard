@@ -62,7 +62,7 @@ export default function PatientDischargeReport({
     "Heart Rate": "rgb(255, 178, 102)",
     "Blood Pressure Systolic": "rgb(76, 153, 0)",
     "Blood Pressure Diastolic": "rgb(76, 153, 0)",
-    Temperature: "rgb(102, 178, 255)",
+    "Temperature": "rgb(102, 178, 255)",
     "Blood Oxygen": "rgb(255, 102, 178)",
   };
 

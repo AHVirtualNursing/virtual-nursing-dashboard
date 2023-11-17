@@ -8,7 +8,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { getFileByPresignedURL } from "@/pages/api/chat_api";
 import Image from "next/image";
 import { Patient } from "@/types/patient";
-import { Alert } from "@/types/alert";
+import { Alert, AlertVitals } from "@/types/alert";
 
 type ChatBubbleProps = {
   message: Message | undefined;
@@ -253,7 +253,7 @@ const ChatBubble = ({
                   marginBottom: "10px",
                 }}
               >
-                Patient Alert
+                Alert
               </Typography>
               <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
                 Description
@@ -287,6 +287,32 @@ const ChatBubble = ({
                   (message?.alert as Alert)?.createdAt as string
                 ).toLocaleTimeString()}
               </Typography>
+              {(message?.alert as Alert)?.alertVitals &&
+              (message?.alert as Alert).alertVitals.length > 0 ? (
+                <>
+                  {(message.alert as Alert).alertVitals.map((vital) => {
+                    return (
+                      <Box
+                        key={
+                          (vital as AlertVitals).reading +
+                          (vital as AlertVitals).vital
+                        }
+                      >
+                        <Typography
+                          sx={{ fontWeight: "bold", fontSize: "14px" }}
+                        >
+                          {(vital as AlertVitals).vital}
+                        </Typography>
+                        <Typography>
+                          {(vital as AlertVitals).reading}
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+                </>
+              ) : (
+                <></>
+              )}
             </Box>
             <Box
               sx={{

@@ -36,7 +36,6 @@ const PatientAlerts = (patientProp: PatientProp) => {
 
   useEffect(() => {
     fetchAlertsByPatientId(patientProp.patient?._id).then((res) => {
-      console.log("patient alerts", res);
       setAlerts(res);
     });
   }, [patientProp.patient?._id, socketData]);
