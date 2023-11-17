@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import WarningIcon from "@mui/icons-material/Warning";
 import {
   fetchBedByBedId,
+  removeProtocolBreachReason,
   updateProtocolBreachReason,
 } from "@/pages/api/smartbed_api";
 import { SmartBed } from "@/types/smartbed";
@@ -55,12 +56,14 @@ const BedStatusComponent = ({ bed }: BedProp) => {
 
   useEffect(() => {
     //fetch patient to set fall risk correctly
-    fetchPatientByPatientId((bed?.patient as Patient)?._id).then((patient) =>
-      setFallRisk(patient.fallRisk)
-    );
+    fetchPatientByPatientId((bed?.patient as Patient)?._id).then((patient) => {
+      setFallRisk(patient.fallRisk);
+      if (patient.fallRisk !== "High") removeProtocolBreachReason(bed?._id);
+    });
     fetchBedByBedId(bed?._id).then((bed: SmartBed) => {
       setCurrBed(bed);
       setInputReason(bed?.bedAlarmProtocolBreachReason);
+      if (bed.isBedExitAlarmOn) removeProtocolBreachReason(bed?._id);
     });
   }, [bed?.patient, socketData, bed?._id]);
 
