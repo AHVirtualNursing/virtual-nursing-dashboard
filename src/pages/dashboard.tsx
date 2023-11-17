@@ -26,7 +26,7 @@ export default function Dashboard() {
   }, [nurseId]);
 
   return (
-    <div className="flex flex-col p-8 gap-3 w-full shadow-lg bg-slate-100">
+    <div className="flex flex-col p-8 gap-3 shadow-lg w-full bg-slate-100">
       <div className="flex justify-between">
         <h4>Virtual Nurse Dashboard</h4>
         <button

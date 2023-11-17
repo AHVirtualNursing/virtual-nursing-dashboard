@@ -290,37 +290,37 @@ export default function Patients({ selectedWard }: PatientListProps) {
   console.log(filteredVital);
 
   return (
-    <div className="overflow-auto scrollbar w-full">
-      <table className="table-auto border-collapse">
+    <div className="overflow-auto scrollbar">
+      <table className="table-auto xl:table-fixed w-full border-spacing-1">
         <thead className="text-sm text-left">
           {/* ------ column headers ------ */}
           <tr>
-            <th></th>
-            <th className="px-2">Patient</th>
-            <th>Condition</th>
-            <th className="px-2">Acuity Level</th>
-            <th className="px-2">Fall Risk</th>
-            <th className="px-2">Bed</th>
-            <th className="px-2">Ward</th>
-            <th colSpan={4} className="px-2">
+            <th className="w-1/4 text-xs"></th>
+            <th className="w-1/4 text-xs">Patient</th>
+            <th className="w-1/4 text-xs">Condition</th>
+            <th className="w-1/4 text-xs">Acuity Level</th>
+            <th className="w-1/4 text-xs">Fall Risk</th>
+            <th className="w-1/4 text-xs">Bed</th>
+            <th className="w-1/4 text-xs">Ward</th>
+            <th colSpan={4} className="w-3/4 text-xs">
               Bed Rails
             </th>
-            <th className="px-2">Bed Brakes</th>
-            <th className="px-2">Bed Lowest</th>
-            <th className="px-2">Blood Pressure</th>
-            <th className="px-2">Heart Rate</th>
-            <th className="px-2">Respiratory Rate</th>
-            <th className="px-2">Saturation</th>
-            <th className="px-2">Temperature</th>
+            <th className="w-1/4 text-xs break-words">Bed Brakes</th>
+            <th className="w-1/4 text-xs break-words">Bed Lowest</th>
+            <th className="w-1/4 text-xs">Blood Pressure</th>
+            <th className="w-1/4 text-xs">Heart Rate</th>
+            <th className="w-1/4 text-xs">Respiratory Rate</th>
+            <th className="w-1/4 text-xs">Saturation</th>
+            <th className="w-1/4 text-xs">Temperature</th>
           </tr>
         </thead>
         <tbody ref={parent}>
           {/* ------ sub-headers ------ */}
           <tr className="text-left">
-            <td className="text-xs underline text-center p-2">ALERTS</td>
-            <td className="px-1">
+            <td className="text-xs underline text-center p-1">ALERTS</td>
+            <td className="px-1 w-1/5">
               <input
-                className="placeholder:italic placeholder:text-slate-400 rounded-md placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
+                className="placeholder:italic placeholder:text-slate-400 rounded-md placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300 w-2/3"
                 placeholder="Search"
                 type="text"
                 name="search"
@@ -330,7 +330,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
             </td>
             <td className="px-1">
               <input
-                className="placeholder:italic placeholder:text-slate-400 rounded-md placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
+                className="placeholder:italic placeholder:text-slate-400 rounded-md w-2/3 placeholder:text-sm p-2 focus:outline-none focus:border-sky-500 border boder-slate-300"
                 placeholder="Search"
                 type="text"
                 name="search"
@@ -338,22 +338,22 @@ export default function Patients({ selectedWard }: PatientListProps) {
                 onChange={handleConditionSearch}
               />
             </td>
-            <td className="px-1">
+            <td>
               <SelectFilter
                 name="acuitySelect"
                 inTable={true}
                 options={["all", "l1", "l2", "l3", "pending", "l4"]}
                 changeSelectedOption={setSelectedAcuity}
-                customStyle=" mt-0"
+                customStyle="w-2/3 mt-0"
               />
             </td>
-            <td className="px-1">
+            <td>
               <SelectFilter
                 name="fallRiskSelect"
                 inTable={true}
                 options={["all", "low", "medium", "high", "pending"]}
                 changeSelectedOption={setSelectedFallRisk}
-                customStyle="mt-0"
+                customStyle="w-2/3 mt-0"
               />
             </td>
             <TableSubHeader subheaderText="Bed No." />
@@ -412,6 +412,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
               <TableDataRow
                 id="acuity"
                 // width="1/12"
+                // width="1/8"
                 data={(pd.patient as Patient)?.acuityLevel}
               />
               <TableDataRow
