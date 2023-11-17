@@ -92,7 +92,9 @@ function BedTiles({ cardLayout, smartbed }: layoutProp) {
             <div className="bg-slate-100 flex flex-1 border-2 border-solid items-center justify-center rounded-2xl my-2">
               <div className="flex items-center">
                 <p className="p-2">Bed exit alarm off.</p>
-                {(smartbed?.patient as Patient).fallRisk === "High" ? (
+                {(smartbed?.patient as Patient).fallRisk === "High" &&
+                smartbed?.bedAlarmProtocolBreachReason &&
+                smartbed?.bedAlarmProtocolBreachReason.length > 0 ? (
                   <Tooltip
                     title={
                       <p style={{ fontSize: "16px" }}>

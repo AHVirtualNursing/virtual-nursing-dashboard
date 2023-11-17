@@ -2,7 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { Patient } from "@/types/patient";
-import { updatePatientLayoutByPatientId } from "@/pages/api/patients_api";
+import {
+  fetchPatientByPatientId,
+  updatePatientLayoutByPatientId,
+} from "@/pages/api/patients_api";
 import { useRouter } from "next/router";
 import { Vital, VitalsReading } from "@/types/vital";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
@@ -59,15 +62,23 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
   };
 
   useEffect(() => {
-    if (patient !== undefined) {
-      setOrder(patient.order!);
-      console.log(order);
-      const l = ["bpSys", "bpDia", "hr", "rr", "temp", "spo2"].filter(
-        (item) => !patient.order?.includes(item)
-      );
-      console.log(l);
-      setDrawerOrder(l);
-    }
+    const fetchData = async () => {
+      if (patient !== undefined) {
+        const res = await fetchPatientByPatientId(patient._id);
+        console.log(res.order);
+        setOrder(res.order);
+        const filteredOrder = [
+          "bpSys",
+          "bpDia",
+          "hr",
+          "rr",
+          "temp",
+          "spo2",
+        ].filter((item) => !res.order?.includes(item));
+        setDrawerOrder(filteredOrder);
+      }
+    };
+    fetchData();
   }, [patient]);
 
   const colours: { [key: string]: string } = {
@@ -253,6 +264,7 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
                 <LastUpdatedVital
                   data={dataMapping[chartType]}
                   vital={chartType}
+                  patientId={patient?._id}
                 />
               </div>
               <div className="w-10/12">
@@ -267,7 +279,7 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
                       />
                       <CartesianGrid stroke="#ccc" strokeDasharray="1" />
                       <XAxis dataKey="datetime" minTickGap={25}></XAxis>
-                      <YAxis />
+                      <YAxis type="number" domain={["dataMin", "dataMax"]} />
                       <Tooltip />
                     </LineChart>
                   </ResponsiveContainer>
