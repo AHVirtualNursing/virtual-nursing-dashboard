@@ -256,7 +256,6 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
     beds = beds.filter(
       (bed) => bed.patient !== undefined && bed.patient !== null
     );
-
     setBedsWithPatientsData(beds);
   };
 
