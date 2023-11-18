@@ -14,8 +14,9 @@ import BedStatusComponent from "@/components/bedStatusTab/BedStatusComponent";
 import { CloudUpload } from "@mui/icons-material";
 import { VisuallyHiddenInput } from "@/styles/Components";
 import { callUploadAndParseMockDataFromS3Api } from "./api/s3_api";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 const PatientChart = dynamic(
-  () => import("@/components/patientAnalyticsChart/PatientAnalyticsChart"),
+  () => import("@/components/patientAnalyticsChart/patientAnalyticsChart"),
   { ssr: false }
 );
 import autoAnimate from "@formkit/auto-animate";
@@ -118,12 +119,12 @@ const PatientVisualisationPage = () => {
                 Ward: {(selectedBed?.ward as Ward)?.wardNum}, Room:{" "}
                 {selectedBed?.roomNum}, Bed: {selectedBed?.bedNum}
               </p>
-              <div className="flex justify-evenly">
+              <div className="flex justify-center gap-x-3">
                 <p className="text-slate-500">Condition:</p>
                 <p>{(selectedBed?.patient as Patient)?.condition}</p>
               </div>
-              <div className="flex justify-evenly">
-                <p className="text-slate-500">Admission Datetime:</p>
+              <div className="flex justify-center gap-x-3">
+                <p className="text-slate-500">Admission:</p>
                 <p>
                   {" "}
                   {(selectedBed?.patient as Patient)?.admissionDateTime
@@ -133,30 +134,6 @@ const PatientVisualisationPage = () => {
                 </p>
               </div>
             </div>
-            {/* <div
-            id="notes"
-            className="bg-white overflow-auto scrollbar p-3 rounded-lg max-h-56 space-y-4 mr-3"
-          >
-            <h4 className="text-md font-serif">Additional Notes</h4>
-            <hr />
-            {(selectedBed?.patient as Patient)?.infoLogs &&
-            (selectedBed?.patient as Patient)?.infoLogs.length > 0
-              ? (selectedBed?.patient as Patient)?.infoLogs.map(
-                  (log, index) => (
-                    <div key={index}>
-                      <div className="flex justify-between py-2 px-1 items-center text-sm">
-                        <p>{log.info}</p>P
-                        <div className="flex flex-col text-right gap-y-1">
-                          <p>{log.datetime}</p>
-                          <p>{log.addedBy}</p>
-                        </div>
-                      </div>
-                      <hr />
-                    </div>
-                  )
-                )
-              : "-"}
-          </div> */}
             <div id="data-col" className="flex flex-col gap-y-4 py-2 grow mr-7">
               <div className="p-2 flex justify-between rounded-lg shadow-lg bg-slate-100">
                 <p>Fall Risk</p>
@@ -182,21 +159,21 @@ const PatientVisualisationPage = () => {
 
               <div className="p-2 flex justify-between rounded-lg shadow-lg bg-slate-100">
                 <p>O2 Intake</p>
-                <p className="font-semibold">
+                <p className="font-semibold uppercase">
                   {(selectedBed?.patient as Patient)?.o2Intake}
                 </p>
               </div>
 
               <div className="p-2 flex justify-between rounded-lg shadow-lg bg-slate-100">
                 <p>Consciousness</p>
-                <p className="font-semibold">
+                <p className="font-semibold uppercase">
                   {(selectedBed?.patient as Patient)?.consciousness}
                 </p>
               </div>
 
               <div className="p-2 flex justify-between rounded-lg shadow-lg bg-slate-100">
                 <p>NEWS2 Score</p>
-                <p className="font-semibold">
+                <p className="font-semibold uppercase">
                   {patientVital?.news2Score
                     ? patientVital?.news2Score[0]?.reading
                     : "-"}
@@ -209,22 +186,29 @@ const PatientVisualisationPage = () => {
                 id="buttons-col"
                 className="flex flex-col-reverse py-5 gap-y-4 "
               >
-                <Button
+                {/* <Button
                   component="label"
                   variant="contained"
                   startIcon={<CloudUpload />}
-                >
-                  <VisuallyHiddenInput
-                    type="file"
-                    onChange={handleFileChange}
-                  />
-                  {processingData ? "Processing Data..." : "Upload Data"}
-                </Button>
+                > */}
+                <button className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 pr-4 rounded-full border-none">
+                  <div className="flex items-center justify-center gap-x-3">
+                    <CloudUpload fontSize="small" />
+                    <VisuallyHiddenInput
+                      type="file"
+                      onChange={handleFileChange}
+                    />
+                    {processingData ? "Processing Data..." : "Upload Data"}
+                  </div>
+                </button>
                 <button
-                  className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full border-none"
+                  className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 pr-1 rounded-full border-none"
                   onClick={updateSelectedPatient}
                 >
-                  Update Details
+                  <div className="flex items-center justify-center gap-x-3">
+                    <EditNoteIcon fontSize="small" />
+                    Update Details
+                  </div>
                 </button>
                 <button
                   className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full border-none"
