@@ -9,6 +9,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { redelegateAlert } from "./api/alerts_api";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 const inter = Inter({ subsets: ["latin"] });
 const socket = io("http://localhost:3001");
@@ -22,7 +23,7 @@ const SocketProvider = ({ children }: any) => {
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { data: sessionData } = useSession();
   const nurseId = sessionData?.user.id;
-
+  const router = useRouter();
   const AlertToast = ({ message }: any) => (
     <div>
       <p>{message}</p>
@@ -109,6 +110,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       socket.off("admitPatient", admitPatientToast);
     };
   }, [nurseId]);
+
+  if (router.pathname === "/dischargeReport") {
+    return <>{children}</>;
+  }
 
   return (
     <SocketProvider>
