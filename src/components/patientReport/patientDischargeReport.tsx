@@ -72,9 +72,10 @@ export default function PatientDischargeReport({
       <Image
         src={"/VND_Banner.jpg"}
         alt="VND Banner"
-        layout="fixed"
-        width={1300}
-        height={200}
+        style={{ width: "100%", height: "auto" }}
+        width={0}
+        height={0}
+        sizes="100vw"
       />
       <TableContainer style={{ overflow: "hidden", marginBottom: 2 }}>
         <Table
@@ -258,7 +259,7 @@ export default function PatientDischargeReport({
               />
               <CartesianGrid stroke="#ccc" strokeDasharray="1" />
               <XAxis dataKey="datetime"></XAxis>
-              <YAxis />
+              <YAxis type="number" domain={["dataMin", "dataMax"]} />
               <Tooltip />
             </LineChart>
           </ResponsiveContainer>
