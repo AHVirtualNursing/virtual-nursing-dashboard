@@ -267,7 +267,7 @@ const Alerts = () => {
                   <AlertsTableRow
                     id="handling-nurse"
                     width="1/12"
-                    data={alertMapping.alert.notes[0]?.addedBy}
+                    data={alertMapping.alert.handledBy?.addedBy}
                   />
                   <AlertsTableRow
                     id="alert-datetime"

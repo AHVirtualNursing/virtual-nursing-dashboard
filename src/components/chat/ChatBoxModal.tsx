@@ -1207,10 +1207,24 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                 {selectedPatientNonCompletedAlerts?.map((alert) => {
                   return (
                     <MenuItem key={alert._id} value={alert._id}>
-                      {"[" +
-                        new Date(alert.createdAt).toLocaleTimeString() +
-                        "] " +
-                        alert.description}
+                      {`[${new Date(alert.createdAt)
+                        .toDateString()
+                        .slice(
+                          0,
+                          new Date(alert.createdAt).toDateString().length - 5
+                        )}, ${new Date(alert.createdAt)
+                        .toLocaleTimeString()
+                        .slice(
+                          0,
+                          new Date(alert.createdAt).toLocaleTimeString()
+                            .length - 6
+                        )}${new Date(alert.createdAt)
+                        .toLocaleTimeString()
+                        .slice(
+                          new Date(alert.createdAt).toLocaleTimeString()
+                            .length - 2
+                        )
+                        .toLowerCase()}] ` + alert.description}
                     </MenuItem>
                   );
                 })}
