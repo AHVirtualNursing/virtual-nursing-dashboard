@@ -130,7 +130,6 @@ export default function Wards() {
     const sortedVitals = combined.map((x) => x.vital);
     const sortedAlerts = combined.map((x) => x.alerts);
     const sortedNurses = combined.map((x) => x.nurse);
-    console.log("sorting alerts");
     if (
       sortedBeds.length !== data.length ||
       !sortedBeds.every((element, index) => element === data[index])
@@ -215,7 +214,6 @@ export default function Wards() {
     };
 
     const refreshPatientInfo = (updatedPatient: any) => {
-      console.log("enter");
       setData((prevData) => {
         const updatedData = prevData.map((bed) => {
           if (
@@ -231,7 +229,6 @@ export default function Wards() {
     };
 
     const refreshPatientVitals = (updatedVitals: any) => {
-      console.log("enter");
       const vitalObj = updatedVitals.vital;
       const patientId = updatedVitals.patient;
       setData((prevData) => {
@@ -246,7 +243,6 @@ export default function Wards() {
     };
 
     const discharge = (patient: any) => {
-      console.log("enter");
       setData((prevData) => {
         const updatedData = prevData.filter((bed) => {
           return !(
@@ -258,13 +254,11 @@ export default function Wards() {
     };
 
     const handleAlertIncoming = (data: any) => {
-      console.log("enter");
       setSocketAlertList(data.alertList);
       setSocketPatient(data.patient);
     };
 
     const handleDeleteAlert = (data: any) => {
-      console.log("enter");
       setSocketAlertList(data.alertList);
       setSocketPatient(data.patient);
     };
@@ -316,17 +310,13 @@ export default function Wards() {
     }
     return include;
   });
-  console.log(filteredData);
-  console.log(filteredOutIndex);
   const filteredVital = vitals.filter(
     (_, index) => !filteredOutIndex.includes(index)
   );
-  console.log(filteredVital);
 
   const filteredNurses = nurses.filter(
     (_, index) => !filteredOutIndex.includes(index)
   );
-  console.log(filteredNurses);
 
   return (
     <div className="flex flex-col p-8 gap-6 w-full shadow-lg bg-slate-100">
@@ -377,7 +367,6 @@ export default function Wards() {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1 mx-2"
             value={selectedWard}
             onChange={(e) => {
-              console.log("selected option", e.target.value);
               setSelectedWard(e.target.value);
             }}
           >
@@ -400,7 +389,6 @@ export default function Wards() {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1 mx-2"
             value={vitalFilterCriteria}
             onChange={(e) => {
-              console.log("selected option", e.target.value);
               setVitalFilterCriteria(e.target.value);
             }}
           >
@@ -420,7 +408,6 @@ export default function Wards() {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1 mx-2"
             value={bedFilterCriteria}
             onChange={(e) => {
-              console.log("selected option", e.target.value);
               setBedFilterCriteria(e.target.value);
             }}
           >

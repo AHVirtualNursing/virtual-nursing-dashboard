@@ -233,7 +233,6 @@ export const getFileByPresignedURL = async (
       }),
     });
     const json = await response.json();
-    console.log("retrieved file by presigned url", json.url);
     return json.presignedUrl;
   } catch (error) {
     console.error(error);

@@ -11,18 +11,16 @@ export default function ChangePasswordModal() {
   const { data: sessionData } = useSession();
   const [nurse, setNurse] = useState<VirtualNurse>();
   useEffect(() => {
-      fetchVirtualNurseByNurseId(sessionData?.user.id).then((res) => {
-        if (res) {
-          setNurse(res.data);
-        }
-      });
+    fetchVirtualNurseByNurseId(sessionData?.user.id).then((res) => {
+      if (res) {
+        setNurse(res.data);
+      }
+    });
   }, [sessionData?.user.id]);
 
   useEffect(() => {
     if (nurse !== undefined) {
       if (!nurse.passwordReset) {
-        console.log(nurse.passwordReset);
-        console.log("RAN");
         setOpen(true);
       }
     }

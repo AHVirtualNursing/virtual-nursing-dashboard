@@ -107,37 +107,31 @@ export default function CreatePatient() {
     if (!patientName) {
       setShowNameErrorMessage(true);
       hasErrors = true;
-      console.log("Missing Name");
     } else {
       setShowNameErrorMessage(false);
     }
     if (!patientNric || !nricRegex.test(patientNric)) {
       setShowNricErrorMessage(true);
-      console.log("Incorrect NRIC");
       hasErrors = true;
     } else {
       setShowNricErrorMessage(false);
     }
     if (bedAssigned == "") {
       setShowBedErrorMessage(true);
-      console.log("No Bed Selected");
       hasErrors = true;
     } else {
       setShowBedErrorMessage(false);
     }
     if (!condition) {
       setShowConditionErrorMessage(true);
-      console.log("Missing Condition");
       hasErrors = true;
     } else {
       setShowConditionErrorMessage(false);
     }
 
     if (hasErrors) {
-      console.log("DETAILS INVALID");
       return;
     }
-    console.log("DETAILS VALID");
     const res = await createNewPatient(
       patientName,
       patientNric,

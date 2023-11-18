@@ -65,7 +65,6 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
     const fetchData = async () => {
       if (patient !== undefined) {
         const res = await fetchPatientByPatientId(patient._id);
-        console.log(res.order);
         setOrder(res.order);
         const filteredOrder = [
           "bpSys",
@@ -197,7 +196,6 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
 
   useEffect(() => {
     const updateCharts = (vitalAndPatientId: any) => {
-      console.log("ENTER");
       const data = vitalAndPatientId.vital;
       const patientId = router.query.patientId;
       const patientIdFromSocket = vitalAndPatientId.patient;

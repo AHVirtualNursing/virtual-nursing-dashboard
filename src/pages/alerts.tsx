@@ -32,7 +32,6 @@ const Alerts = () => {
 
   useEffect(() => {
     const handleUpdatedAlert = (data: any) => {
-      console.log(data);
       setSocketData(data);
     };
     socket.on("updatedAlert", handleUpdatedAlert);
@@ -76,7 +75,6 @@ const Alerts = () => {
               patient: res[index].name,
             })
           );
-          console.log("alerttopatientmapping", alertToPatientMappings);
           setAlerts(alertToPatientMappings);
         });
       });

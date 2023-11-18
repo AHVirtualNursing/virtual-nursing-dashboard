@@ -29,7 +29,6 @@ import PatientInfoModal from "@/components/PatientInfoModal";
 
 const PatientVisualisationPage = () => {
   const router = useRouter();
-  console.log("router query", router.query);
   const { patientId, bedId, viewAlerts } = router.query;
   const [selectedBed, setSelectedBed] = useState<SmartBed>();
   const [socketData, setSocketData] = useState();
@@ -49,7 +48,6 @@ const PatientVisualisationPage = () => {
 
   useEffect(() => {
     const handleUpdatedPatient = (data: any) => {
-      console.log("updated patient", data);
       setSocketData(data);
     };
     socket.on("updatedPatient", handleUpdatedPatient);

@@ -58,10 +58,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     socket.emit("clientConnections", nurseId);
 
     const handleAlertIncoming = (data: any) => {
-      console.log(data);
-      console.log(data.patient);
-      console.log(data.alert);
-      console.log(data.smartbed);
       if (data.alert.redelegate) {
         const message = `${data.patient.name}: ${data.alert.description}`;
         toast.error(
@@ -82,7 +78,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     };
 
     const admitPatientToast = (data: any) => {
-      console.log("admitting patient toast");
       const message = `${data.patient.name} has been admitted.`;
       toast.success(
         <Link
@@ -95,7 +90,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     };
 
     const dischargePatientToast = (data: any) => {
-      console.log("toasting discharge patient");
       const message = `${data.name} has been discharged. The discharge report is being generated currently.`;
       toast.info(<AlertToast message={message} />);
     };

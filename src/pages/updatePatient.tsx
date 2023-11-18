@@ -40,16 +40,12 @@ function updatePatient() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const condition = data.get("condition") as string;
-    console.log(condition);
     if (!condition || condition === "") {
-      console.log("set to true");
       setShowConditionErrorMessage(true);
       return;
     } else {
       setShowConditionErrorMessage(false);
     }
-    console.log(showConditionErrorMessage);
-    console.log("running");
     const res = await updatePatientConditionByPatientId(patientId, condition);
     if (res?.status === 200) {
       setShowSuccessMessage(true);
