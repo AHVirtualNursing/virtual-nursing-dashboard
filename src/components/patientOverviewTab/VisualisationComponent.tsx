@@ -142,7 +142,7 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
         .then((res) => setPatientVitals(res))
         .finally(() => setLoading(false));
     }
-  }, [patient?.vital]);
+  }, [patient]);
 
   useEffect(() => {
     if (patientVitals) {
@@ -285,7 +285,7 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
                         strokeWidth={3}
                       />
                       <CartesianGrid stroke="#ccc" strokeDasharray="1" />
-                      <XAxis dataKey="datetime" minTickGap={25}></XAxis>
+                      <XAxis dataKey="datetime" padding="gap"></XAxis>
                       <YAxis type="number" domain={["dataMin", "dataMax"]} />
                       <Tooltip />
                     </LineChart>
