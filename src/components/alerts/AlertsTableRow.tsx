@@ -8,6 +8,7 @@ type AlertsTableRowProps = {
 };
 
 const AlertsTableRow = ({ id, data, width }: AlertsTableRowProps) => {
+  console.log("data received in row", data);
   return (
     <td
       id={id}
@@ -21,7 +22,11 @@ const AlertsTableRow = ({ id, data, width }: AlertsTableRowProps) => {
           ))
         : typeof data === "object" && typeof data[0] === "number"
         ? data.map((value, index) => <p key={index}>{value}</p>)
-        : data}
+        : typeof data === "object" && data.length === 0
+        ? "-"
+        : data
+        ? data
+        : "-"}
     </td>
   );
 };
