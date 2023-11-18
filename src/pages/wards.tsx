@@ -498,7 +498,7 @@ export default function Wards() {
           ))}
         </div>
       ) : (
-        <h3 className="text-left">No such patient / bed.</h3>
+        <h3 className="text-left">No patient or bed found.</h3>
       )}
     </div>
   );
