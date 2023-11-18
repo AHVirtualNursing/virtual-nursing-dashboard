@@ -66,14 +66,10 @@ const BedStatusComponent = ({ bed }: BedProp) => {
     //fetch patient to set fall risk correctly
     fetchPatientByPatientId((bed?.patient as Patient)?._id).then((patient) => {
       setFallRisk(patient.fallRisk);
-      // if (patient.fallRisk !== "High") removeProtocolBreachReason(bed?._id);
-      // if (patient.fallRisk !== "High") updateProtocolBreachReason(bed?._id, "");
     });
     fetchBedByBedId(bed?._id).then((bed: SmartBed) => {
       setCurrBed(bed);
       setInputReason(bed?.bedAlarmProtocolBreachReason);
-      // if (bed.isBedExitAlarmOn) removeProtocolBreachReason(bed?._id);
-      // if (bed.isBedExitAlarmOn) updateProtocolBreachReason(bed?._id, "");
     });
   }, [bed?.patient, socketData, bed?._id]);
 
