@@ -89,6 +89,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       );
     };
 
+    const handleChatMessageIncoming = (data: any) => {
+      console.log("receiving chat message toast");
+      const message = `Bedside Nurse has sent you a new message.`;
+      toast.info(<AlertToast message={message} />);
+    };
+
     const dischargePatientToast = (data: any) => {
       const message = `${data.name} has been discharged. The discharge report is being generated currently.`;
       toast.info(<AlertToast message={message} />);
@@ -97,11 +103,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     socket.on("alertIncoming", handleAlertIncoming);
     socket.on("dischargePatient", dischargePatientToast);
     socket.on("admitPatient", admitPatientToast);
+    socket.on("updateVirtualNurseChatNewMessage", handleChatMessageIncoming);
     // Clean up the event listener when the component unmounts
     return () => {
       socket.off("alertIncoming", handleAlertIncoming);
       socket.off("dischargePatient", dischargePatientToast);
       socket.off("admitPatient", admitPatientToast);
+      socket.off("updateVirtualNurseChatNewMessage", handleChatMessageIncoming);
     };
   }, [nurseId]);
 
