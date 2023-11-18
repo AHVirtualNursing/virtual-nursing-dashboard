@@ -46,7 +46,7 @@ const BedStatusComponent = ({ bed }: BedProp) => {
 
     const handleUpdatedSmartbed = (data: any) => {
       console.log("updated smartbed", data);
-      if (data.isBedExitAlarmOn) {
+      if (data.isBedExitAlarmOn && data.bedAlarmProtocolBreachReason !== "") {
         updateProtocolBreachReason(bed?._id, "");
         setReasonAdded(false);
       }
