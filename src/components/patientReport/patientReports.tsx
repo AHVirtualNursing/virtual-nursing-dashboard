@@ -53,13 +53,17 @@ export default function PatientReports({
           return callFetchReportApi(reportId as string);
         });
         const reportData = await Promise.all(reportPromises);
-        setReports(reportData);
-        setFilteredReports(reportData);
+        if (reportData) {
+          setReports(reportData);
+          setFilteredReports(reportData);
+        }
       }
     } else {
       const reportData = await callFetchDischargeReportsApi();
-      setReports(reportData);
-      setFilteredReports(reportData);
+      if (reportData) {
+        setReports(reportData);
+        setFilteredReports(reportData);
+      }
     }
   };
 
