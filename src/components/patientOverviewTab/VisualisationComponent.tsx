@@ -44,7 +44,7 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
     temp: "Temperature",
     spo2: "SPO2",
   };
-
+  const [loading, setLoading] = useState(true);
   const [rrData, setRRData] = useState<VitalsReading[]>([]);
   const [hrData, setHRData] = useState<VitalsReading[]>([]);
   const [bpSysData, setBpSysData] = useState<VitalsReading[]>([]);
@@ -137,12 +137,16 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
         typeof patient?.vital === "string"
           ? patient?.vital
           : patient?.vital?._id;
-      fetchVitalByVitalId(vitalId).then((res) => setPatientVitals(res));
+      setLoading(true);
+      fetchVitalByVitalId(vitalId)
+        .then((res) => setPatientVitals(res))
+        .finally(() => setLoading(false));
     }
   }, [patient?.vital]);
 
   useEffect(() => {
     if (patientVitals) {
+      setLoading(true);
       if (patientVitals.spO2.length > 0) {
         setSpO2Data(
           patientVitals.spO2
@@ -185,6 +189,7 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
             .map((i) => ({ ...i, datetime: getDateTime(new Date(i.datetime)) }))
         );
       }
+      setLoading(false);
     }
   }, [patientVitals]);
 
@@ -268,7 +273,9 @@ export default function VisualisationComponent({ patient }: ComponentProp) {
                 />
               </div>
               <div className="w-10/12">
-                {dataMapping[chartType].length > 0 ? (
+                {loading ? (
+                  <p>Loading Graphs</p>
+                ) : dataMapping[chartType].length > 0 ? (
                   <ResponsiveContainer width="100%" height={250}>
                     <LineChart data={dataMapping[chartType]}>
                       <Line
