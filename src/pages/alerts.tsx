@@ -224,6 +224,7 @@ const Alerts = () => {
                 <tr
                   key={index}
                   onClick={() => handleViewAlertDetails(alertMapping)}
+                  className="hover: cursor-pointer"
                 >
                   <AlertsTableRow
                     id="patient-name"
@@ -267,7 +268,7 @@ const Alerts = () => {
                   <AlertsTableRow
                     id="handling-nurse"
                     width="1/12"
-                    data={alertMapping.alert.notes[0]?.addedBy}
+                    data={alertMapping.alert.handledBy?.addedBy}
                   />
                   <AlertsTableRow
                     id="alert-datetime"
