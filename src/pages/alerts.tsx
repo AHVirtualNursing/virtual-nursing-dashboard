@@ -224,6 +224,7 @@ const Alerts = () => {
                 <tr
                   key={index}
                   onClick={() => handleViewAlertDetails(alertMapping)}
+                  className="hover: cursor-pointer"
                 >
                   <AlertsTableRow
                     id="patient-name"

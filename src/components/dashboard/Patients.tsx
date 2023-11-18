@@ -344,7 +344,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
               <SelectFilter
                 name="acuitySelect"
                 inTable={true}
-                options={["all", "l1", "l2", "l3", "pending", "l4"]}
+                options={["all", "l1", "l2", "l3", "pending"]}
                 changeSelectedOption={setSelectedAcuity}
                 customStyle="w-2/3 mt-0"
               />

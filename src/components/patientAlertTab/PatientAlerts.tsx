@@ -181,7 +181,7 @@ const PatientAlerts = (patientProp: PatientProp) => {
                 <AlertsTableRow
                   id="handling-nurse"
                   width="1/12"
-                  data={alert.notes[0]?.addedBy}
+                  data={alert.handledBy?.addedBy}
                 />
                 <AlertsTableRow
                   id="alert-datetime"

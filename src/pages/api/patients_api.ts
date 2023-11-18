@@ -39,7 +39,9 @@ export const fetchPatientByPatientNRIC = async (
   patientNRIC: string | string[] | undefined
 ) => {
   try {
-    const res = await axios.get(`http://localhost:3001/patient/nric/${patientNRIC}`);
+    const res = await axios.get(
+      `http://localhost:3001/patient/nric/${patientNRIC}`
+    );
     return res.data;
   } catch (error) {
     console.error(error);
@@ -94,7 +96,7 @@ export const createNewPatient = async (
 };
 
 export const getVitalByPatientId = async (
-  patientId: string
+  patientId: string | undefined | string[]
 ): Promise<Vital | null> => {
   var vital: Vital | null = null;
   try {
