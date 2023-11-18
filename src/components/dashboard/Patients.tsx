@@ -262,10 +262,12 @@ export default function Patients({ selectedWard }: PatientListProps) {
 
   const filteredData = data.filter((bed, index) => {
     const include =
-      (bed.patient as Patient)?.name.toLowerCase().includes(searchPatient) &&
+      (bed.patient as Patient)?.name
+        .toLowerCase()
+        .includes(searchPatient.toLowerCase()) &&
       (bed.patient as Patient)?.condition
         .toLowerCase()
-        .includes(searchCondition) &&
+        .includes(searchCondition.toLowerCase()) &&
       (selectedFallRisk === ""
         ? true
         : (bed.patient as Patient).fallRisk

@@ -122,9 +122,9 @@ const VitalTiles = ({ data, cardLayout, patient }: VitalProps) => {
             data.bloodPressureSys.length > 0
               ? getColour(
                   [
-                    data.bloodPressureDia[data.bloodPressureSys.length - 1]
+                    data.bloodPressureSys[data.bloodPressureSys.length - 1]
                       .reading,
-                    data.bloodPressureSys[data.bloodPressureDia.length - 1]
+                    data.bloodPressureDia[data.bloodPressureDia.length - 1]
                       .reading,
                   ],
                   "bp"

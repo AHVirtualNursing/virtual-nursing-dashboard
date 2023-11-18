@@ -299,8 +299,9 @@ export default function Wards() {
 
   const filteredData = data.filter((bed, index) => {
     const include =
-      (bed.patient as Patient)?.name.toLowerCase().includes(searchPatient) &&
-      filteredByAlerts(index);
+      (bed.patient as Patient)?.name
+        .toLowerCase()
+        .includes(searchPatient.toLowerCase()) && filteredByAlerts(index);
     if (!include) {
       filteredOutIndex.push(index);
     }
