@@ -157,10 +157,12 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
 
   useEffect(() => {
     fetchVirtualNurseByNurseId(sessionData?.user.id).then((res) => {
-      setVirtualNurse(res.data);
+      if (res) {
+        setVirtualNurse(res.data);
+        getChatsForVirtualNurse(res.data);
+        getPatients(res.data);
+      }
 
-      getChatsForVirtualNurse(res.data);
-      getPatients(res.data);
     });
 
     // Set an interval to call myFunction every 1000 milliseconds (1 second)

@@ -168,9 +168,11 @@ export default function Wards() {
         );
       }
       setWards(wards);
-      for (const ward of wardsToView) {
-        const bedArray = ward.smartBeds;
-        smartBedIds.push(...bedArray);
+      if (wardsToView) {
+        for (const ward of wardsToView) {
+          const bedArray = ward.smartBeds;
+          smartBedIds.push(...bedArray);
+        }
       }
       smartBedIds.map((id) => promises.push(fetchBedByBedId(id)));
       Promise.all(promises).then((res) => {
@@ -181,9 +183,11 @@ export default function Wards() {
         );
       });
     });
-    fetchVirtualNurseByNurseId(sessionData?.user.id).then((res) => {
-      setNurse(res.data);
-    });
+      fetchVirtualNurseByNurseId(sessionData?.user.id).then((res) => {
+        if (res) {
+          setNurse(res.data);
+        }
+      });
   }, [selectedWard, vitalFilterCriteria, bedFilterCriteria]);
 
   useEffect(() => {
@@ -325,8 +329,7 @@ export default function Wards() {
         <h4>Virtual Nurse Dashboard</h4>
         <button
           className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full border-none"
-          onClick={() => router.push("/createPatient")}
-        >
+          onClick={() => router.push("/createPatient")}>
           Create Patient
         </button>
       </div>
@@ -344,8 +347,7 @@ export default function Wards() {
           </div>
           <label
             htmlFor="ward-select"
-            className="text-sm font-medium text-gray-900"
-          >
+            className="text-sm font-medium text-gray-900">
             Search Patient:
           </label>
           <input
@@ -354,12 +356,10 @@ export default function Wards() {
             type="text"
             name="search"
             value={searchPatient}
-            onChange={handlePatientSearch}
-          ></input>
+            onChange={handlePatientSearch}></input>
           <label
             htmlFor="ward-select"
-            className="text-sm font-medium text-gray-900"
-          >
+            className="text-sm font-medium text-gray-900">
             Beds
           </label>
           <select
@@ -370,10 +370,9 @@ export default function Wards() {
             onChange={(e) => {
               console.log("selected option", e.target.value);
               setSelectedWard(e.target.value);
-            }}
-          >
+            }}>
             <option value="assigned-wards">Assigned Wards</option>
-            {wards.map((ward) => (
+            {wards?.map((ward) => (
               <option key={ward._id} value={`${ward.wardNum}`}>
                 Ward {ward.wardNum}
               </option>
@@ -381,8 +380,7 @@ export default function Wards() {
           </select>
           <label
             htmlFor="vital-alerts-select"
-            className="text-sm font-medium text-gray-900"
-          >
+            className="text-sm font-medium text-gray-900">
             Vital Alerts
           </label>
           <select
@@ -393,16 +391,14 @@ export default function Wards() {
             onChange={(e) => {
               console.log("selected option", e.target.value);
               setVitalFilterCriteria(e.target.value);
-            }}
-          >
+            }}>
             <option value="all">All</option>
             <option value="open">Open</option>
             <option value="handling">Handling</option>
           </select>
           <label
             htmlFor="bed-alerts-select"
-            className="text-sm font-medium text-gray-900"
-          >
+            className="text-sm font-medium text-gray-900">
             Bed Alerts
           </label>
           <select
@@ -413,8 +409,7 @@ export default function Wards() {
             onChange={(e) => {
               console.log("selected option", e.target.value);
               setBedFilterCriteria(e.target.value);
-            }}
-          >
+            }}>
             <option value="all">All</option>
             <option value="open">Open</option>
             <option value="handling">Handling</option>
@@ -432,8 +427,7 @@ export default function Wards() {
             onClick={() =>
               viewPatientVisualisation((pd.patient as Patient)?._id, pd._id)
             }
-            key={pd._id}
-          >
+            key={pd._id}>
             <div className="flex items-start justify-start">
               <div className="w-1/2 flex items-start justify-start">
                 <img
