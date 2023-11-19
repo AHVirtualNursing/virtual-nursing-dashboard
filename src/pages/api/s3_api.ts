@@ -11,7 +11,7 @@ export const callUploadAndParseMockDataFromS3Api = async (
       formData.append("patientId", patientId);
     }
 
-    await axios.post(
+    const response = await axios.post(
       process.env.NEXT_PUBLIC_API_ENDPOINT_DEV + "/s3/mockdata",
       formData,
       {
@@ -20,6 +20,7 @@ export const callUploadAndParseMockDataFromS3Api = async (
         },
       }
     );
+    return response.status;
   } catch (error) {
     console.error(error);
   }

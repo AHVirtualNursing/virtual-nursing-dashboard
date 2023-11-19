@@ -158,14 +158,6 @@ export default function CreatePatient() {
     }
   };
 
-  const ErrorMessage = (message: string) => {
-    return (
-      <Grid>
-        <p className="text-red-600">{message}</p>
-      </Grid>
-    );
-  };
-
   const handleCloseSnackbar = (_?: SyntheticEvent | Event, reason?: string) => {
     if (reason === "clickaway") {
       return;

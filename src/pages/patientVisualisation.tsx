@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { Box, Button, Tab, Tabs } from "@mui/material";
+import { Alert, Box, Button, Snackbar, Tab, Tabs } from "@mui/material";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import profilePic from "../../public/profilepic.png";
@@ -35,6 +35,12 @@ const PatientVisualisationPage = () => {
   const [socketData, setSocketData] = useState();
   const [patientVital, setPatientVital] = useState<Vital>();
   const [shown, setShown] = useState(false);
+
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const [currentTab, setCurrentTab] = useState(
     viewAlerts === "true" ? "alerts" : "overview"
@@ -75,15 +81,49 @@ const PatientVisualisationPage = () => {
     );
   }
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] as File | undefined;
 
     if (file) {
-      callUploadAndParseMockDataFromS3Api(file, patientId as string);
       setProcessingData(true);
+
+      try {
+        const res = await callUploadAndParseMockDataFromS3Api(
+          file,
+          patientId as string
+        );
+        if (res === 200) {
+          setSnackbarSeverity("success");
+          setSnackbarMessage("File uploaded and processed successfully!");
+          setProcessingData(false);
+          setOpenSnackbar(true);
+        } else {
+          console.error("error");
+          setSnackbarSeverity("error");
+          setSnackbarMessage(`Error uploading and processing file`);
+          setOpenSnackbar(true);
+          setProcessingData(false);
+        }
+      } catch (error) {
+        console.error(error);
+        setSnackbarSeverity("error");
+        setSnackbarMessage(`Error uploading and processing file`);
+        setOpenSnackbar(true);
+        setProcessingData(false);
+      }
     } else {
       setProcessingData(false);
     }
+  };
+
+  const handleCloseSnackbar = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenSnackbar(false);
   };
 
   return (
@@ -186,21 +226,21 @@ const PatientVisualisationPage = () => {
                 id="buttons-col"
                 className="flex flex-col-reverse py-5 gap-y-4 "
               >
-                {/* <Button
+                <Button
                   component="label"
                   variant="contained"
                   startIcon={<CloudUpload />}
-                > */}
-                <button className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 pr-4 rounded-full border-none">
+                >
+                  {/* <button className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 pr-4 rounded-full border-none">
                   <div className="flex items-center justify-center gap-x-3">
-                    <CloudUpload fontSize="small" />
-                    <VisuallyHiddenInput
-                      type="file"
-                      onChange={handleFileChange}
-                    />
-                    {processingData ? "Processing Data..." : "Upload Data"}
-                  </div>
-                </button>
+                    <CloudUpload fontSize="small" /> */}
+                  <VisuallyHiddenInput
+                    type="file"
+                    onChange={handleFileChange}
+                  />
+                  {processingData ? "Processing Data..." : "Upload Data"}
+                  {/* </div> */}
+                </Button>
                 <button
                   className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 pr-1 rounded-full border-none"
                   onClick={updateSelectedPatient}
@@ -250,6 +290,19 @@ const PatientVisualisationPage = () => {
               <BedStatusComponent bed={selectedBed} />
             ) : null}
           </div>
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={6000}
+            onClose={handleCloseSnackbar}
+          >
+            <Alert
+              onClose={handleCloseSnackbar}
+              severity={snackbarSeverity}
+              sx={{ width: "100%" }}
+            >
+              {snackbarMessage}
+            </Alert>
+          </Snackbar>
         </Box>
       </div>
     </>
