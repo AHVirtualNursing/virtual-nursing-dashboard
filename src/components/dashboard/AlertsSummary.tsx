@@ -59,8 +59,9 @@ const AlertsSummary = ({
     <div className="flex flex-col w-1/2 p-4 gap-y-4 align-middle">
       <h4 className="text-left">Alerts Summary</h4>
       <div className="h-full flex gap-x-5">
-        <div className="w-1/6 rounded-md bg-pink-200 flex items-center justify-center p-3">
-          <p>Total: {alerts && alerts.length}</p>
+        <div className="w-1/6 rounded-md bg-pink-200 flex flex-col gap-y-3 items-center justify-center p-3">
+          <p className="font-sans text-6xl">{alerts && alerts.length}</p>
+          <p className="">Total Alerts</p>
         </div>
         <div className="w-3/4">
           <ResponsiveContainer width="80%" height="90%">

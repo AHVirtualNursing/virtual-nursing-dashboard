@@ -96,12 +96,11 @@ const PatientSummary = ({
       <p className="text-left font-bold text-sm">Total Patients: {patients}</p>
       <div className="flex gap-x-5">
         <div>
-          <p className="underline text-sm">Fall Risk of Patients</p>
           <PieChart title="Fall Risks" width={300} height={150}>
             <Pie
               data={fallRiskData}
               cx="50%"
-              cy="55%"
+              cy="50%"
               labelLine={false}
               label={(entry) =>
                 entry.value === 0
@@ -121,15 +120,14 @@ const PatientSummary = ({
               ))}
             </Pie>
           </PieChart>
+          <p className="underline text-sm">Fall Risk of Patients</p>
         </div>
         <div>
-          <p className="underline text-sm">Acuity Level of Patients</p>
-
           <PieChart title="Acuity Levels" width={300} height={150}>
             <Pie
               data={acuityData}
               cx="50%"
-              cy="55%"
+              cy="50%"
               labelLine={false}
               label={(entry) =>
                 entry.value === 0
@@ -149,6 +147,7 @@ const PatientSummary = ({
               ))}
             </Pie>
           </PieChart>
+          <p className="underline text-sm">Acuity Level of Patients</p>
         </div>
       </div>
     </div>

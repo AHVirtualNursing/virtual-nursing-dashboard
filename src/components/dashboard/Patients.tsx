@@ -158,7 +158,6 @@ export default function Patients({ selectedWard }: PatientListProps) {
     };
 
     const refreshPatientInfo = (updatedPatient: any) => {
-      console.log("enter");
       setData((prevData) => {
         const updatedData = prevData.map((bed) => {
           if (
@@ -174,7 +173,6 @@ export default function Patients({ selectedWard }: PatientListProps) {
     };
 
     const refreshPatientVitals = (updatedVitals: any) => {
-      console.log("ENTER");
       const vitalObj = updatedVitals.vital;
       const patientId = updatedVitals.patient;
       setData((prevData) => {
@@ -189,7 +187,6 @@ export default function Patients({ selectedWard }: PatientListProps) {
     };
 
     const discharge = (patient: any) => {
-      console.log("enter");
       setData((prevData) => {
         const updatedData = prevData.filter((bed) => {
           return !(
@@ -344,7 +341,7 @@ export default function Patients({ selectedWard }: PatientListProps) {
               <SelectFilter
                 name="acuitySelect"
                 inTable={true}
-                options={["all", "l1", "l2", "l3", "pending", "l4"]}
+                options={["all", "l1", "l2", "l3", "pending"]}
                 changeSelectedOption={setSelectedAcuity}
                 customStyle="w-2/3 mt-0"
               />

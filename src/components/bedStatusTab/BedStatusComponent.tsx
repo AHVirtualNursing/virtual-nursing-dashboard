@@ -37,11 +37,19 @@ const BedStatusComponent = ({ bed }: BedProp) => {
   useEffect(() => {
     const handleUpdatedPatient = (data: any) => {
       console.log("updated patient", data);
+      if (data.fallRisk !== "High") {
+        updateProtocolBreachReason(bed?._id, "");
+        setReasonAdded(false);
+      }
       setSocketData(data);
     };
 
     const handleUpdatedSmartbed = (data: any) => {
       console.log("updated smartbed", data);
+      if (data.isBedExitAlarmOn && data.bedAlarmProtocolBreachReason !== "") {
+        updateProtocolBreachReason(bed?._id, "");
+        setReasonAdded(false);
+      }
       setSocketData(data);
     };
 
@@ -52,18 +60,16 @@ const BedStatusComponent = ({ bed }: BedProp) => {
       socket.off("updatedPatient", handleUpdatedPatient);
       socket.off("updatedSmartbed", handleUpdatedSmartbed);
     };
-  }, [socket]);
+  }, [socket, bed?._id]);
 
   useEffect(() => {
     //fetch patient to set fall risk correctly
     fetchPatientByPatientId((bed?.patient as Patient)?._id).then((patient) => {
       setFallRisk(patient.fallRisk);
-      if (patient.fallRisk !== "High") removeProtocolBreachReason(bed?._id);
     });
     fetchBedByBedId(bed?._id).then((bed: SmartBed) => {
       setCurrBed(bed);
       setInputReason(bed?.bedAlarmProtocolBreachReason);
-      if (bed.isBedExitAlarmOn) removeProtocolBreachReason(bed?._id);
     });
   }, [bed?.patient, socketData, bed?._id]);
 
@@ -204,7 +210,7 @@ const BedStatusComponent = ({ bed }: BedProp) => {
             placeholder="Please input reason for protocol breach"
             className=" focus:border-red-400 p-1 font-serif rounded-lg w-4/5"
             disabled={
-              reasonAdded || currBed?.bedAlarmProtocolBreachReason
+              currBed?.bedAlarmProtocolBreachReason !== "" || reasonAdded
                 ? true
                 : false
             }

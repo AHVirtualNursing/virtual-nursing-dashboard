@@ -74,7 +74,7 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
       {rr.length > 0 && (
         <RangeSlider
           min={0}
-          max={50}
+          max={40}
           lowerBound={rr[0]}
           upperBound={rr[1]}
           label="Respiratory Rate"
@@ -96,7 +96,7 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
       {systolic.length > 0 && (
         <RangeSlider
           min={0}
-          max={200}
+          max={220}
           lowerBound={systolic[0]}
           upperBound={systolic[1]}
           label="Systolic"
@@ -127,7 +127,7 @@ const PatientConfigs = ({ patient }: PatientConfigProps) => {
 
       {temp.length > 0 && (
         <RangeSlider
-          min={20}
+          min={30}
           max={50}
           lowerBound={temp[0]}
           upperBound={temp[1]}

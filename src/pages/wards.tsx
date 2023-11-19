@@ -42,6 +42,7 @@ export default function Wards() {
   const socket = useContext(SocketContext);
   const [socketAlertList, setSocketAlertList] = useState<Alert[]>();
   const [socketPatient, setSocketPatient] = useState<Patient>();
+  const [loading, setLoading] = useState(true);
 
   const handlePatientSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchPatient(event.target.value);
@@ -64,6 +65,7 @@ export default function Wards() {
   };
 
   const fetchPatientVitals = async () => {
+    // setLoading(true);
     let patientVitalsArr: any[] = [];
     let patientAlertsArr: any[] = [];
     let patientNursesArr: any[] = [];
@@ -128,7 +130,6 @@ export default function Wards() {
     const sortedVitals = combined.map((x) => x.vital);
     const sortedAlerts = combined.map((x) => x.alerts);
     const sortedNurses = combined.map((x) => x.nurse);
-    console.log("sorting alerts");
     if (
       sortedBeds.length !== data.length ||
       !sortedBeds.every((element, index) => element === data[index])
@@ -153,9 +154,11 @@ export default function Wards() {
     ) {
       setNurses(sortedNurses);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchWardsByVirtualNurse(sessionData?.user.id).then((wards) => {
       let promises: Promise<SmartBed>[] = [];
       let wardsToView = [];
@@ -183,11 +186,12 @@ export default function Wards() {
         );
       });
     });
-      fetchVirtualNurseByNurseId(sessionData?.user.id).then((res) => {
-        if (res) {
-          setNurse(res.data);
-        }
-      });
+    fetchVirtualNurseByNurseId(sessionData?.user.id).then((res) => {
+      if (res) {
+        setNurse(res.data);
+      }
+    });
+    // setLoading(false);
   }, [selectedWard, vitalFilterCriteria, bedFilterCriteria]);
 
   useEffect(() => {
@@ -210,7 +214,6 @@ export default function Wards() {
     };
 
     const refreshPatientInfo = (updatedPatient: any) => {
-      console.log("enter");
       setData((prevData) => {
         const updatedData = prevData.map((bed) => {
           if (
@@ -226,7 +229,6 @@ export default function Wards() {
     };
 
     const refreshPatientVitals = (updatedVitals: any) => {
-      console.log("enter");
       const vitalObj = updatedVitals.vital;
       const patientId = updatedVitals.patient;
       setData((prevData) => {
@@ -241,7 +243,6 @@ export default function Wards() {
     };
 
     const discharge = (patient: any) => {
-      console.log("enter");
       setData((prevData) => {
         const updatedData = prevData.filter((bed) => {
           return !(
@@ -253,13 +254,11 @@ export default function Wards() {
     };
 
     const handleAlertIncoming = (data: any) => {
-      console.log("enter");
       setSocketAlertList(data.alertList);
       setSocketPatient(data.patient);
     };
 
     const handleDeleteAlert = (data: any) => {
-      console.log("enter");
       setSocketAlertList(data.alertList);
       setSocketPatient(data.patient);
     };
@@ -286,13 +285,13 @@ export default function Wards() {
     } else {
       if (alerts.length > 0) {
         if (vitalFilterCriteria === "all") {
-          return alerts[index][1] === bedFilterCriteria;
+          return alerts?.[index]?.[1] === bedFilterCriteria;
         } else if (bedFilterCriteria === "all") {
-          return alerts[index][0] === vitalFilterCriteria;
+          return alerts?.[index]?.[0] === vitalFilterCriteria;
         } else {
           return (
-            alerts[index][0] === vitalFilterCriteria &&
-            alerts[index][1] === bedFilterCriteria
+            alerts?.[index]?.[0] === vitalFilterCriteria &&
+            alerts?.[index]?.[1] === bedFilterCriteria
           );
         }
       }
@@ -311,17 +310,13 @@ export default function Wards() {
     }
     return include;
   });
-  console.log(filteredData);
-  console.log(filteredOutIndex);
   const filteredVital = vitals.filter(
     (_, index) => !filteredOutIndex.includes(index)
   );
-  console.log(filteredVital);
 
   const filteredNurses = nurses.filter(
     (_, index) => !filteredOutIndex.includes(index)
   );
-  console.log(filteredNurses);
 
   return (
     <div className="flex flex-col p-8 gap-6 w-full shadow-lg bg-slate-100">
@@ -329,7 +324,8 @@ export default function Wards() {
         <h4>Virtual Nurse Dashboard</h4>
         <button
           className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full border-none"
-          onClick={() => router.push("/createPatient")}>
+          onClick={() => router.push("/createPatient")}
+        >
           Create Patient
         </button>
       </div>
@@ -347,7 +343,8 @@ export default function Wards() {
           </div>
           <label
             htmlFor="ward-select"
-            className="text-sm font-medium text-gray-900">
+            className="text-sm font-medium text-gray-900"
+          >
             Search Patient:
           </label>
           <input
@@ -356,10 +353,12 @@ export default function Wards() {
             type="text"
             name="search"
             value={searchPatient}
-            onChange={handlePatientSearch}></input>
+            onChange={handlePatientSearch}
+          ></input>
           <label
             htmlFor="ward-select"
-            className="text-sm font-medium text-gray-900">
+            className="text-sm font-medium text-gray-900"
+          >
             Beds
           </label>
           <select
@@ -368,9 +367,9 @@ export default function Wards() {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1 mx-2"
             value={selectedWard}
             onChange={(e) => {
-              console.log("selected option", e.target.value);
               setSelectedWard(e.target.value);
-            }}>
+            }}
+          >
             <option value="assigned-wards">Assigned Wards</option>
             {wards?.map((ward) => (
               <option key={ward._id} value={`${ward.wardNum}`}>
@@ -380,7 +379,8 @@ export default function Wards() {
           </select>
           <label
             htmlFor="vital-alerts-select"
-            className="text-sm font-medium text-gray-900">
+            className="text-sm font-medium text-gray-900"
+          >
             Vital Alerts
           </label>
           <select
@@ -389,16 +389,17 @@ export default function Wards() {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1 mx-2"
             value={vitalFilterCriteria}
             onChange={(e) => {
-              console.log("selected option", e.target.value);
               setVitalFilterCriteria(e.target.value);
-            }}>
+            }}
+          >
             <option value="all">All</option>
             <option value="open">Open</option>
             <option value="handling">Handling</option>
           </select>
           <label
             htmlFor="bed-alerts-select"
-            className="text-sm font-medium text-gray-900">
+            className="text-sm font-medium text-gray-900"
+          >
             Bed Alerts
           </label>
           <select
@@ -407,9 +408,9 @@ export default function Wards() {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1 mx-2"
             value={bedFilterCriteria}
             onChange={(e) => {
-              console.log("selected option", e.target.value);
               setBedFilterCriteria(e.target.value);
-            }}>
+            }}
+          >
             <option value="all">All</option>
             <option value="open">Open</option>
             <option value="handling">Handling</option>
@@ -420,78 +421,85 @@ export default function Wards() {
           setNurse={setNurse}
         />
       </div>
-      <div className="grid grid-cols-2 gap-4 flex" ref={parent}>
-        {filteredData.map((pd, index) => (
-          <div
-            className="bg-white rounded-2xl p-4 shadow-lg hover:cursor-pointer hover:bg-blue-100"
-            onClick={() =>
-              viewPatientVisualisation((pd.patient as Patient)?._id, pd._id)
-            }
-            key={pd._id}>
-            <div className="flex items-start justify-start">
-              <div className="w-1/2 flex items-start justify-start">
-                <img
-                  style={{ borderRadius: "50%" }}
-                  width={60}
-                  src={profilePic.src}
-                />
-                <div className="text-left px-4">
-                  <h3>{(pd.patient as Patient)?.name}</h3>
-                  <p>
-                    Ward: {(pd.ward as Ward)?.wardNum} Bed: {pd.bedNum}
-                  </p>
-                  {filteredNurses[index]?.length > 0 ? (
+      {loading ? (
+        <h3 className="text-left">Loading...</h3>
+      ) : filteredData.length > 0 ? (
+        <div className="grid grid-cols-2 gap-4 flex" ref={parent}>
+          {filteredData.map((pd, index) => (
+            <div
+              className="bg-white rounded-2xl p-4 shadow-lg hover:cursor-pointer hover:bg-blue-100"
+              onClick={() =>
+                viewPatientVisualisation((pd.patient as Patient)?._id, pd._id)
+              }
+              key={pd._id}
+            >
+              <div className="flex items-start justify-start">
+                <div className="w-1/2 flex items-start justify-start">
+                  <img
+                    style={{ borderRadius: "50%" }}
+                    width={60}
+                    src={profilePic.src}
+                  />
+                  <div className="text-left px-4">
+                    <h3>{(pd.patient as Patient)?.name}</h3>
                     <p>
-                      Nurse:{" "}
-                      {filteredNurses[index]
-                        .map((nurse: BedSideNurse) => nurse.name)
-                        .join(", ")}
+                      Ward: {(pd.ward as Ward)?.wardNum} Bed: {pd.bedNum}
                     </p>
-                  ) : (
-                    "-"
-                  )}
+                    {filteredNurses[index]?.length > 0 ? (
+                      <p>
+                        Nurse:{" "}
+                        {filteredNurses[index]
+                          .map((nurse: BedSideNurse) => nurse.name)
+                          .join(", ")}
+                      </p>
+                    ) : (
+                      "-"
+                    )}
+                  </div>
+                </div>
+                <div className="w-1/2 flex items-start justify-around">
+                  <DashboardAlertIcon
+                    patientId={(pd.patient as Patient)?._id}
+                    socketData={
+                      socketPatient?._id === (pd.patient as Patient)?._id
+                        ? socketAlertList
+                        : null
+                    }
+                  />
+                  {nurse?.cardLayout.fallRisk ? (
+                    <div>
+                      <p>Fall Risk</p>
+                      <div className="flex items-center justify-center">
+                        <p>{(pd.patient as Patient)?.fallRisk}</p>
+                      </div>
+                    </div>
+                  ) : null}
+                  {nurse?.cardLayout.news2 ? (
+                    <div>
+                      <p>NEWS2</p>
+                      <p>
+                        {filteredVital[index]?.news2Score?.length > 0
+                          ? filteredVital[index]?.news2Score[
+                              filteredVital[index]?.news2Score.length - 1
+                            ]?.reading || "-"
+                          : "-"}
+                      </p>
+                    </div>
+                  ) : null}
                 </div>
               </div>
-              <div className="w-1/2 flex items-start justify-around">
-                <DashboardAlertIcon
-                  patientId={(pd.patient as Patient)?._id}
-                  socketData={
-                    socketPatient?._id === (pd.patient as Patient)?._id
-                      ? socketAlertList
-                      : null
-                  }
-                />
-                {nurse?.cardLayout.fallRisk ? (
-                  <div>
-                    <p>Fall Risk</p>
-                    <div className="flex items-center justify-center">
-                      <p>{(pd.patient as Patient)?.fallRisk}</p>
-                    </div>
-                  </div>
-                ) : null}
-                {nurse?.cardLayout.news2 ? (
-                  <div>
-                    <p>NEWS2</p>
-                    <p>
-                      {filteredVital[index]?.news2Score?.length > 0
-                        ? filteredVital[index]?.news2Score[
-                            filteredVital[index]?.news2Score.length - 1
-                          ]?.reading || "-"
-                        : "-"}
-                    </p>
-                  </div>
-                ) : null}
-              </div>
+              <BedTiles cardLayout={nurse?.cardLayout} smartbed={pd} />
+              <VitalTiles
+                cardLayout={nurse?.cardLayout}
+                data={filteredVital[index]}
+                patient={pd.patient as Patient}
+              />
             </div>
-            <BedTiles cardLayout={nurse?.cardLayout} smartbed={pd} />
-            <VitalTiles
-              cardLayout={nurse?.cardLayout}
-              data={filteredVital[index]}
-              patient={pd.patient as Patient}
-            />
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <h3 className="text-left">No patient or bed found.</h3>
+      )}
     </div>
   );
 }

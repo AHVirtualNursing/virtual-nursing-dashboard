@@ -9,6 +9,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { redelegateAlert } from "./api/alerts_api";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 const inter = Inter({ subsets: ["latin"] });
 const socket = io("http://localhost:3001");
@@ -22,7 +23,7 @@ const SocketProvider = ({ children }: any) => {
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { data: sessionData } = useSession();
   const nurseId = sessionData?.user.id;
-
+  const router = useRouter();
   const AlertToast = ({ message }: any) => (
     <div>
       <p>{message}</p>
@@ -57,10 +58,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     socket.emit("clientConnections", nurseId);
 
     const handleAlertIncoming = (data: any) => {
-      console.log(data);
-      console.log(data.patient);
-      console.log(data.alert);
-      console.log(data.smartbed);
       if (data.alert.redelegate) {
         const message = `${data.patient.name}: ${data.alert.description}`;
         toast.error(
@@ -81,7 +78,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     };
 
     const admitPatientToast = (data: any) => {
-      console.log("admitting patient toast");
       const message = `${data.patient.name} has been admitted.`;
       toast.success(
         <Link
@@ -93,8 +89,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       );
     };
 
+    const handleChatMessageIncoming = (data: any) => {
+      console.log("receiving chat message toast");
+      const message = `Bedside Nurse has sent you a new message.`;
+      toast.info(<AlertToast message={message} />);
+    };
+
     const dischargePatientToast = (data: any) => {
-      console.log("toasting discharge patient");
       const message = `${data.name} has been discharged. The discharge report is being generated currently.`;
       toast.info(<AlertToast message={message} />);
     };
@@ -102,13 +103,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     socket.on("alertIncoming", handleAlertIncoming);
     socket.on("dischargePatient", dischargePatientToast);
     socket.on("admitPatient", admitPatientToast);
+    socket.on("updateVirtualNurseChatNewMessage", handleChatMessageIncoming);
     // Clean up the event listener when the component unmounts
     return () => {
       socket.off("alertIncoming", handleAlertIncoming);
       socket.off("dischargePatient", dischargePatientToast);
       socket.off("admitPatient", admitPatientToast);
+      socket.off("updateVirtualNurseChatNewMessage", handleChatMessageIncoming);
     };
   }, [nurseId]);
+
+  if (router.pathname === "/dischargeReport") {
+    return <>{children}</>;
+  }
 
   return (
     <SocketProvider>

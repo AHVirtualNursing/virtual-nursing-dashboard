@@ -17,6 +17,7 @@ import PatientAlerts from "../patientAlertTab/PatientAlerts";
 import { fetchPatientByPatientId } from "@/pages/api/patients_api";
 import { fetchVitalByVitalId } from "@/pages/api/vitals_api";
 import { callFetchAlertConfigByIdApi } from "@/pages/api/alert_config_api";
+import { getDateTime } from "../patientAnalyticsChart/utils";
 interface PatientDischargeReportProps {
   patientId: string;
   vitalId: string;
@@ -62,7 +63,7 @@ export default function PatientDischargeReport({
     "Heart Rate": "rgb(255, 178, 102)",
     "Blood Pressure Systolic": "rgb(76, 153, 0)",
     "Blood Pressure Diastolic": "rgb(76, 153, 0)",
-    "Temperature": "rgb(102, 178, 255)",
+    Temperature: "rgb(102, 178, 255)",
     "Blood Oxygen": "rgb(255, 102, 178)",
   };
 
@@ -71,9 +72,10 @@ export default function PatientDischargeReport({
       <Image
         src={"/VND_Banner.jpg"}
         alt="VND Banner"
-        layout="fixed"
-        width={1300}
-        height={200}
+        style={{ width: "100%", height: "auto" }}
+        width={0}
+        height={0}
+        sizes="100vw"
       />
       <TableContainer style={{ overflow: "hidden", marginBottom: 2 }}>
         <Table
@@ -106,9 +108,10 @@ export default function PatientDischargeReport({
               <br />
               <strong>Acuity Level:</strong> {patient?.acuityLevel}
               <br />
-              <strong>O2 Intake:</strong> {patient?.o2Intake}
+              <strong>O2 Intake:</strong> {patient?.o2Intake.toUpperCase()}
               <br />
-              <strong>Consciousness:</strong> {patient?.consciousness}
+              <strong>Consciousness:</strong>{" "}
+              {patient?.consciousness.toUpperCase()}
               <br />
               <strong>Fall Risk:</strong> {patient?.fallRisk}
             </TableCell>
@@ -166,7 +169,7 @@ export default function PatientDischargeReport({
                 <Table>
                   <TableRow>
                     <TableCell>
-                      <strong>Info</strong>
+                      <strong>Note Log</strong>
                     </TableCell>
                     <TableCell>
                       <strong>Date Added</strong>
@@ -178,7 +181,9 @@ export default function PatientDischargeReport({
                   {patient?.infoLogs?.map((infoLog, index) => (
                     <TableRow key={index}>
                       <TableCell>{infoLog.info}</TableCell>
-                      <TableCell>{infoLog.datetime}</TableCell>
+                      <TableCell>
+                        {getDateTime(new Date(infoLog.datetime))}
+                      </TableCell>
                       <TableCell>{infoLog.addedBy}</TableCell>
                     </TableRow>
                   ))}
@@ -254,7 +259,7 @@ export default function PatientDischargeReport({
               />
               <CartesianGrid stroke="#ccc" strokeDasharray="1" />
               <XAxis dataKey="datetime"></XAxis>
-              <YAxis />
+              <YAxis type="number" domain={["dataMin", "dataMax"]} />
               <Tooltip />
             </LineChart>
           </ResponsiveContainer>
