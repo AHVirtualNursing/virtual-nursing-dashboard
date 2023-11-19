@@ -359,7 +359,7 @@ export default function Wards() {
             htmlFor="ward-select"
             className="text-sm font-medium text-gray-900"
           >
-            Beds
+            Wards
           </label>
           <select
             name="wardSelect"
