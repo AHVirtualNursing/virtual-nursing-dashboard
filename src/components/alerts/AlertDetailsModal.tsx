@@ -56,7 +56,7 @@ const AlertDetailsModal = ({
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <div className="absolute p-4 max-h-[600px] -translate-x-1/2 -translate-y-1/2 border-2 border-solid shadow-lg bg-slate-100 space-y-3 rounded-xl top-1/2 left-1/2">
+        <div className="absolute p-4 max-h-[600px] -translate-x-1/2 -translate-y-1/2 border-2 border-solid shadow-lg bg-slate-100 space-y-3 rounded-xl top-1/2 left-1/2 w-[900px]">
           <div className="flex justify-between">
             <div className="flex items-center gap-x-4">
               <Typography id="modal-modal-title" variant="h6" component="h2">
