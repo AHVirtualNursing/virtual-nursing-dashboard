@@ -182,7 +182,9 @@ const PatientVisualisationPage = () => {
                       ? "text-red-400"
                       : (selectedBed?.patient as Patient)?.fallRisk === "Medium"
                       ? "text-orange-400"
-                      : "text-emerald-400"
+                      : (selectedBed?.patient as Patient)?.fallRisk === "Low"
+                      ? "text-emerald-400"
+                      : "text-black"
                   } uppercase font-extrabold`}
                 >
                   {(selectedBed?.patient as Patient)?.fallRisk}

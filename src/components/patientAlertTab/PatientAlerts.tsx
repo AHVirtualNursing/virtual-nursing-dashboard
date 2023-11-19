@@ -62,7 +62,7 @@ const PatientAlerts = (patientProp: PatientProp) => {
               )) &&
           (nurseSearch === ""
             ? true
-            : alert.notes[0]?.addedBy.toLowerCase().includes(nurseSearch));
+            : alert.handledBy?.addedBy.toLowerCase().includes(nurseSearch));
         return include;
       });
 

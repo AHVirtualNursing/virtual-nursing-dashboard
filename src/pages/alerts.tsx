@@ -108,7 +108,7 @@ const Alerts = () => {
               )) &&
           (nurseSearch === ""
             ? true
-            : alertMapping.alert.notes[0]?.addedBy
+            : alertMapping.alert.handledBy?.addedBy
                 .toLowerCase()
                 .includes(nurseSearch));
         return include;
