@@ -60,6 +60,7 @@ const PatientVisualisationPage = () => {
     fetchBedByBedId(bedId).then((res) => setSelectedBed(res));
     getVitalByPatientId(patientId).then((res) => {
       console.log("vital", res);
+      setPatientVital(res as Vital);
     });
   }, [bedId, socketData, patientId]);
 
@@ -74,6 +75,7 @@ const PatientVisualisationPage = () => {
   }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
     const file = event.target.files?.[0] as File | undefined;
 
     if (file) {
@@ -184,35 +186,40 @@ const PatientVisualisationPage = () => {
                 id="buttons-col"
                 className="flex flex-col-reverse py-5 gap-y-4 "
               >
-                {/* <Button
+                <Button
                   component="label"
                   variant="contained"
                   startIcon={<CloudUpload />}
-                > */}
-                <button className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 pr-4 rounded-full border-none">
-                  <div className="flex items-center justify-center gap-x-3">
-                    <CloudUpload fontSize="small" />
-                    <VisuallyHiddenInput
-                      type="file"
-                      onChange={handleFileChange}
-                    />
-                    {processingData ? "Processing Data..." : "Upload Data"}
-                  </div>
-                </button>
+                  style={{
+                    backgroundColor: "#1e3a8a",
+                    borderRadius: "9999px",
+                  }}
+                >
+                  <VisuallyHiddenInput
+                    type="file"
+                    onChange={handleFileChange}
+                  />
+                  {processingData ? "Processing Data..." : "Upload Data"}
+                </Button>
+
                 <button
                   className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 pr-1 rounded-full border-none"
                   onClick={updateSelectedPatient}
                 >
                   <div className="flex items-center justify-center gap-x-3">
                     <EditNoteIcon fontSize="small" />
-                    Update Details
+                    <span className="uppercase text-md font-thin">
+                      Update Details
+                    </span>
                   </div>
                 </button>
                 <button
-                  className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full border-none"
+                  className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-full border-none"
                   onClick={() => setShown(true)}
                 >
-                  View Additional Notes
+                  <span className="uppercase font-thin">
+                    View Additional Notes
+                  </span>
                 </button>
               </div>
             </div>

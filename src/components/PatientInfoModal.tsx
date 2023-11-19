@@ -35,15 +35,17 @@ const PatientInfoModal = ({
           </div>
           <div>
             <div className="flex flex-col">
-              {infoLogs.map((info, index) => (
-                <div key={index} className="flex justify-between p-4">
-                  <p>{info.info}</p>
-                  <div className="text-right">
-                    <p>{info.addedBy}</p>
-                    <p>{info.datetime}</p>
-                  </div>
-                </div>
-              ))}
+              {infoLogs.length > 0
+                ? infoLogs.map((info, index) => (
+                    <div key={index} className="flex justify-between p-4">
+                      <p>{info.info}</p>
+                      <div className="text-right">
+                        <p>{info.addedBy}</p>
+                        <p>{info.datetime}</p>
+                      </div>
+                    </div>
+                  ))
+                : "-"}
             </div>
           </div>
         </div>
