@@ -162,7 +162,6 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
         getChatsForVirtualNurse(res.data);
         getPatients(res.data);
       }
-
     });
 
     // Set an interval to call myFunction every 1000 milliseconds (1 second)
@@ -1206,30 +1205,36 @@ const ChatBoxModal = ({ open, handleClose }: ChatBoxModalProps) => {
                   setShareToSelectedChatAlertId(event.target.value);
                 }}
               >
-                {selectedPatientNonCompletedAlerts?.map((alert) => {
-                  return (
-                    <MenuItem key={alert._id} value={alert._id}>
-                      {`[${new Date(alert.createdAt)
-                        .toDateString()
-                        .slice(
-                          0,
-                          new Date(alert.createdAt).toDateString().length - 5
-                        )}, ${new Date(alert.createdAt)
-                        .toLocaleTimeString()
-                        .slice(
-                          0,
-                          new Date(alert.createdAt).toLocaleTimeString()
-                            .length - 6
-                        )}${new Date(alert.createdAt)
-                        .toLocaleTimeString()
-                        .slice(
-                          new Date(alert.createdAt).toLocaleTimeString()
-                            .length - 2
-                        )
-                        .toLowerCase()}] ` + alert.description}
-                    </MenuItem>
-                  );
-                })}
+                {selectedPatientNonCompletedAlerts
+                  ?.sort(
+                    (a1, a2) =>
+                      new Date(a2.createdAt).getTime() -
+                      new Date(a1.createdAt).getTime()
+                  )
+                  ?.map((alert) => {
+                    return (
+                      <MenuItem key={alert._id} value={alert._id}>
+                        {`[${new Date(alert.createdAt)
+                          .toDateString()
+                          .slice(
+                            0,
+                            new Date(alert.createdAt).toDateString().length - 5
+                          )}, ${new Date(alert.createdAt)
+                          .toLocaleTimeString()
+                          .slice(
+                            0,
+                            new Date(alert.createdAt).toLocaleTimeString()
+                              .length - 6
+                          )}${new Date(alert.createdAt)
+                          .toLocaleTimeString()
+                          .slice(
+                            new Date(alert.createdAt).toLocaleTimeString()
+                              .length - 2
+                          )
+                          .toLowerCase()}] ` + alert.description}
+                      </MenuItem>
+                    );
+                  })}
               </Select>
             </FormControl>
           </Box>
