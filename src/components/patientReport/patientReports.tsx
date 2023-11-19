@@ -25,6 +25,8 @@ import { callRetrieveFileWithPresignedUrl } from "@/pages/api/s3_api";
 import { ModalBoxStyle } from "@/styles/StyleTemplates";
 import { fetchPatientByPatientId } from "@/pages/api/patients_api";
 import { convertToSingaporeTime } from "../utils/datetime";
+import SelectFilter from "../SelectFilter";
+import { report } from "process";
 
 interface PatientReportsProps {
   viewType: "all" | "single";
@@ -40,6 +42,7 @@ export default function PatientReports({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
+  const [reportTypeCriteria, setReportTypeCriteria] = useState("");
 
   useEffect(() => {
     fetchPatientReports();
@@ -67,18 +70,22 @@ export default function PatientReports({
     }
   };
 
-  const handleFilterReports = (searchInput: string) => {
+  const handleFilterReports = (searchInput: string, reportType: string) => {
     setSearchTerm(searchInput);
+    setReportTypeCriteria(reportType);
+    console.log(searchInput);
     const filteredReports = reports.filter((report) => {
       if (viewType === "all") {
+        console.log("view all")
         return (
-          report.patientName
-            .toLowerCase()
-            .includes(searchInput.toLowerCase()) ||
+          report.patientName.toLowerCase().includes(searchInput.toLowerCase()) ||
           report.patientNric.toLowerCase().includes(searchInput.toLowerCase())
         );
       } else {
-        return report.name.toLowerCase().includes(searchInput.toLowerCase());
+        return (
+          report.name.toLowerCase().includes(searchInput.toLowerCase()) &&
+          report.type.toLowerCase().includes(reportType)
+        );
       }
     });
     setFilteredReports(filteredReports);
@@ -113,6 +120,7 @@ export default function PatientReports({
       <h3 className="text-left mb-5">
         {viewType == "all" ? "Discharge Reports" : "Patient Reports"}
       </h3>
+
       <TextField
         label={
           viewType == "all"
@@ -121,11 +129,13 @@ export default function PatientReports({
         }
         variant="outlined"
         fullWidth
-        onChange={(e) => handleFilterReports(e.target.value)}
+        onChange={(e) => {
+          handleFilterReports(e.target.value, reportTypeCriteria);
+        }}
         value={searchTerm}
         sx={{ mb: 2 }}
       />
-      {filteredReports.length > 0 ? (
+      {reports.length > 0 ? (
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -137,11 +147,26 @@ export default function PatientReports({
                   </>
                 )}
                 <TableCell>Report Name</TableCell>
-                <TableCell>Report Type</TableCell>
+                {viewType !== "all" && (
+                  <TableCell id="report-type-and-filter">
+                    Report Type&nbsp;&nbsp;&nbsp;
+                    <select
+                      value={reportTypeCriteria}
+                      onChange={(e) =>
+                        handleFilterReports(searchTerm, e.target.value)
+                      }
+                    >
+                      <option value={""}>All</option>
+                      <option value={"event"}>Event</option>
+                      <option value={"discharge"}>Discharge</option>
+                    </select>
+                  </TableCell>
+                )}
                 <TableCell>Created At</TableCell>
                 <TableCell></TableCell>
               </TableRow>
             </TableHead>
+
             {filteredReports
               .sort(
                 (a, b) =>
@@ -167,15 +192,16 @@ export default function PatientReports({
                       {convertToSingaporeTime(report.createdAt)}
                     </TableCell>
                     <TableCell>
+                      <Button
+                        onClick={() => handleDownloadReport(report.url)}
+                        startIcon={<DownloadIcon />}
+                      ></Button>
                       {report.type == "event" && (
                         <Button
                           onClick={() => handleShowDeleteModal()}
                           startIcon={<DeleteIcon />}
                         />
                       )}
-                      <Button
-                        onClick={() => handleDownloadReport(report.url)}
-                        startIcon={<DownloadIcon />}></Button>
                     </TableCell>
                   </TableRow>
 
@@ -189,14 +215,16 @@ export default function PatientReports({
                           onClick={() => handleDeleteReport(report._id)}
                           variant="contained"
                           color="error"
-                          sx={{ mt: 2 }}>
+                          sx={{ mt: 2 }}
+                        >
                           Delete
                         </Button>
                         <Button
                           onClick={handleShowDeleteModal}
                           variant="contained"
                           color="primary"
-                          sx={{ mt: 2, ml: 2 }}>
+                          sx={{ mt: 2, ml: 2 }}
+                        >
                           Cancel
                         </Button>
                       </Box>
