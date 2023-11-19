@@ -152,7 +152,7 @@ const PatientVisualisationPage = () => {
               />
               <h4>
                 {(selectedBed?.patient as Patient)?.name} (
-                {(selectedBed?.patient as Patient)?.nric})
+                {(selectedBed?.patient as Patient)?.nric.slice(5)})
               </h4>
               <p className="font-bold">
                 Ward: {(selectedBed?.ward as Ward)?.wardNum}, Room:{" "}
