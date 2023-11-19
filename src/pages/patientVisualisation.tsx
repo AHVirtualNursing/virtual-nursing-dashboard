@@ -29,7 +29,6 @@ import PatientInfoModal from "@/components/PatientInfoModal";
 
 const PatientVisualisationPage = () => {
   const router = useRouter();
-  console.log("router query", router.query);
   const { patientId, bedId, viewAlerts } = router.query;
   const [selectedBed, setSelectedBed] = useState<SmartBed>();
   const [socketData, setSocketData] = useState();
@@ -55,7 +54,6 @@ const PatientVisualisationPage = () => {
 
   useEffect(() => {
     const handleUpdatedPatient = (data: any) => {
-      console.log("updated patient", data);
       setSocketData(data);
     };
     socket.on("updatedPatient", handleUpdatedPatient);
@@ -68,6 +66,7 @@ const PatientVisualisationPage = () => {
     fetchBedByBedId(bedId).then((res) => setSelectedBed(res));
     getVitalByPatientId(patientId).then((res) => {
       console.log("vital", res);
+      setPatientVital(res as Vital);
     });
   }, [bedId, socketData, patientId]);
 
@@ -230,31 +229,36 @@ const PatientVisualisationPage = () => {
                   component="label"
                   variant="contained"
                   startIcon={<CloudUpload />}
+                  style={{
+                    backgroundColor: "#1e3a8a",
+                    borderRadius: "9999px",
+                  }}
                 >
-                  {/* <button className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 pr-4 rounded-full border-none">
-                  <div className="flex items-center justify-center gap-x-3">
-                    <CloudUpload fontSize="small" /> */}
                   <VisuallyHiddenInput
                     type="file"
                     onChange={handleFileChange}
                   />
                   {processingData ? "Processing Data..." : "Upload Data"}
-                  {/* </div> */}
                 </Button>
+
                 <button
                   className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 pr-1 rounded-full border-none"
                   onClick={updateSelectedPatient}
                 >
                   <div className="flex items-center justify-center gap-x-3">
                     <EditNoteIcon fontSize="small" />
-                    Update Details
+                    <span className="uppercase text-md font-thin">
+                      Update Details
+                    </span>
                   </div>
                 </button>
                 <button
-                  className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full border-none"
+                  className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-full border-none"
                   onClick={() => setShown(true)}
                 >
-                  View Additional Notes
+                  <span className="uppercase font-thin">
+                    View Additional Notes
+                  </span>
                 </button>
               </div>
             </div>
